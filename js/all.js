@@ -50,8 +50,7 @@
         init_masonry();
     });
     
-    $(window).resize(function(){
-        
+    $(window).resize(function(){        
         init_classic_menu_resize();
         init_side_panel_resize()
         js_height_init();
@@ -146,6 +145,8 @@
     var mobile_nav = $(".mobile-nav");
     var desktop_nav = $(".desktop-nav");
     
+    mobile_nav.attr("aria-expanded", "false");
+    
     function init_classic_menu_resize(){
         
         // Mobile menu max height
@@ -180,21 +181,21 @@
         });
         
         // Transpaner menu
-        
+                
         if ($(".main-nav").hasClass("transparent")){
            $(".main-nav").addClass("js-transparent"); 
         }
         
         $(window).scroll(function(){        
             
-                if ($(window).scrollTop() > 10) {
-                    $(".js-transparent").removeClass("transparent");
-                    $(".main-nav, .nav-logo-wrap .logo, .mobile-nav").addClass("small-height");
-                }
-                else {
-                    $(".js-transparent").addClass("transparent");
-                    $(".main-nav, .nav-logo-wrap .logo, .mobile-nav").removeClass("small-height");
-                }
+            if ($(window).scrollTop() > 10) {
+                $(".js-transparent").removeClass("transparent");
+                $(".main-nav, .nav-logo-wrap .logo, .mobile-nav").addClass("small-height");
+            }
+            else {
+                $(".js-transparent").addClass("transparent");
+                $(".main-nav, .nav-logo-wrap .logo, .mobile-nav").removeClass("small-height");
+            }
             
             
         });
@@ -202,22 +203,52 @@
         // Mobile menu toggle
         
         mobile_nav.click(function(){
-        
+                  
             if (desktop_nav.hasClass("js-opened")) {
                 desktop_nav.slideUp("slow", "easeOutExpo").removeClass("js-opened");
                 $(this).removeClass("active");
+                $(this).attr("aria-expanded", "false");
             }
             else {
                 desktop_nav.slideDown("slow", "easeOutQuart").addClass("js-opened");
                 $(this).addClass("active");
-                
+                $(this).attr("aria-expanded", "true");
                 // Fix for responsive menu
                 if ($(".main-nav").hasClass("not-top")){
                     $(window).scrollTo(".main-nav", "slow"); 
+                }                
+            }   
+                     
+        });
+        
+        $(document).on("click", function(event){            
+            if ($(window).width() <= 1024) {
+                var $trigger = $(".main-nav");
+                if ($trigger !== event.target && !$trigger.has(event.target).length) {
+                    desktop_nav.slideUp("slow", "easeOutExpo").removeClass("js-opened");
+                    mobile_nav.removeClass("active");
+                    mobile_nav.attr("aria-expanded", "false");
                 }
-                
             }
-            
+        });
+        
+        mobile_nav.keydown(function(e){
+            if (e.keyCode == 13 || e.keyCode == 32) {
+                if (desktop_nav.hasClass("js-opened")) {
+                    desktop_nav.slideUp("slow", "easeOutExpo").removeClass("js-opened");
+                    $(this).removeClass("active");
+                    $(this).attr("aria-expanded", "false");
+                }
+                else {
+                    desktop_nav.slideDown("slow", "easeOutQuart").addClass("js-opened");
+                    $(this).addClass("active");
+                    $(this).attr("aria-expanded", "true");
+                    // Fix for responsive menu
+                    if ($(".main-nav").hasClass("not-top")) {
+                        $(window).scrollTo(".main-nav", "slow");
+                    }
+                }
+            }        
         });
         
         desktop_nav.find("a:not(.mn-has-sub)").click(function(){
@@ -233,6 +264,11 @@
         var mnHasSub = $(".mn-has-sub");
         var mnThisLi;
         
+        mnHasSub.attr({
+            "role": "button",
+            "aria-expanded": "false"
+        });
+        
         $(".mobile-on .mn-has-sub").find(".fa:first").removeClass("fa-angle-right").addClass("fa-angle-down");
         
         mnHasSub.click(function(){
@@ -240,21 +276,20 @@
             if ($(".main-nav").hasClass("mobile-on")) {
                 mnThisLi = $(this).parent("li:first");
                 if (mnThisLi.hasClass("js-opened")) {
+                    $(this).attr("aria-expanded", "false");
                     mnThisLi.find(".mn-sub:first").slideUp(function(){
                         mnThisLi.removeClass("js-opened");
                         mnThisLi.find(".mn-has-sub").find(".fa:first").removeClass("fa-angle-up").addClass("fa-angle-down");
                     });
                 }
                 else {
+                    $(this).attr("aria-expanded", "true");
                     $(this).find(".fa:first").removeClass("fa-angle-down").addClass("fa-angle-up");
                     mnThisLi.addClass("js-opened");
                     mnThisLi.find(".mn-sub:first").slideDown();
                 }
                 
                 return false;
-            }
-            else {
-                
             }
             
         });
@@ -263,17 +298,117 @@
         mnThisLi.hover(function(){
         
             if (!($(".main-nav").hasClass("mobile-on"))) {
-            
+                $(this).find(".mn-has-sub:first")
+                    .attr("aria-expanded", "true")
+                    .addClass("js-opened");
                 $(this).find(".mn-sub:first").stop(true, true).fadeIn("fast");
             }
             
         }, function(){
         
             if (!($(".main-nav").hasClass("mobile-on"))) {
-            
+                $(this).find(".mn-has-sub:first")
+                    .attr("aria-expanded", "false")
+                    .removeClass("js-opened");
                 $(this).find(".mn-sub:first").stop(true, true).delay(100).fadeOut("fast");
             }
             
+        });
+        
+        /* Keyboard navigation for main menu */
+       
+        mnHasSub.keydown(function(e){            
+        
+            if ($(".main-nav").hasClass("mobile-on")) {                
+                if (e.keyCode == 13 || e.keyCode == 32) {                
+                    mnThisLi = $(this).parent("li:first");
+                    if (mnThisLi.hasClass("js-opened")) {
+                        $(this).attr("aria-expanded", "false");
+                        mnThisLi.find(".mn-sub:first").slideUp(function(){                            
+                            mnThisLi.removeClass("js-opened");
+                            mnThisLi.find(".mn-has-sub").find(".fa:first").removeClass("fa-angle-up").addClass("fa-angle-down");
+                        });
+                    }
+                    else {
+                        $(this).attr("aria-expanded", "true");
+                        $(this).find(".fa:first").removeClass("fa-angle-down").addClass("fa-angle-up");
+                        mnThisLi.addClass("js-opened");
+                        mnThisLi.find(".mn-sub:first").slideDown();
+                    }
+                    
+                    return false;
+                }
+            }
+            
+        });
+        
+        $(".inner-nav a").focus(function(){
+            if (!($(".main-nav").hasClass("mobile-on"))) {
+                $(this).parent("li").parent().children().find(".mn-has-sub:first")
+                    .attr("aria-expanded", "false")
+                    .removeClass("js-opened");
+                $(this).parent("li").parent().children().find(".mn-sub:first").stop(true, true).delay(100).fadeOut("fast");
+            }
+        });
+     
+        $(".inner-nav a").first().keydown(function(e){
+            if (!($(".main-nav").hasClass("mobile-on"))) {
+                if (e.shiftKey && e.keyCode == 9) {
+                    $(this).parent("li").find(".mn-has-sub:first")
+                        .attr("aria-expanded", "false")
+                        .removeClass("js-opened");
+                    $(this).parent("li").find(".mn-sub:first").stop(true, true).delay(100).fadeOut("fast");
+                }
+            }
+        });
+        
+        $(".mn-sub li:last a").keydown(function(e){
+            if (!($(".main-nav").hasClass("mobile-on"))) {
+                if (!e.shiftKey && e.keyCode == 9) {
+                    $(this).parent("li").parent().parent().find(".mn-has-sub:first")
+                        .attr("aria-expanded", "false")
+                        .removeClass("js-opened");
+                    $(this).parent("li").parent().stop(true, true).delay(100).fadeOut("fast");
+                }
+            }
+        }); 
+
+        $(document).keydown(function(e){
+            if (!($(".main-nav").hasClass("mobile-on"))) {
+                if (e.keyCode == 27) {
+                    if (mnHasSub.parent("li").find(".mn-sub:first li .mn-sub").is(":visible")){
+                        mnHasSub.parent("li").find(".mn-sub:first li .mn-has-sub")
+                            .attr("aria-expanded", "false")
+                            .removeClass("js-opened");
+                        mnHasSub.parent("li").find(".mn-sub:first li .mn-sub").stop(true, true).delay(100).fadeOut("fast");
+                    } else{
+                        mnHasSub.parent("li").find(".mn-has-sub:first")
+                            .attr("aria-expanded", "false")
+                            .removeClass("js-opened");
+                        mnHasSub.parent("li").find(".mn-sub:first").stop(true, true).delay(100).fadeOut("fast");
+                    }
+                    
+                }
+            }
+        });
+         
+        mnHasSub.keydown(function(e){
+            if (!($(".main-nav").hasClass("mobile-on"))) {
+                if (e.keyCode == 13 || e.keyCode == 32) {
+                    if (!($(this).hasClass("js-opened"))){
+                        $(this).addClass("js-opened");
+                        $(this).attr("aria-expanded", "true");
+                        $(this).parent("li").find(".mn-sub:first").stop(true, true).fadeIn("fast");
+                        return false;
+                    }
+                    else{
+                        $(this).removeClass("js-opened");
+                        $(this).attr("aria-expanded", "false");
+                        $(this).parent("li").find(".mn-sub:first").stop(true, true).fadeOut("fast");
+                        return false;
+                    }
+                }
+            }            
         });
         
     }
@@ -290,7 +425,17 @@
             target: "body",
             duration: 1500,
             offset: 0,
-            easing: "easeInOutExpo"
+            easing: "easeInOutExpo",
+            onAfter: function(anchor, settings){
+                anchor.focus();
+                if (anchor.is(":focus")) {
+                    return !1;
+                }
+                else {
+                    anchor.attr('tabindex', '-1');
+                    anchor.focus()
+                }        
+            }
         });
         
         var sections = $(".home-section, .split-section, .page-section");
@@ -356,7 +501,7 @@
     function init_parallax(){
     
         // Parallax        
-        if (($(window).width() >= 1024) && (mobileTest == false)) {
+        if (($(window).width() >= 1024) && (mobileTest == false) && $("html").hasClass("no-touch")) {
             $(".parallax-1").parallax("50%", 0.1);
             $(".parallax-2").parallax("50%", 0.2);
             $(".parallax-3").parallax("50%", 0.3);
@@ -493,6 +638,13 @@
             }
         });
         
+        // Keayboar navigation for team section        
+        $(".team-social-links > a").on("focus blur", function(){
+             if (!($("html").hasClass("mobile"))) {
+                 $(this).parent().parent().parent().parent().toggleClass("js-active");
+             }       
+        });
+        
     }
     
     
@@ -506,13 +658,41 @@ function initPageSliders(){
     (function($){
         "use strict";
         
+        function owl_keynav(el){            
+            el.find(".owl-prev, .owl-next").attr({
+                "aria-hidden": "true",
+                "tabindex": "0"
+            });            
+            el.prepend(el.find(".owl-controls"));     
+            el.on("click", ".owl-page, .owl-prev, .owl-next", function(e){
+                var this_owl = el.data("owlCarousel");
+                this_owl.stop();
+            });            
+            el.on("keydown", ".owl-prev", function(e){
+                if (e.keyCode == 13 || e.keyCode == 32) {
+                    var this_owl = el.data("owlCarousel");
+                    this_owl.prev();
+                    return false;                    
+                }
+            });
+            el.on("keydown", ".owl-next", function(e){
+                if (e.keyCode == 13 || e.keyCode == 32) {
+                    var this_owl = el.data("owlCarousel");
+                    this_owl.next();
+                    return false;                   
+                }
+            });
+        }
+        
         // Fullwidth slider
         $(".fullwidth-slider").owlCarousel({
             slideSpeed: 350,
             singleItem: true,
             autoHeight: true,
             navigation: true,
-            navigationText: ["<i class='fa fa-angle-left'></i>", "<i class='fa fa-angle-right'></i>"]
+            lazyLoad: true,
+            navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
+            afterInit: owl_keynav
         });
         
         // Fullwidth slider
@@ -522,7 +702,9 @@ function initPageSliders(){
             singleItem: true,
             autoHeight: true,
             navigation: true,
-            navigationText: ["<i class='fa fa-angle-left'></i>", "<i class='fa fa-angle-right'></i>"]
+            lazyLoad: true,
+            navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
+            afterInit: owl_keynav
         });
         
         // Fullwidth gallery
@@ -533,19 +715,23 @@ function initPageSliders(){
             singleItem: true,
             autoHeight: true,
             navigation: false,
-            pagination: false
+            pagination: false,
+            lazyLoad: true,
+            afterInit: owl_keynav
         });
         
         // Item carousel
         $(".item-carousel").owlCarousel({
             autoPlay: 2500,
-            //stopOnHover: true,
+            stopOnHover: true,
             items: 3,
             itemsDesktop: [1199, 3],
             itemsTabletSmall: [768, 3],
             itemsMobile: [480, 1],
-            navigation: false,
-            navigationText: ["<i class='fa fa-angle-left'></i>", "<i class='fa fa-angle-right'></i>"]
+            navigation: true,
+            lazyLoad: true,
+            navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
+            afterInit: owl_keynav
         });
         
         // Item carousel
@@ -557,8 +743,10 @@ function initPageSliders(){
             itemsTabletSmall: [768, 3],
             itemsMobile: [480, 2],
             pagination: false,
-            navigation: false,
-            navigationText: ["<i class='fa fa-angle-left'></i>", "<i class='fa fa-angle-right'></i>"]
+            navigation: true,
+            lazyLoad: true,
+            navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
+            afterInit: owl_keynav
         });
         
         // Single carousel
@@ -566,7 +754,9 @@ function initPageSliders(){
             singleItem: true,
             autoHeight: true,
             navigation: true,
-            navigationText: ["<i class='fa fa-angle-left'></i>", "<i class='fa fa-angle-right'></i>"]
+            lazyLoad: true,
+            navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
+            afterInit: owl_keynav
         });
         
         // Content Slider
@@ -575,7 +765,9 @@ function initPageSliders(){
             singleItem: true,
             autoHeight: true,
             navigation: true,
-            navigationText: ["<i class='fa fa-angle-left'></i>", "<i class='fa fa-angle-right'></i>"]
+            lazyLoad: true,
+            navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
+            afterInit: owl_keynav
         });
 
         // Photo slider
@@ -587,7 +779,9 @@ function initPageSliders(){
             itemsMobile: [480, 1],
             autoHeight: true,
             navigation: true,
-            navigationText: ["<i class='fa fa-angle-left'></i>", "<i class='fa fa-angle-right'></i>"]
+            lazyLoad: true,
+            navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
+            afterInit: owl_keynav
         }); 
         
         // Work slider
@@ -596,7 +790,9 @@ function initPageSliders(){
             singleItem: true,
             autoHeight: true,
             navigation: true,
-            navigationText: ["<i class='fa fa-angle-left'></i>", "<i class='fa fa-angle-right'></i>"]
+            lazyLoad: true,
+            navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
+            afterInit: owl_keynav
         });
         
         // Blog posts carousel
@@ -609,7 +805,9 @@ function initPageSliders(){
             itemsMobile: [480, 1],
             pagination: false,
             navigation: true,
-            navigationText: ["<i class='fa fa-angle-left'></i>", "<i class='fa fa-angle-right'></i>"]
+            lazyLoad: true,
+            navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
+            afterInit: owl_keynav
         });
         
         // Blog posts carousel alt
@@ -621,7 +819,9 @@ function initPageSliders(){
             autoHeight: true,
             pagination: false,
             navigation: true,
-            navigationText: ["<i class='fa fa-angle-left'></i>", "<i class='fa fa-angle-right'></i>"]
+            lazyLoad: true,
+            navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
+            afterInit: owl_keynav
         });
         
         // Image carousel
@@ -633,7 +833,9 @@ function initPageSliders(){
             itemsTabletSmall: [768, 2],
             itemsMobile: [480, 1],
             navigation: true,
-            navigationText: ["<i class='fa fa-angle-left'></i>", "<i class='fa fa-angle-right'></i>"]
+            lazyLoad: true,
+            navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
+            afterInit: owl_keynav
         });
         
         // Fullwidth slideshow
@@ -650,7 +852,7 @@ function initPageSliders(){
             autoHeight: true,
             pagination: false,
             navigation: true,
-            navigationText: ["<i class='fa fa-angle-left'></i>", "<i class='fa fa-angle-right'></i>"],
+            navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
             afterAction : syncPosition,
             responsiveRefreshRate : 200
         });
@@ -668,6 +870,18 @@ function initPageSliders(){
             responsiveRefreshRate : 100,
             afterInit : function(el){
               el.find(".owl-item").eq(0).addClass("synced");
+              el.find(".owl-item").attr({
+                  "role": "button",
+                  "tabindex": "0"
+              });
+              $(".fullwidth-slideshow").each(function(){
+                  var owl = $(this).data('owlCarousel');
+                  $(".fullwidth-slideshow-pager").find(".owl-item").keydown(function(e){
+                      if (event.key === "Enter") {
+                          owl.goTo($(this).index());
+                      }
+                  });
+              });
             }
         });
         
@@ -743,6 +957,17 @@ function initPageSliders(){
     
     var fm_menu_wrap = $("#fullscreen-menu");
     var fm_menu_button = $(".fm-button");
+    fm_menu_button.attr({
+        "role": "button",
+        "aria-expanded": "false"
+    });
+    
+    fm_menu_button.keydown(function(e){
+        if (e.keyCode == 32) {
+            $(this).trigger("click");
+            return false;
+        }
+    });
     
     function init_fullscreen_menu(){
         
@@ -753,7 +978,8 @@ function initPageSliders(){
             }
             else{
                 if ($(this).hasClass("active")) {
-                    $(this).removeClass("active").css("z-index", "2001").addClass("animation-process");;
+                    
+                    $(this).removeClass("active").attr("aria-expanded", "false").css("z-index", "2001").addClass("animation-process");;
                     
                     fm_menu_wrap.find(".fm-wrapper-sub").fadeOut("fast", function(){
                         fm_menu_wrap.fadeOut(function(){
@@ -772,7 +998,7 @@ function initPageSliders(){
                     if ($(".owl-carousel").lenth) {
                         $(".owl-carousel").data("owlCarousel").stop();
                     }
-                    $(this).addClass("active").css("z-index", "2001").addClass("animation-process");
+                    $(this).addClass("active").attr("aria-expanded", "true").css("z-index", "2001").addClass("animation-process");
                     
                     fm_menu_wrap.fadeIn(function(){
                         fm_menu_wrap.find(".fm-wrapper-sub").addClass("js-active");
@@ -781,6 +1007,35 @@ function initPageSliders(){
                 }
                 
                 return false;
+            }
+            
+        });
+        
+        $(document).keydown(function(e){
+            
+            if (fm_menu_button.hasClass("animation-process")){
+                return false;
+            } 
+            else {
+                if (e.keyCode == 27 && fm_menu_button.hasClass("active")) {
+                    
+                    fm_menu_button.removeClass("active").attr("aria-expanded", "false").css("z-index", "2001").addClass("animation-process");;
+                    
+                    fm_menu_wrap.find(".fm-wrapper-sub").fadeOut("fast", function(){
+                        fm_menu_wrap.fadeOut(function(){
+                            fm_menu_wrap.find(".fm-wrapper-sub").removeClass("js-active").show();
+                            fm_menu_button.css("z-index", "1030").removeClass("animation-process");
+                            
+                        });
+                    });
+                    
+                    if ($(".owl-carousel").lenth) {
+                        $(".owl-carousel").data("owlCarousel").play();
+                    }
+                    
+                    return false;
+                    
+                }
             }
             
         });
@@ -812,16 +1067,30 @@ function initPageSliders(){
         var fmHasSub = $(".fm-has-sub");
         var fmThisLi;
         
+        fmHasSub.attr({
+            "role": "button",
+            "aria-expanded": "false"
+        });
+        
+        fmHasSub.keydown(function(e){
+            if (e.keyCode == 32) {
+                $(this).trigger("click");
+                return false;
+            }
+        });
+        
         fmHasSub.click(function(){
         
             fmThisLi = $(this).parent("li:first");
             if (fmThisLi.hasClass("js-opened")) {
+                $(this).attr("aria-expanded", "false");
                 fmThisLi.find(".fm-sub:first").slideUp(function(){
                     fmThisLi.removeClass("js-opened");
                     fmThisLi.find(".fm-has-sub").find(".fa:first").removeClass("fa-angle-up").addClass("fa-angle-down");
                 });
             }
             else {
+                $(this).attr("aria-expanded", "true");
                 $(this).find(".fa:first").removeClass("fa-angle-down").addClass("fa-angle-up");
                 fmThisLi.addClass("js-opened");
                 fmThisLi.find(".fm-sub:first").slideDown();
@@ -900,16 +1169,30 @@ function initPageSliders(){
             var spHasSub = $(".sp-has-sub");
             var spThisLi;
             
+            spHasSub.attr({
+                "role": "button",
+                "aria-expanded": "false"
+            });
+            
+            spHasSub.keydown(function(e){
+                if (e.keyCode == 32) {
+                    $(this).trigger("click");
+                    return false;
+                }
+            });
+            
             spHasSub.click(function(){
             
                 spThisLi = $(this).parent("li:first");
                 if (spThisLi.hasClass("js-opened")) {
+                    $(this).attr("aria-expanded", "false");
                     spThisLi.find(".sp-sub:first").slideUp(function(){
                         spThisLi.removeClass("js-opened");
                         spThisLi.find(".sp-has-sub").find(".fa:first").removeClass("fa-angle-up").addClass("fa-angle-down");
                     });
                 }
                 else {
+                    $(this).attr("aria-expanded", "true");
                     $(this).find(".fa:first").removeClass("fa-angle-down").addClass("fa-angle-up");
                     spThisLi.addClass("js-opened");
                     spThisLi.find(".sp-sub:first").slideDown();
@@ -935,13 +1218,15 @@ function initPageSliders(){
                sp_button.css("display", "none");
                sp_close_button.css("display", "none");
              } else {
-                 side_panel.css({
-                     opacity: 0,
-                     left: -270
-                 });
-                 $(".side-panel-is-left").css("margin-left", "0");
-                 sp_button.css("display", "block");
-                 sp_close_button.css("display", "block");
+                 if (sp_close_button.is(":hidden")) {
+                     side_panel.css({
+                         opacity: 0,
+                         left: -270
+                     });
+                     $(".side-panel-is-left").css("margin-left", "0");
+                     sp_button.css("display", "block");
+                     sp_close_button.css("display", "block");
+                 }
              }
             
         })(jQuery);
@@ -1000,8 +1285,24 @@ function initWorkFilter(){
              filter: fselector
          });
      });
-        
-        
+     
+     // Lazy loading plus isotope filter
+     $(".img-lazy-work").load(function(){
+         masonry_update();
+     });     
+     function masonry_update(){
+         work_grid.imagesLoaded(function(){
+             work_grid.isotope({
+                 itemSelector: '.mix',
+                 layoutMode: isotope_mode,
+                 filter: fselector
+             });
+         });
+     }
+     work_grid.on("arrangeComplete", function(){
+         $(window).trigger("scroll");
+     });
+    
     })(jQuery);
 }
 
@@ -1022,8 +1323,8 @@ function js_height_init(){
 }
 
 
-    
-    
+
+
 /* ---------------------------------------------
  Google map
  --------------------------------------------- */
@@ -1037,45 +1338,13 @@ function init_map(){
             $(this).toggleClass("js-active");
             $(this).find(".mt-open").toggle();
             $(this).find(".mt-close").toggle();
+            return false;
         });
-        
-        
-        if (gmMapDiv.length) {
-        
-            var gmCenterAddress = gmMapDiv.attr("data-address");
-            var gmMarkerAddress = gmMapDiv.attr("data-address");
-            
-            
-            gmMapDiv.gmap3({
-                action: "init",
-                marker: {
-                    address: gmMarkerAddress,
-                    options: {
-                        icon: "images/map-marker.png"
-                    }
-                },
-                map: {
-                    options: {
-                        zoom: 14,
-                        zoomControl: true,
-                        zoomControlOptions: {
-                            style: google.maps.ZoomControlStyle.SMALL
-                        },
-                        zoomControlOptions: {
-                            position: google.maps.ControlPosition.LEFT_TOP
-                        },
-                        mapTypeControl: false,
-                        scaleControl: false,
-                        scrollwheel: false,
-                        streetViewControl: false,
-                        draggable: true,
-                        styles: [{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#d3d3d3"}]},{"featureType":"transit","stylers":[{"color":"#808080"},{"visibility":"off"}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"visibility":"on"},{"color":"#b3b3b3"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"road.local","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#ffffff"},{"weight":1.8}]},{"featureType":"road.local","elementType":"geometry.stroke","stylers":[{"color":"#d7d7d7"}]},{"featureType":"poi","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#ebebeb"}]},{"featureType":"administrative","elementType":"geometry","stylers":[{"color":"#a7a7a7"}]},{"featureType":"road.arterial","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"road.arterial","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"landscape","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#efefef"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#696969"}]},{"featureType":"administrative","elementType":"labels.text.fill","stylers":[{"visibility":"on"},{"color":"#737373"}]},{"featureType":"poi","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"poi","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"road.arterial","elementType":"geometry.stroke","stylers":[{"color":"#d6d6d6"}]},{"featureType":"road","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{},{"featureType":"poi","elementType":"geometry.fill","stylers":[{"color":"#dadada"}]}]
-                    }
-                }
-            });
-        }
+
     })(jQuery);
 }
+
+
 
 
 /* ---------------------------------------------
@@ -1134,3 +1403,301 @@ function split_height_init(){
             
     })(jQuery);
 }
+
+
+/* ---------------------------------------------
+ Polyfill for :focus-visible     
+ --------------------------------------------- */
+
+/**
+ * https://github.com/WICG/focus-visible
+ */
+function init() {
+  var hadKeyboardEvent = true;
+  var hadFocusVisibleRecently = false;
+  var hadFocusVisibleRecentlyTimeout = null;
+
+  var inputTypesWhitelist = {
+    text: true,
+    search: true,
+    url: true,
+    tel: true,
+    email: true,
+    password: true,
+    number: true,
+    date: true,
+    month: true,
+    week: true,
+    time: true,
+    datetime: true,
+    'datetime-local': true
+  };
+
+  /**
+   * Helper function for legacy browsers and iframes which sometimes focus
+   * elements like document, body, and non-interactive SVG.
+   * @param {Element} el
+   */
+  function isValidFocusTarget(el) {
+    if (
+      el &&
+      el !== document &&
+      el.nodeName !== 'HTML' &&
+      el.nodeName !== 'BODY' &&
+      'classList' in el &&
+      'contains' in el.classList
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Computes whether the given element should automatically trigger the
+   * `focus-visible` class being added, i.e. whether it should always match
+   * `:focus-visible` when focused.
+   * @param {Element} el
+   * @return {boolean}
+   */
+  function focusTriggersKeyboardModality(el) {
+    var type = el.type;
+    var tagName = el.tagName;
+
+    if (tagName == 'INPUT' && inputTypesWhitelist[type] && !el.readOnly) {
+      return true;
+    }
+
+    if (tagName == 'TEXTAREA' && !el.readOnly) {
+      return true;
+    }
+
+    if (el.isContentEditable) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Add the `focus-visible` class to the given element if it was not added by
+   * the author.
+   * @param {Element} el
+   */
+  function addFocusVisibleClass(el) {
+    if (el.classList.contains('focus-visible')) {
+      return;
+    }
+    el.classList.add('focus-visible');
+    el.setAttribute('data-focus-visible-added', '');
+  }
+
+  /**
+   * Remove the `focus-visible` class from the given element if it was not
+   * originally added by the author.
+   * @param {Element} el
+   */
+  function removeFocusVisibleClass(el) {
+    if (!el.hasAttribute('data-focus-visible-added')) {
+      return;
+    }
+    el.classList.remove('focus-visible');
+    el.removeAttribute('data-focus-visible-added');
+  }
+
+  /**
+   * Treat `keydown` as a signal that the user is in keyboard modality.
+   * Apply `focus-visible` to any current active element and keep track
+   * of our keyboard modality state with `hadKeyboardEvent`.
+   * @param {Event} e
+   */
+  function onKeyDown(e) {
+    if (isValidFocusTarget(document.activeElement)) {
+      addFocusVisibleClass(document.activeElement);
+    }
+
+    hadKeyboardEvent = true;
+  }
+
+  /**
+   * If at any point a user clicks with a pointing device, ensure that we change
+   * the modality away from keyboard.
+   * This avoids the situation where a user presses a key on an already focused
+   * element, and then clicks on a different element, focusing it with a
+   * pointing device, while we still think we're in keyboard modality.
+   * @param {Event} e
+   */
+  function onPointerDown(e) {
+    hadKeyboardEvent = false;
+  }
+
+  /**
+   * On `focus`, add the `focus-visible` class to the target if:
+   * - the target received focus as a result of keyboard navigation, or
+   * - the event target is an element that will likely require interaction
+   *   via the keyboard (e.g. a text box)
+   * @param {Event} e
+   */
+  function onFocus(e) {
+    // Prevent IE from focusing the document or HTML element.
+    if (!isValidFocusTarget(e.target)) {
+      return;
+    }
+
+    if (hadKeyboardEvent || focusTriggersKeyboardModality(e.target)) {
+      addFocusVisibleClass(e.target);
+    }
+  }
+
+  /**
+   * On `blur`, remove the `focus-visible` class from the target.
+   * @param {Event} e
+   */
+  function onBlur(e) {
+    if (!isValidFocusTarget(e.target)) {
+      return;
+    }
+
+    if (
+      e.target.classList.contains('focus-visible') ||
+      e.target.hasAttribute('data-focus-visible-added')
+    ) {
+      // To detect a tab/window switch, we look for a blur event followed
+      // rapidly by a visibility change.
+      // If we don't see a visibility change within 100ms, it's probably a
+      // regular focus change.
+      hadFocusVisibleRecently = true;
+      window.clearTimeout(hadFocusVisibleRecentlyTimeout);
+      hadFocusVisibleRecentlyTimeout = window.setTimeout(function() {
+        hadFocusVisibleRecently = false;
+        window.clearTimeout(hadFocusVisibleRecentlyTimeout);
+      }, 100);
+      removeFocusVisibleClass(e.target);
+    }
+  }
+
+  /**
+   * If the user changes tabs, keep track of whether or not the previously
+   * focused element had .focus-visible.
+   * @param {Event} e
+   */
+  function onVisibilityChange(e) {
+    if (document.visibilityState == 'hidden') {
+      // If the tab becomes active again, the browser will handle calling focus
+      // on the element (Safari actually calls it twice).
+      // If this tab change caused a blur on an element with focus-visible,
+      // re-apply the class when the user switches back to the tab.
+      if (hadFocusVisibleRecently) {
+        hadKeyboardEvent = true;
+      }
+      addInitialPointerMoveListeners();
+    }
+  }
+
+  /**
+   * Add a group of listeners to detect usage of any pointing devices.
+   * These listeners will be added when the polyfill first loads, and anytime
+   * the window is blurred, so that they are active when the window regains
+   * focus.
+   */
+  function addInitialPointerMoveListeners() {
+    document.addEventListener('mousemove', onInitialPointerMove);
+    document.addEventListener('mousedown', onInitialPointerMove);
+    document.addEventListener('mouseup', onInitialPointerMove);
+    document.addEventListener('pointermove', onInitialPointerMove);
+    document.addEventListener('pointerdown', onInitialPointerMove);
+    document.addEventListener('pointerup', onInitialPointerMove);
+    document.addEventListener('touchmove', onInitialPointerMove);
+    document.addEventListener('touchstart', onInitialPointerMove);
+    document.addEventListener('touchend', onInitialPointerMove);
+  }
+
+  function removeInitialPointerMoveListeners() {
+    document.removeEventListener('mousemove', onInitialPointerMove);
+    document.removeEventListener('mousedown', onInitialPointerMove);
+    document.removeEventListener('mouseup', onInitialPointerMove);
+    document.removeEventListener('pointermove', onInitialPointerMove);
+    document.removeEventListener('pointerdown', onInitialPointerMove);
+    document.removeEventListener('pointerup', onInitialPointerMove);
+    document.removeEventListener('touchmove', onInitialPointerMove);
+    document.removeEventListener('touchstart', onInitialPointerMove);
+    document.removeEventListener('touchend', onInitialPointerMove);
+  }
+
+  /**
+   * When the polfyill first loads, assume the user is in keyboard modality.
+   * If any event is received from a pointing device (e.g. mouse, pointer,
+   * touch), turn off keyboard modality.
+   * This accounts for situations where focus enters the page from the URL bar.
+   * @param {Event} e
+   */
+  function onInitialPointerMove(e) {
+    // Work around a Safari quirk that fires a mousemove on <html> whenever the
+    // window blurs, even if you're tabbing out of the page. ¯\_(ツ)_/¯
+    if (e.target.nodeName.toLowerCase() === 'html') {
+      return;
+    }
+
+    hadKeyboardEvent = false;
+    removeInitialPointerMoveListeners();
+  }
+
+  document.addEventListener('keydown', onKeyDown, true);
+  document.addEventListener('mousedown', onPointerDown, true);
+  document.addEventListener('pointerdown', onPointerDown, true);
+  document.addEventListener('touchstart', onPointerDown, true);
+  document.addEventListener('focus', onFocus, true);
+  document.addEventListener('blur', onBlur, true);
+  document.addEventListener('visibilitychange', onVisibilityChange, true);
+  addInitialPointerMoveListeners();
+
+  document.body.classList.add('js-focus-visible');
+}
+
+/**
+ * Subscription when the DOM is ready
+ * @param {Function} callback
+ */
+function onDOMReady(callback) {
+  var loaded;
+
+  /**
+   * Callback wrapper for check loaded state
+   */
+  function load() {
+    if (!loaded) {
+      loaded = true;
+
+      callback();
+    }
+  }
+
+  if (['interactive', 'complete'].indexOf(document.readyState) >= 0) {
+    callback();
+  } else {
+    loaded = false;
+    document.addEventListener('DOMContentLoaded', load, false);
+    window.addEventListener('load', load, false);
+  }
+}
+
+if (typeof document !== 'undefined') {
+  onDOMReady(init);
+}
+
+
+/* ---------------------------------------------
+ Adding aria-hidden to Font Awesome and Et-line 
+ icons
+ --------------------------------------------- */
+
+(function(){
+    let getIcons = document.querySelectorAll('i.fa, span[class^="icon"]');
+    getIcons.forEach(function(iconEach)
+    {
+        let getIconAttr = iconEach.getAttribute('aria-hidden');
+        if (!getIconAttr)
+        {
+            iconEach.setAttribute('aria-hidden','true');
+        }
+    });
+})();
