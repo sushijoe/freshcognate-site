@@ -50,8 +50,7 @@
         init_masonry();
     });
     
-    $(window).resize(function(){
-        
+    $(window).resize(function(){        
         init_classic_menu_resize();
         init_side_panel_resize()
         js_height_init();
@@ -182,7 +181,7 @@
         });
         
         // Transpaner menu
-        
+                
         if ($(".main-nav").hasClass("transparent")){
            $(".main-nav").addClass("js-transparent"); 
         }
@@ -222,7 +221,7 @@
                      
         });
         
-        $(document).on("click", function(event){
+        $(document).on("click", function(event){            
             if ($(window).width() <= 1024) {
                 var $trigger = $(".main-nav");
                 if ($trigger !== event.target && !$trigger.has(event.target).length) {
@@ -659,16 +658,9 @@ function initPageSliders(){
     (function($){
         "use strict";
         
-        function owl_keynav(el){
-            el.attr({
-                "aria-roledescription": "carousel"
-            });
-            el.find(".owl-item").attr({
-                "role": "group",
-                "aria-roledescription": "slide"
-            });
+        function owl_keynav(el){            
             el.find(".owl-prev, .owl-next").attr({
-                "role": "button",
+                "aria-hidden": "true",
                 "tabindex": "0"
             });            
             el.prepend(el.find(".owl-controls"));     
@@ -1123,7 +1115,7 @@ function initPageSliders(){
     function sp_panel_close(){
         side_panel.animate({
             opacity: 0,
-            right: -270
+            left: -270
         }, 500, "easeOutExpo");
         sp_overlay.fadeOut();
         
@@ -1141,7 +1133,7 @@ function initPageSliders(){
             
                 side_panel.animate({
                     opacity: 1,
-                    right: 0
+                    left: 0
                 }, 500, "easeOutExpo");
                 
                 setTimeout(function(){
@@ -1220,18 +1212,18 @@ function initPageSliders(){
              if ($(window).width() >= 1199){
                side_panel.css({
                    opacity: 1,
-                   right: 0
+                   left: 0
                });
-               $(".side-panel-is-right").css("margin-right", "270px");
+               $(".side-panel-is-left").css("margin-left", "270px");
                sp_button.css("display", "none");
                sp_close_button.css("display", "none");
              } else {
                  if (sp_close_button.is(":hidden")) {
                      side_panel.css({
                          opacity: 0,
-                         right: -270
+                         left: -270
                      });
-                     $(".side-panel-is-right").css("margin-right", "0");
+                     $(".side-panel-is-left").css("margin-left", "0");
                      sp_button.css("display", "block");
                      sp_close_button.css("display", "block");
                  }
