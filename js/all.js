@@ -522,9 +522,9 @@
     /* ---------------------------------------------
      Shortcodes
      --------------------------------------------- */
-    // Tabs minimal	
+    	
     function init_shortcodes(){
-    
+        // Tabs minimal
         var tpl_tab_height;
         $(".tpl-minimal-tabs > li > a").click(function(){
         
@@ -543,36 +543,45 @@
         // Accordion        
         $(".accordion").each(function(){
             var allPanels = $(this).children("dd").hide();
+            var allTabs = $(this).children("dt").children("a");
+            allTabs.attr("role", "button");
             $(this).children("dd").first().slideDown("easeOutExpo");
             $(this).children("dt").children("a").first().addClass("active");
+            $(this).children("dt").children("a").attr("aria-expanded", "false");
+            $(this).children("dt").children("a").first().attr("aria-expanded", "true");
                         
             $(this).children("dt").children("a").click(function(){        
                 var current = $(this).parent().next("dd");
-                $(".accordion > dt > a").removeClass("active");
+                allTabs.removeClass("active");
                 $(this).addClass("active");
+                allTabs.attr("aria-expanded", "false");
+                $(this).attr("aria-expanded", "true");
                 allPanels.not(current).slideUp("easeInExpo");
                 $(this).parent().next().slideDown("easeOutExpo");                
                 return false;                
             });
             
-         });
-        
-        
+         });        
         
         // Toggle
         var allToggles = $(".toggle > dd").hide();
+        var allTabs = $(".toggle > dt > a");
+        allTabs.attr({
+            "role": "button",
+            "aria-expanded": "false"
+            });
         
         $(".toggle > dt > a").click(function(){
         
-            if ($(this).hasClass("active")) {
-            
+            if ($(this).hasClass("active")) {            
                 $(this).parent().next().slideUp("easeOutExpo");
                 $(this).removeClass("active");
-                
+                $(this).attr("aria-expanded", "false");                
             }
             else {
                 var current = $(this).parent().next("dd");
                 $(this).addClass("active");
+                $(this).attr("aria-expanded", "true");
                 $(this).parent().next().slideDown("easeOutExpo");
             }
             
@@ -660,9 +669,9 @@ function initPageSliders(){
         
         function owl_keynav(el){            
             el.find(".owl-prev, .owl-next").attr({
-                "aria-hidden": "true",
+                "role": "button",
                 "tabindex": "0"
-            });            
+            });
             el.prepend(el.find(".owl-controls"));     
             el.on("click", ".owl-page, .owl-prev, .owl-next", function(e){
                 var this_owl = el.data("owlCarousel");
@@ -684,6 +693,21 @@ function initPageSliders(){
             });
         }
         
+        function owl_update(el){       
+            el.find(".owl-item").attr({
+                "aria-hidden": "true"
+            });
+            el.find(".owl-item.active").attr({
+                "aria-hidden": "false"
+            });
+            el.find(".owl-item a, .owl-item button, .owl-item input").attr({
+                "tabindex": "-1"
+            });
+            el.find(".owl-item.active a, .owl-item.active button, .owl-item.active input").attr({
+                "tabindex": "0"
+            });
+        }
+        
         // Fullwidth slider
         $(".fullwidth-slider").owlCarousel({
             slideSpeed: 350,
@@ -691,11 +715,13 @@ function initPageSliders(){
             autoHeight: true,
             navigation: true,
             lazyLoad: true,
+            addClassActive : true,
             navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
-            afterInit: owl_keynav
+            afterInit: owl_keynav,
+            afterAction: owl_update
         });
         
-        // Fullwidth slider
+        // Fullwidth slider fade
         $(".fullwidth-slider-fade").owlCarousel({
             transitionStyle: "fadeUp",
             slideSpeed: 350,
@@ -703,8 +729,10 @@ function initPageSliders(){
             autoHeight: true,
             navigation: true,
             lazyLoad: true,
+            addClassActive : true,
             navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
-            afterInit: owl_keynav
+            afterInit: owl_keynav,
+            afterAction: owl_update
         });
         
         // Fullwidth gallery
@@ -717,24 +745,28 @@ function initPageSliders(){
             navigation: false,
             pagination: false,
             lazyLoad: true,
-            afterInit: owl_keynav
+            addClassActive : true,
+            afterInit: owl_keynav,
+            afterAction: owl_update
         });
         
         // Item carousel
         $(".item-carousel").owlCarousel({
             autoPlay: 2500,
-            stopOnHover: true,
+            stopOnHover: false,
             items: 3,
             itemsDesktop: [1199, 3],
             itemsTabletSmall: [768, 3],
             itemsMobile: [480, 1],
             navigation: true,
             lazyLoad: true,
+            addClassActive : true,
             navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
-            afterInit: owl_keynav
+            afterInit: owl_keynav,
+            afterAction: owl_update
         });
         
-        // Item carousel
+        // Small item carousel
         $(".small-item-carousel").owlCarousel({
             autoPlay: 2500,
             stopOnHover: true,
@@ -745,8 +777,10 @@ function initPageSliders(){
             pagination: false,
             navigation: true,
             lazyLoad: true,
+            addClassActive : true,
             navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
-            afterInit: owl_keynav
+            afterInit: owl_keynav,
+            afterAction: owl_update
         });
         
         // Single carousel
@@ -755,8 +789,10 @@ function initPageSliders(){
             autoHeight: true,
             navigation: true,
             lazyLoad: true,
+            addClassActive : true,
             navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
-            afterInit: owl_keynav
+            afterInit: owl_keynav,
+            afterAction: owl_update
         });
         
         // Content Slider
@@ -766,8 +802,10 @@ function initPageSliders(){
             autoHeight: true,
             navigation: true,
             lazyLoad: true,
+            addClassActive : true,
             navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
-            afterInit: owl_keynav
+            afterInit: owl_keynav,
+            afterAction: owl_update
         });
 
         // Photo slider
@@ -780,8 +818,10 @@ function initPageSliders(){
             autoHeight: true,
             navigation: true,
             lazyLoad: true,
+            addClassActive : true,
             navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
-            afterInit: owl_keynav
+            afterInit: owl_keynav,
+            afterAction: owl_update
         }); 
         
         // Work slider
@@ -791,8 +831,10 @@ function initPageSliders(){
             autoHeight: true,
             navigation: true,
             lazyLoad: true,
+            addClassActive : true,
             navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
-            afterInit: owl_keynav
+            afterInit: owl_keynav,
+            afterAction: owl_update
         });
         
         // Blog posts carousel
@@ -806,8 +848,10 @@ function initPageSliders(){
             pagination: false,
             navigation: true,
             lazyLoad: true,
+            addClassActive : true,
             navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
-            afterInit: owl_keynav
+            afterInit: owl_keynav,
+            afterAction: owl_update
         });
         
         // Blog posts carousel alt
@@ -820,8 +864,10 @@ function initPageSliders(){
             pagination: false,
             navigation: true,
             lazyLoad: true,
+            addClassActive : true,
             navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
-            afterInit: owl_keynav
+            afterInit: owl_keynav,
+            afterAction: owl_update
         });
         
         // Image carousel
@@ -834,8 +880,10 @@ function initPageSliders(){
             itemsMobile: [480, 1],
             navigation: true,
             lazyLoad: true,
+            addClassActive : true,
             navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
-            afterInit: owl_keynav
+            afterInit: owl_keynav,
+            afterAction: owl_update
         });
         
         // Fullwidth slideshow
@@ -850,6 +898,7 @@ function initPageSliders(){
             slideSpeed: 350,
             singleItem: true,
             autoHeight: true,
+            addClassActive : true,
             pagination: false,
             navigation: true,
             navigationText: ["<span class='sr-only'>Previous Slide</span><i class='fa fa-angle-left' aria-hidden='true'></i>", "<span class='sr-only'>Next Slide</span><i class='fa fa-angle-right' aria-hidden='true'></i>"],
@@ -1364,7 +1413,9 @@ function init_wow(){
         
         if ($("body").hasClass("appear-animate")){
            wow.init(); 
-        }        
+        } else{
+            $(".wow").css("opacity", "1");
+        }
         
     })(jQuery);
 }
