@@ -2,9 +2,9 @@
 /*------------------------------------------------------------------
 [Responsive Stylesheet]
 
-Project: Rhythm
-Version: 2.16
-Primary use: MultiPurpose Template  
+Project:    Rhythm
+Version:    2.16
+Primary use:    MultiPurpose Template  
 -------------------------------------------------------------------*/
 
 
@@ -27,32 +27,27 @@ Primary use: MultiPurpose Template
    ============================== */
 
 @media only screen and (max-width: 1366px) {
-	
-    	
+    
+        
     .inner-nav ul li {
-        margin-left: 25px;
+        margin-right: 34px;
     }
-	
+    
 }  
 
 @media only screen and (max-width: 1200px) {
-	
+    
     .hs-wrap {
         max-width: 540px;
-    }
-    .hs-line-1 {
-        letter-spacing: 40px;
     }
     .hs-line-2{
         font-size: 68px;
     }
     .hs-line-12{
         font-size: 70px;
-        letter-spacing: 0.3em;
     }
     .hs-line-13 {
         font-size: 78px;
-        letter-spacing: 0.195em;
     }
     
     .alt-service-grid {
@@ -60,10 +55,10 @@ Primary use: MultiPurpose Template
     } 
     .alt-service-item {
         margin-top: 40px;
-        padding-left: 48px;
+        padding-right: 48px;
     }
     .alt-services-title{
-        font-size: 14px;
+        font-size: 16px;
         margin-bottom: 5px;
     }
     .alt-services-image{
@@ -75,15 +70,14 @@ Primary use: MultiPurpose Template
     }
     
     .mod-breadcrumbs-mini{
-        text-align: right;
+        text-align: left;
     }
     
 }
 @media only screen and (max-width: 1199px) {
     
     .tpl-alt-tabs{
-        font-size: 13px;
-        letter-spacing: 0.2em;
+        font-size: 15px;
     }
     .tpl-alt-tabs > li{
         width: 170px;
@@ -106,10 +100,7 @@ Primary use: MultiPurpose Template
         padding-top: 37px;
         padding-bottom: 43px;
     }
-    
-    .hs-line-1 {
-        letter-spacing: 30px;
-    }
+
     .hs-line-2{
         font-size: 60px;
     }
@@ -119,7 +110,6 @@ Primary use: MultiPurpose Template
     } 
     .hs-line-10 {
         padding: 10px 14px;
-        letter-spacing: 1px;
     }
     .hs-line-10 > span {
         margin: 0 1px;
@@ -153,25 +143,18 @@ Primary use: MultiPurpose Template
         clear: none; 
     }
     .lp-item:nth-child(2n + 3) {        
-        clear:left;
+        clear:right;
     }
     .lp-title, .lp-author{
-        font-size: 13px;
+        font-size: 15px;
     }
 
 }
   
 @media only screen and (max-width: 992px) {
     
-    .hs-line-1 {
-        letter-spacing: 23px;
-    }
-    .hs-line-13 {
-        letter-spacing: 0.17em;
-    }
-    
     .mod-breadcrumbs:not(.align-center):not(.mod-breadcrumbs-mini){
-        text-align: left !important;
+        text-align: right !important;
     }
     
     .tpl-alt-tabs > li{
@@ -179,18 +162,17 @@ Primary use: MultiPurpose Template
     }
       
     .split-section-headings,
-    .split-section-headings.left,
     .split-section-headings.right,
+    .split-section-headings.left,
     .split-section-content,
-    .split-section-content.left,
-    .split-section-content.right{
+    .split-section-content.right,
+    .split-section-content.left{
         float: none !important;
         width: auto;
     }
     
     .split-section-headings .section-title{
         font-size: 35px;
-        letter-spacing: 5px;
     }
     
     .banner-text {
@@ -202,17 +184,17 @@ Primary use: MultiPurpose Template
     }
 
     .team-item-name{
-        font-size: 13px;
+        font-size: 15px;
     }
     
     .features-icon {
         font-size: 64px;
     } 
     .features-title {
-        font-size: 20px;
+        font-size: 22px;
     }
     .features-descr{
-        font-size: 14px;
+        font-size: 16px;
     }
     
     .work-item,
@@ -268,7 +250,7 @@ Primary use: MultiPurpose Template
         padding: 50px 0;
     }
     .small-title{
-        font-size: 18px;
+        font-size: 20px;
     }
     
     .owl-pagination {
@@ -301,8 +283,8 @@ Primary use: MultiPurpose Template
     }
 
     .works-filter a{
-        padding-left: 10px;
         padding-right: 10px;
+        padding-left: 10px;
         margin: 4px;
     }
     
@@ -311,35 +293,36 @@ Primary use: MultiPurpose Template
     }
     .blog-item-date{
         top: 0;
-        left: -100px;
+        right: -100px;
     }
     .blog-item-title{
-        font-size: 20px;
+        font-size: 22px;
     }
     .blog-item-title .small{
-        font-size: 15px;
+        font-size: 16px;
     }
     .blog-item-body{
-        font-size: 14px;
+        font-size: 16px;
     }
     .blog-media{
         margin-bottom: 15px;
     }
     .blog-item-body .small{
-        font-size: 13px;
+        font-size: 16px;
     }
 
+    
     .google-map > iframe{
         height: 300px;
     }
     
     .fm-logo-wrap{
         top: 17px;
-        left: 17px;
+        right: 17px;
     }
     .fm-button{
         top: 17px;
-        right: 17px;
+        left: 17px;
     }
 
 }
@@ -352,13 +335,13 @@ Primary use: MultiPurpose Template
         padding-bottom: 33px;
     }
     .hs-line-1 {
-        font-size: 24px;
+        font-size: 26px;
     }
     .hs-line-2{
-        font-size: 36px;
+        font-size: 38px;
     }    
     .hs-line-3 {
-        font-size: 13px;
+        font-size: 15px;
     }
     .hs-image{
         display: none;
@@ -369,10 +352,9 @@ Primary use: MultiPurpose Template
     }    
     .hs-line-5{
         font-size: 44px;
-        letter-spacing: 0.28em;
     }
     .hs-line-6{
-        font-size: 16px;
+        font-size: 18px;
     }
     .hs-line-7{
         font-size: 32px;
@@ -383,8 +365,7 @@ Primary use: MultiPurpose Template
     } 
     .hs-line-10 {
         padding: 5px 8px;
-        font-size: 11px;
-        letter-spacing: 1px;
+        font-size: 13px;
     }
     .hs-line-10 > span {
         margin: 0;
@@ -399,11 +380,6 @@ Primary use: MultiPurpose Template
     }
     .hs-line-13{
         font-size: 60px;
-        letter-spacing: 0.1em;
-    }
-    .hs-line-14{
-        font-size: 24px;
-        letter-spacing: 0.3em;
     }
     .hs-line-15{
         font-size: 32px;
@@ -411,8 +387,8 @@ Primary use: MultiPurpose Template
     
     .team-item{
         max-width: 370px;
-        margin-left: auto;
         margin-right: auto;
+        margin-left: auto;
     }
     
     .alt-features-grid {
@@ -427,30 +403,32 @@ Primary use: MultiPurpose Template
         padding: 0;
     }
     
+    .hs-line-14 {
+        font-size: 24px;
+    }
     .benefit-item:hover:after{
         display: none;
     }
     
     .wide-heading {
         font-size: 32px;
-        letter-spacing: 2px;
     }
     
     .works-filter a{
-        padding-left: 10px;
         padding-right: 10px;
+        padding-left: 10px;
         margin: 4px;
         width: 46%;
-        font-size: 11px;
+        font-size: 13px;
     }    
     
     .blog-item-date{
         width: auto;
         position: relative;
         top: auto;
-        left: auto;
+        right: auto;
         padding: 0;
-        text-align: left;
+        text-align: right;
     }
     .date-num{
         display: inline !important;
@@ -466,7 +444,7 @@ Primary use: MultiPurpose Template
     
     blockquote footer {
         margin-top: 0;
-        font-size: 12px;
+        font-size: 13px;
     }   
 
     .banner-content {
@@ -477,16 +455,16 @@ Primary use: MultiPurpose Template
     }
     
     
-    .cf-left-col,
-    .cf-right-col{
+    .cf-right-col,
+    .cf-left-col{
         width: auto;
-        margin-right: 0;
+        margin-left: 0;
         float: none;
     }
     
     .section-more,
-    .section-more.left,
-    .section-more.right{
+    .section-more.right,
+    .section-more.left{
         float: none !important;
         display: block;
     }
@@ -503,7 +481,7 @@ Primary use: MultiPurpose Template
         padding: 10px;
     }
     .blog-slide-title{
-        font-size: 12px;
+        font-size: 14px;
     }
     .blog-slide-data{
         display: none;
@@ -600,7 +578,6 @@ Primary use: MultiPurpose Template
     }
     .hs-line-1 {
         font-size: 20px;
-        letter-spacing: 18px;
     }
     .hs-line-2{
         font-size: 28px;
@@ -619,16 +596,16 @@ Primary use: MultiPurpose Template
     } 
     .hs-line-11 {
         font-size: 20px;
-        letter-spacing: 0.2em;
     } 
     .hs-line-12 {
         font-size: 32px;
     }
     .hs-line-13 {
         font-size: 30px;
-        letter-spacing: 0.1em;
     }
-    
+    .hs-line-14{
+        font-size: 24px;
+    }
     .hs-line-15{
         font-size: 24px;
     }
@@ -640,7 +617,7 @@ Primary use: MultiPurpose Template
     }
     .scroll-down-icon {
         width: 22px;
-        margin-left: -11px;
+        margin-right: -11px;
     }    
     .scroll-down span{
         display: none;
@@ -648,7 +625,7 @@ Primary use: MultiPurpose Template
     
     .nav-bar-compact{
         top: 0;
-        left: 0;
+        right: 0;
     }
     
     
@@ -667,8 +644,8 @@ Primary use: MultiPurpose Template
         display: none;
     }
     .owl-page {
-        padding-left: 8px;
         padding-right: 8px;
+        padding-left: 8px;
     }
     
     .section-bot-image {
@@ -679,7 +656,6 @@ Primary use: MultiPurpose Template
     .split-section-headings .section-title,
     .wide-heading {
         font-size: 24px;
-        letter-spacing: 2px;
     }    
     .section-heading,
     .sub-heading{
@@ -698,7 +674,6 @@ Primary use: MultiPurpose Template
     }
     .tpl-alt-tabs{
         font-size: 12px;
-        letter-spacing: 0.1em;
     }
     .tpl-alt-tabs > li{
         width: 120px;
@@ -729,8 +704,8 @@ Primary use: MultiPurpose Template
     
     .works-filter a{
         width: 100%;
-        margin-left: 0;
         margin-right: 0;
+        margin-left: 0;
     }    
     
     .work-item,
@@ -805,7 +780,7 @@ Primary use: MultiPurpose Template
     .fm-menu-links a{
         font-size: 14px;
     }
-    .fm-search {
+    .fm-search{
         width: 200px;
     }
 }
