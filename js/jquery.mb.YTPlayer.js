@@ -4,7 +4,6 @@ $(document).ready(function(){
 });
 
 
-
 /*jquery.mb.YTPlayer 07-12-2020
  _ jquery.mb.components 
  _ email: matbicoc@gmail.com 
