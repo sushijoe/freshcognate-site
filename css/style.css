@@ -514,7 +514,7 @@ hr.white{
     line-height: 1.6;
 }
 .lead-alt{
-    font-size: 46px;
+    font-size: 42px;
     font-weight: 600;
     line-height: 1.196;
     letter-spacing: -0.04em;
@@ -6244,4 +6244,5 @@ table.shopping-cart-table tr td{
     display: inline-block;
     -webkit-animation-duration: 1.2s;
     animation-duration: 1.2s;
+
 }
