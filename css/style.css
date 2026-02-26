@@ -1055,18 +1055,26 @@ a.btn-mod:focus{
  * Header common styles
  */
 
-.home-section{
+.home-section {
     width: 100%;
-    display: block;    
+    display: block;
     position: relative;
     overflow: hidden;
+    background-image: url('images/mobile-video-placeholder-fullwidth.jpg');
     background-repeat: no-repeat;
-    background-attachment: fixed;
+    background-attachment: scroll; /* Fix for iOS/mobile */
     background-position: center center;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
+}
+
+/* Re-enable fixed only for desktop where it's safe */
+@media (min-width: 992px) and (not (hover: none)) {
+    .home-section {
+        background-attachment: fixed;
+    }
 }
 
 /* Home content */
@@ -6246,4 +6254,5 @@ table.shopping-cart-table tr td{
     animation-duration: 1.2s;
 
 }
+
 
