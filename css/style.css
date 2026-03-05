@@ -5208,10 +5208,10 @@ table.shopping-cart-table tr td{
     color: #111;
 }
 .owl-prev{
-    left: 20px;
+    left: -50px;
 }
 .owl-next{
-    right: 20px;
+    right: -50px;
 }
 .owl-prev svg,
 .owl-next svg{
@@ -6254,18 +6254,5 @@ table.shopping-cart-table tr td{
     animation-duration: 1.2s;
 
 }
-
-/* Attempts to get the carousel arrows outside of the media box on portfolio pages */
-.work-full-media {
-    margin-left: -50px;
-    margin-right: -50px;
-    padding-left: 50px;
-    padding-right: 50px;
-}
-
-.container.relative {
-    overflow: visible;
-}
-
 
 
