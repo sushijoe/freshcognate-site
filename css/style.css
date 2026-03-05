@@ -6255,4 +6255,10 @@ table.shopping-cart-table tr td{
 
 }
 
+/* Attempts to get the carousel arrows outside of the media box on portfolio pages */
+.work-full-media {
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
 
