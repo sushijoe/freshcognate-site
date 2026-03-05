@@ -6263,4 +6263,9 @@ table.shopping-cart-table tr td{
     padding-right: 50px;
 }
 
+.container.relative {
+    overflow: visible;
+}
+
+
 
