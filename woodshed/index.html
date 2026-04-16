@@ -412,30 +412,31 @@
     .instrument-row {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 4px 16px 6px;
+      gap: 6px;
+      padding: 6px 12px;
       background: var(--bg-surface);
       border-bottom: 1px solid rgba(255,255,255,0.04);
       flex-shrink: 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
-    .instrument-label {
-      font-size: 11px;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      white-space: nowrap;
-    }
+    .instrument-row::-webkit-scrollbar { display: none; }
 
-    .instrument-select {
-      flex: 1;
-      background: var(--bg-card);
-      color: var(--text-primary);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-size: 13px;
+    .inst-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      background: var(--bg-card); border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 10px; padding: 6px 8px 5px; cursor: pointer;
+      min-width: 62px; flex-shrink: 0; transition: all 0.15s;
     }
+    .inst-btn:hover { border-color: rgba(255,255,255,0.2); }
+    .inst-btn.active { background: rgba(232,74,39,0.15); border-color: var(--accent); }
+    .inst-btn svg { width: 28px; height: 28px; fill: var(--text-secondary); transition: fill 0.15s; }
+    .inst-btn.active svg { fill: var(--accent); }
+    .inst-btn-label { font-size: 9px; color: var(--text-secondary); text-align: center; line-height: 1.2; white-space: nowrap; }
+    .inst-btn.active .inst-btn-label { color: var(--accent); font-weight: 600; }
+
+    .instrument-select { display: none; }
 
     /* ===== HEAR LICK ===== */
     .hear-lick-row {
@@ -1096,22 +1097,42 @@
   </div>
 
   <!-- Instrument / Transposition -->
-  <div class="instrument-row">
-    <span class="instrument-label">Instrument</span>
-    <select class="instrument-select" id="instrumentSelect">
-      <option value="bass-concert">Trombone / Tuba / Euph</option>
-      <option value="treble-bb">Trumpet / Tenor Sax / Clarinet</option>
-      <option value="treble-f">French Horn / Mellophone</option>
-      <option value="treble-eb">Alto Sax / Bari Sax</option>
-      <option value="treble-concert">Flute / Piano / Guitar</option>
-    </select>
+  <div class="instrument-row" id="instrumentRow">
+    <button class="inst-btn active" data-inst="bass-concert" title="Trombone / Tuba / Euphonium">
+      <svg viewBox="0 0 64 64"><path d="M14 52c0-2 1-3 3-4l2-18c0-2 1-4 3-5l4-3c1-1 2-3 2-5V12c0-2 2-4 4-4s4 2 4 4v5c0 2 1 4 2 5l4 3c2 1 3 3 3 5l2 18c2 1 3 2 3 4 0 3-7 6-18 6S14 55 14 52z"/></svg>
+      <span class="inst-btn-label">Trombone</span>
+    </button>
+    <button class="inst-btn" data-inst="treble-bb" title="Trumpet / Tenor Sax / Clarinet">
+      <svg viewBox="0 0 64 64"><path d="M12 38c0-4 3-8 8-10V14c0-2 1-3 3-3h2V8c0-1 1-2 2-2h10c1 0 2 1 2 2v3h2c2 0 3 1 3 3v14c5 2 8 6 8 10 0 8-9 14-20 14S12 46 12 38zM22 14v12h20V14H22z"/></svg>
+      <span class="inst-btn-label">Trumpet</span>
+    </button>
+    <button class="inst-btn" data-inst="treble-f" title="French Horn / Mellophone">
+      <svg viewBox="0 0 64 64"><path d="M32 6c14 0 24 10 24 22 0 10-6 18-16 21l-2-4c8-3 12-9 12-17C50 18 42 12 32 12S14 18 14 28c0 6 3 11 8 14v6H16V42c-5-4-8-10-8-14C8 16 18 6 32 6z M28 34c-3-2-6-5-6-8 0-5 4-10 10-10s10 5 10 10c0 3-3 6-6 8l-1 18h-6L28 34z"/></svg>
+      <span class="inst-btn-label">Horn</span>
+    </button>
+    <button class="inst-btn" data-inst="treble-eb" title="Alto Sax / Bari Sax">
+      <svg viewBox="0 0 64 64"><path d="M28 8c0-1 1-2 3-2s3 1 3 2v4l6 22c1 4 2 7 2 10 0 7-5 14-14 14-8 0-12-5-12-10 0-4 2-7 5-9l4-2V24l-4 2c-1 0-2-1-2-2V16c0-1 1-2 2-2l4-2V8zM25 46c-2 1-3 3-3 5 0 3 3 6 7 6 5 0 8-4 8-8 0-2-1-5-2-8L31 27v14l-6 5z"/></svg>
+      <span class="inst-btn-label">Alto Sax</span>
+    </button>
+    <button class="inst-btn" data-inst="treble-concert" title="Flute / Piano / Guitar">
+      <svg viewBox="0 0 64 64"><path d="M8 28h4v8H8v-8zM14 20c0-1 1-2 2-2h32c1 0 2 1 2 2v24c0 1-1 2-2 2H16c-1 0-2-1-2-2V20zm4 2v8h6v-8h-6zm8 0v8h6v-8h-6zm8 0v8h6v-8h-6zm8 0v8h6v-8h-6zM18 34v8h28v-8H18zM52 28h4v8h-4v-8z"/></svg>
+      <span class="inst-btn-label">Piano</span>
+    </button>
   </div>
+  <!-- Hidden select for JS compatibility -->
+  <select class="instrument-select" id="instrumentSelect" style="display:none">
+    <option value="bass-concert">Trombone / Tuba / Euph</option>
+    <option value="treble-bb">Trumpet / Tenor Sax / Clarinet</option>
+    <option value="treble-f">French Horn / Mellophone</option>
+    <option value="treble-eb">Alto Sax / Bari Sax</option>
+    <option value="treble-concert">Flute / Piano / Guitar</option>
+  </select>
 
   <!-- Mode toggle -->
   <div class="mode-bar">
+    <button class="mode-btn" data-mode="symbols">Symbols Only</button>
     <button class="mode-btn active" data-mode="licks">Guided Licks</button>
     <button class="mode-btn" data-mode="tones">Chord Tones</button>
-    <button class="mode-btn" data-mode="symbols">Symbols Only</button>
   </div>
 
   <!-- Level selector (visible only in Guided Licks mode) -->
@@ -3795,6 +3816,8 @@
       return vexKey.replace('/', '');
     }
 
+    let lickEventIds = [];
+
     async function playLickDemo() {
       if (currentMode !== 'licks') return;
       await initAudio();
@@ -3810,44 +3833,89 @@
       const myGen = lickPlayGeneration;
       updateHearLickBtn();
 
-      const bpm = parseInt(document.getElementById('tempoSlider').value);
-      const beatSec = 60 / bpm;
-      const now = Tone.now() + 0.05;
-      let offset = 0;
+      // If Transport is running, schedule on Transport so lick syncs to the beat
+      if (isPlaying) {
+        lickEventIds = [];
+        let beatOffset = 0;
+        const prog = currentProgression;
+        prog.measures.forEach(measure => {
+          const levelLicks = LICKS[currentLevel];
+          if (!levelLicks) { beatOffset += 4; return; }
+          const licks = levelLicks[measure.chord];
+          if (!licks || !licks.length) { beatOffset += 4; return; }
+          const lick = licks[(chorusCount - 1) % licks.length];
 
-      const prog = currentProgression;
-      prog.measures.forEach(measure => {
-        const levelLicks = LICKS[currentLevel];
-        if (!levelLicks) { offset += 4 * beatSec; return; }
-        const licks = levelLicks[measure.chord];
-        if (!licks || !licks.length) { offset += 4 * beatSec; return; }
-        const lick = licks[(chorusCount - 1) % licks.length];
-
-        lick.notes.forEach(n => {
-          const beats = durationToBeats(n.duration);
-          const isRest = n.duration.endsWith('r');
-          if (!isRest) {
-            const noteName = vexToTone(n.keys[0]);
-            const dur = beats * beatSec * 0.85; // slight gap between notes
-            lickSynth.triggerAttackRelease(noteName, dur, now + offset);
-          }
-          offset += beats * beatSec;
+          lick.notes.forEach(n => {
+            const beats = durationToBeats(n.duration);
+            const isRest = n.duration.endsWith('r');
+            if (!isRest) {
+              const noteName = vexToTone(n.keys[0]);
+              const durBeats = beats * 0.85;
+              const schedTime = `0:${beatOffset}:0`;
+              const eid = Tone.Transport.schedule(time => {
+                if (myGen === lickPlayGeneration) {
+                  lickSynth.triggerAttackRelease(noteName, `0:${durBeats}:0`, time);
+                }
+              }, schedTime);
+              lickEventIds.push(eid);
+            }
+            beatOffset += beats;
+          });
         });
-      });
 
-      // Auto-reset after playback finishes
-      const totalMs = offset * 1000 + 300;
-      setTimeout(() => {
-        if (myGen === lickPlayGeneration) {
-          isPlayingLick = false;
-          updateHearLickBtn();
-        }
-      }, totalMs);
+        // Auto-stop at end of chorus
+        const endId = Tone.Transport.schedule(() => {
+          if (myGen === lickPlayGeneration) {
+            isPlayingLick = false;
+            lickEventIds = [];
+            updateHearLickBtn();
+          }
+        }, `0:${beatOffset}:0`);
+        lickEventIds.push(endId);
+
+      } else {
+        // Transport not running — play standalone with absolute timing
+        const bpm = parseInt(document.getElementById('tempoSlider').value);
+        const beatSec = 60 / bpm;
+        const now = Tone.now() + 0.05;
+        let offset = 0;
+
+        const prog = currentProgression;
+        prog.measures.forEach(measure => {
+          const levelLicks = LICKS[currentLevel];
+          if (!levelLicks) { offset += 4 * beatSec; return; }
+          const licks = levelLicks[measure.chord];
+          if (!licks || !licks.length) { offset += 4 * beatSec; return; }
+          const lick = licks[(chorusCount - 1) % licks.length];
+
+          lick.notes.forEach(n => {
+            const beats = durationToBeats(n.duration);
+            const isRest = n.duration.endsWith('r');
+            if (!isRest) {
+              const noteName = vexToTone(n.keys[0]);
+              const dur = beats * beatSec * 0.85;
+              lickSynth.triggerAttackRelease(noteName, dur, now + offset);
+            }
+            offset += beats * beatSec;
+          });
+        });
+
+        const totalMs = offset * 1000 + 300;
+        setTimeout(() => {
+          if (myGen === lickPlayGeneration) {
+            isPlayingLick = false;
+            updateHearLickBtn();
+          }
+        }, totalMs);
+      }
     }
 
     function stopLickDemo() {
       lickPlayGeneration++;
       isPlayingLick = false;
+      // Clear Transport-scheduled lick events
+      lickEventIds.forEach(id => Tone.Transport.clear(id));
+      lickEventIds = [];
       if (lickSynth) lickSynth.triggerRelease(Tone.now());
       updateHearLickBtn();
     }
@@ -4018,12 +4086,22 @@
         Tone.Transport.bpm.value = bpm;
       });
 
-      // Instrument selector
+      // Instrument selector — icon buttons
+      document.querySelectorAll('.inst-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.inst-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const instId = btn.dataset.inst;
+          currentInstrument = INSTRUMENTS[instId] || INSTRUMENTS['bass-concert'];
+          // Keep hidden select in sync (for any code that reads it)
+          document.getElementById('instrumentSelect').value = instId;
+          updateSlideToggleVisibility();
+          renderNotation();
+        });
+      });
+      // Hidden select fallback
       document.getElementById('instrumentSelect').addEventListener('change', e => {
         currentInstrument = INSTRUMENTS[e.target.value] || INSTRUMENTS['bass-concert'];
-        if (isPlaying) {
-          // Don't reschedule audio — it stays concert pitch. Just re-render notation.
-        }
         updateSlideToggleVisibility();
         renderNotation();
       });
