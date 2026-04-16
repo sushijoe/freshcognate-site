@@ -217,11 +217,16 @@
       fill: #ffffff !important;
       stroke: #ffffff !important;
     }
-    /* Leger lines — bright and clear */
+    /* Ledger lines — VexFlow draws these as #444 stroke paths inside stavenote.
+       On dark background they disappear; force bright white + thicker stroke. */
+    #notation svg path[stroke="#444"] {
+      stroke: #ffffff !important;
+      stroke-width: 1.6px !important;
+    }
     #notation svg .vf-ledger line,
     #notation svg line.vf-ledger {
-      stroke: rgba(255,255,255,0.65) !important;
-      stroke-width: 1.2px !important;
+      stroke: rgba(255,255,255,0.9) !important;
+      stroke-width: 1.4px !important;
     }
 
     .measure-highlight {
@@ -1153,19 +1158,25 @@
       </button>
     </div>
     <select class="progression-select" id="progressionSelect">
-      <optgroup label="Blues">
+      <optgroup label="NOLA Tunes">
+        <option value="do-whatcha-wanna">Do Whatcha Wanna</option>
+        <option value="saints">When the Saints</option>
+        <option value="feel-like-funkin">Feel Like Funkin' It Up</option>
+        <option value="fly-away">I'll Fly Away</option>
+        <option value="mardi-gras">Mardi Gras in New Orleans</option>
+        <option value="its-later">It's Later Than You Think</option>
+      </optgroup>
+      <optgroup label="NOLA Grooves">
+        <option value="nola-second-line">Second Line Vamp (Bb)</option>
+        <option value="nola-funk">NOLA Funk Vamp (Eb)</option>
+        <option value="nola-traditional">Trad Vamp (Bb)</option>
+      </optgroup>
+      <optgroup label="Practice Fundamentals">
         <option value="bb-blues">12-Bar Bb Blues</option>
         <option value="f-blues">12-Bar F Blues</option>
         <option value="eb-blues">12-Bar Eb Blues</option>
         <option value="c-minor-blues">Minor Blues in C</option>
-      </optgroup>
-      <optgroup label="Jazz">
         <option value="ii-v-i-bb">ii-V-I in Bb</option>
-      </optgroup>
-      <optgroup label="New Orleans">
-        <option value="nola-second-line">Second Line in Bb</option>
-        <option value="nola-funk">NOLA Funk in Eb</option>
-        <option value="nola-traditional">Brass Band Trad in Bb</option>
       </optgroup>
     </select>
   </header>
@@ -1219,9 +1230,10 @@
 
   <!-- Mode toggle -->
   <div class="mode-bar">
-    <button class="mode-btn" data-mode="symbols">Symbols Only</button>
-    <button class="mode-btn active" data-mode="licks">Guided Licks</button>
-    <button class="mode-btn" data-mode="tones">Chord Tones</button>
+    <button class="mode-btn" data-mode="melody">Melody</button>
+    <button class="mode-btn" data-mode="symbols">Symbols</button>
+    <button class="mode-btn active" data-mode="licks">Licks</button>
+    <button class="mode-btn" data-mode="tones">Tones</button>
   </div>
 
   <!-- Level selector (visible only in Guided Licks mode) -->
@@ -1341,10 +1353,10 @@
     <div class="swing-row">
       <span class="swing-label">Feel</span>
       <div class="swing-options">
-        <button class="swing-btn active" data-swing="0">Straight</button>
+        <button class="swing-btn" data-swing="0">Straight</button>
         <button class="swing-btn" data-swing="1">Light Swing</button>
         <button class="swing-btn" data-swing="2">Hard Swing</button>
-        <button class="swing-btn" data-swing="3">Second Line</button>
+        <button class="swing-btn active" data-swing="3">Second Line</button>
       </div>
     </div>
   </div>
@@ -1361,6 +1373,362 @@
     // =========================================================================
 
     const PROGRESSIONS = {
+      // ====================================================================
+      // NOLA TUNES — the heart of the app. Tunes the band actually plays.
+      // ====================================================================
+
+      'do-whatcha-wanna': {
+        id: 'do-whatcha-wanna',
+        title: 'Do Whatcha Wanna',
+        composer: 'Rebirth Brass Band',
+        key: 'F',
+        timeSignature: '4/4',
+        defaultTempo: 95,
+        tempoRange: [70, 130],
+        measures: [
+          { chord: 'F7',  beats: 4, melody: [{keys:['F/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['Eb/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['C/4'],duration:'2'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['F/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['Eb/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['C/4'],duration:'4'},{keys:['A/3'],duration:'4'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['Ab/3'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['F/3'],duration:'2'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['Ab/3'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['F/3'],duration:'4'},{keys:['D/3'],duration:'4'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['F/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['Eb/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['C/4'],duration:'2'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['F/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['Eb/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['A/3'],duration:'4'},{keys:['F/3'],duration:'4'}] },
+          { chord: 'C7',  beats: 4, melody: [{keys:['C/4'],duration:'4'},{keys:['Bb/3'],duration:'4'},{keys:['G/3'],duration:'4'},{keys:['E/3'],duration:'4'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['F/3'],duration:'4'},{keys:['A/3'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['F/4'],duration:'4'}] }
+        ],
+        layout: { measuresPerLine: 4, clef: 'bass' },
+        audio: {
+          type: 'synth',
+          voicings: {
+            'F7':  ['A3', 'C4', 'Eb4', 'F4'],
+            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4'],
+            'C7':  ['Bb3', 'C4', 'E4', 'G4']
+          },
+          bassNotes: {
+            'F7':  ['F2', 'A2', 'C3', 'Eb3'],
+            'Bb7': ['Bb2', 'D3', 'F3', 'Ab3'],
+            'C7':  ['C2', 'E2', 'G2', 'Bb2']
+          }
+        },
+        tips: {
+          beginner: [
+            'Rebirth Brass Band signature tune. This vamp is F7 → Bb7 (I7–IV7) — two chords, infinite groove.',
+            'The hook is a 2-bar rhythmic riff on F. Internalize it, then improvise around it.',
+            'Use the F blues scale (F, Ab, Bb, B, C, Eb) over the whole tune.',
+            'Leave space — NOLA funk breathes. Play 2 notes, rest, then 2 more.',
+            'Listen to Phil Frazier (sousaphone) anchoring the groove. Feel that pocket.'
+          ],
+          intermediate: [
+            'The 3rd (A) and b7 (Eb) of F7 are guide tones. Target them on strong beats.',
+            'Call-and-response: play a 2-bar phrase on F7, answer it on Bb7.',
+            'Syncopate: accent the "and" of 2 and "and" of 4 to lock with the second line drum feel.',
+            'Chromatic approach from Eb up to F gives classic brass band grit.',
+            'Minor third bends (Ab to A) are the sound of NOLA funk — work them in.'
+          ],
+          advanced: [
+            'Over C7 in bar 7, use Gb (tritone) for tension, resolve to F on the downbeat.',
+            'Quote "When the Saints" or "Iko Iko" — NOLA tradition is layering familiar melodies.',
+            'Octave displacement: low unison into high octave jump, Rebirth-style.',
+            'Mixolydian with b3 added (F G Ab A Bb C D Eb) is the full NOLA dominant sound.',
+            'Listen to Dirty Dozen and Soul Rebels versions for trumpet/trombone trade ideas.'
+          ]
+        }
+      },
+
+      'saints': {
+        id: 'saints',
+        title: 'When the Saints Go Marching In',
+        composer: 'Traditional',
+        key: 'Bb',
+        timeSignature: '4/4',
+        defaultTempo: 110,
+        tempoRange: [70, 180],
+        measures: [
+          { chord: 'Bb7', beats: 4, melody: [{keys:['d/4'],duration:'2r'},{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'2'},{keys:['d/4'],duration:'4r'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['d/4'],duration:'4r'},{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/4'],duration:'2'},{keys:['d/4'],duration:'2r'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/4'],duration:'2'},{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'4'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['A/3'],duration:'4'}] },
+          { chord: 'Eb7', beats: 4, melody: [{keys:['Bb/3'],duration:'2'},{keys:['d/4'],duration:'2r'}] },
+          { chord: 'Eb7', beats: 4, melody: [{keys:['G/3'],duration:'4'},{keys:['G/3'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['Eb/4'],duration:'4'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['d/4'],duration:'2r'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['d/4'],duration:'4r'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'w'}] }
+        ],
+        layout: { measuresPerLine: 4, clef: 'bass' },
+        audio: {
+          type: 'synth',
+          voicings: {
+            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4'],
+            'Eb7': ['Bb3', 'Db4', 'Eb4', 'G4'],
+            'F7':  ['A3', 'C4', 'Eb4', 'F4']
+          },
+          bassNotes: {
+            'Bb7': ['Bb2', 'D3', 'F3', 'D3'],
+            'Eb7': ['Eb2', 'G2', 'Bb2', 'G2'],
+            'F7':  ['F2', 'A2', 'C3', 'A2']
+          }
+        },
+        tips: {
+          beginner: [
+            'The most iconic NOLA tune. Start by playing just the melody clean — that IS the gig.',
+            'Traditional form: I (Bb) - V (F7) - I - I - IV (Eb) - I - V - I. Standard hymn changes.',
+            'Play it like a dirge on the way to the cemetery, uptempo on the way back. Both are right.',
+            'The pickup "Oh when the" (D-Eb-F) leads into "saints" on Bb — feel that resolution.',
+            'Brass bands often trade solos 4 bars at a time. Listen before you jump in.'
+          ],
+          intermediate: [
+            'Paraphrase the melody — embellish it with grace notes, approach tones, and rhythmic variation.',
+            'The Bb major pentatonic (Bb, C, D, F, G) sounds pure and hymn-like over the whole tune.',
+            'On the Eb (bar 8), strong the 3rd of Eb (G) — it\'s the brightest note in the tune.',
+            'Tailgate trombone style: glide smears into target notes. Use slow slide moves.',
+            'Listen to Preservation Hall Jazz Band and Treme Brass Band for the traditional feel.'
+          ],
+          advanced: [
+            'Play the melody "out" — displace rhythms, change octaves, add chromatic passing tones.',
+            'The Bb blues scale works on any bar — lean into the blue 3rd (Db) for grit.',
+            'Quote other hymns: "I\'ll Fly Away", "Just a Closer Walk" — they share the DNA.',
+            'For the "shout chorus" (last time through), play high and loud in the upper register.',
+            'Louis Armstrong\'s version is the Rosetta Stone. Study his melodic paraphrase.'
+          ]
+        }
+      },
+
+      'feel-like-funkin': {
+        id: 'feel-like-funkin',
+        title: 'Feel Like Funkin\' It Up',
+        composer: 'Rebirth Brass Band',
+        key: 'Bb',
+        timeSignature: '4/4',
+        defaultTempo: 100,
+        tempoRange: [80, 140],
+        measures: [
+          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'8'},{keys:['d/4'],duration:'8r'},{keys:['Db/4'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['Ab/3'],duration:'4'},{keys:['F/3'],duration:'4'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'8'},{keys:['d/4'],duration:'8r'},{keys:['Db/4'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['F/3'],duration:'4'},{keys:['D/3'],duration:'4'}] },
+          { chord: 'Eb7', beats: 4, melody: [{keys:['Eb/4'],duration:'8'},{keys:['d/4'],duration:'8r'},{keys:['Gb/4'],duration:'8'},{keys:['Eb/4'],duration:'8'},{keys:['Db/4'],duration:'4'},{keys:['Bb/3'],duration:'4'}] },
+          { chord: 'Eb7', beats: 4, melody: [{keys:['Eb/4'],duration:'8'},{keys:['d/4'],duration:'8r'},{keys:['Gb/4'],duration:'8'},{keys:['Eb/4'],duration:'8'},{keys:['Bb/3'],duration:'4'},{keys:['G/3'],duration:'4'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'8'},{keys:['d/4'],duration:'8r'},{keys:['Db/4'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['Ab/3'],duration:'4'},{keys:['F/3'],duration:'4'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['F/3'],duration:'8'},{keys:['d/4'],duration:'8r'},{keys:['Ab/3'],duration:'8'},{keys:['F/3'],duration:'8'},{keys:['Eb/3'],duration:'4'},{keys:['C/3'],duration:'4'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'4'},{keys:['Db/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['A/3'],duration:'4'},{keys:['F/3'],duration:'4'}] }
+        ],
+        layout: { measuresPerLine: 4, clef: 'bass' },
+        audio: {
+          type: 'synth',
+          voicings: {
+            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4'],
+            'Eb7': ['Bb3', 'Db4', 'Eb4', 'G4'],
+            'F7':  ['A3', 'C4', 'Eb4', 'F4']
+          },
+          bassNotes: {
+            'Bb7': ['Bb2', 'D3', 'F3', 'Ab3'],
+            'Eb7': ['Eb2', 'G2', 'Bb2', 'G2'],
+            'F7':  ['F2', 'A2', 'C3', 'Eb3']
+          }
+        },
+        tips: {
+          beginner: [
+            'Rebirth Brass Band anthem. Funky minor-pentatonic hook over a driving I7-IV7-V7 groove.',
+            'Bb minor pentatonic (Bb, Db, Eb, F, Ab) is home base. Use the blue note E for grit.',
+            'Keep it in the pocket — every note serves the groove, nothing flashy.',
+            'The hook is percussive: short, punchy notes with space between.',
+            'Play loud and proud. This is party music.'
+          ],
+          intermediate: [
+            'Second line drum pattern drives this. Lock into the "and of 2" snare accent.',
+            'Over Eb7 (bar 3-4), try the Db blues lick — it walks up from Bb to Eb naturally.',
+            'Use ghost notes — almost-unvoiced pitches that add rhythm without melody.',
+            'The F7 in bar 6 is the climax — build intensity into it, release on the Bb turnaround.',
+            'Trade 4 bars with another horn player if available. Call and response is core NOLA.'
+          ],
+          advanced: [
+            'Polyrhythmic feel: play in 3 against the 4 — dotted 8th note patterns create tension.',
+            'Chromatic lead-ins: approach each chord tone from a half step above or below.',
+            'Build to a "shout chorus": high register, unison lines with the section.',
+            'Quote "Hey Pocky Way" or other NOLA standards — the tradition loves musical references.',
+            'Listen to the trombone solos on Rebirth recordings for slide-heavy NOLA phrasing.'
+          ]
+        }
+      },
+
+      'fly-away': {
+        id: 'fly-away',
+        title: 'I\'ll Fly Away',
+        composer: 'Albert E. Brumley (trad.)',
+        key: 'Bb',
+        timeSignature: '4/4',
+        defaultTempo: 120,
+        tempoRange: [80, 180],
+        measures: [
+          { chord: 'Bb7', beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'4'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['G/4'],duration:'2'},{keys:['F/4'],duration:'2'}] },
+          { chord: 'Eb7', beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['G/4'],duration:'4'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['F/4'],duration:'2'},{keys:['d/4'],duration:'2r'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'4'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['G/4'],duration:'2'},{keys:['A/4'],duration:'2'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['F/4'],duration:'4'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'w'}] }
+        ],
+        layout: { measuresPerLine: 4, clef: 'bass' },
+        audio: {
+          type: 'synth',
+          voicings: {
+            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4'],
+            'Eb7': ['Bb3', 'Db4', 'Eb4', 'G4'],
+            'F7':  ['A3', 'C4', 'Eb4', 'F4']
+          },
+          bassNotes: {
+            'Bb7': ['Bb2', 'D3', 'F3', 'D3'],
+            'Eb7': ['Eb2', 'G2', 'Bb2', 'G2'],
+            'F7':  ['F2', 'A2', 'C3', 'A2']
+          }
+        },
+        tips: {
+          beginner: [
+            'Gospel staple embraced by brass bands. Usually played with joy and lift.',
+            'Simple I-IV-V changes. Bb major pentatonic gets you through the whole tune.',
+            'Lean into the major 3rd (D) — this is happy, bright music.',
+            'Clap on 2 and 4 while you play. Feel the church rhythm.',
+            'Many NOLA funerals end with this tune on the way back. Celebrate with every note.'
+          ],
+          intermediate: [
+            'Add grace notes above the melody — gospel singers do this naturally.',
+            'Trade the lead: play straight melody once, then paraphrase with eighth notes the second time.',
+            'The 6th (G) over Bb gives a sweet gospel sound. Use it freely.',
+            'When the form restarts, try playing an octave higher for lift and excitement.',
+            'Listen to Rebirth, Dirty Dozen, and Preservation Hall\'s takes.'
+          ],
+          advanced: [
+            'Reharmonize mentally: the V-of-V (C7) can sub for the F7 in bar 6 for a jazzier sound.',
+            'Gospel lick: blues-scale descending riff (Bb-Ab-G-F-Eb-D-Bb) fits any measure.',
+            'Build three choruses: melody, paraphrase, wail. The arc teaches solo architecture.',
+            'Quote "Amazing Grace" or "Just a Closer Walk" — sister gospel tunes that share DNA.',
+            'End on a long held note with vibrato — classic gospel brass ending.'
+          ]
+        }
+      },
+
+      'mardi-gras': {
+        id: 'mardi-gras',
+        title: 'Mardi Gras in New Orleans',
+        composer: 'Professor Longhair',
+        key: 'F',
+        timeSignature: '4/4',
+        defaultTempo: 95,
+        tempoRange: [80, 130],
+        measures: [
+          { chord: 'F7',  beats: 4, melody: [{keys:['C/4'],duration:'4'},{keys:['A/3'],duration:'8'},{keys:['C/4'],duration:'8'},{keys:['F/4'],duration:'4'},{keys:['A/3'],duration:'4'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['C/4'],duration:'4'},{keys:['A/3'],duration:'8'},{keys:['C/4'],duration:'8'},{keys:['F/4'],duration:'2'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['A/3'],duration:'4'},{keys:['G/3'],duration:'4'},{keys:['F/3'],duration:'4'},{keys:['C/4'],duration:'4'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['F/4'],duration:'2'},{keys:['d/4'],duration:'2r'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['Bb/4'],duration:'2'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['D/4'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['Bb/3'],duration:'4'},{keys:['F/3'],duration:'4'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['C/4'],duration:'4'},{keys:['A/3'],duration:'8'},{keys:['C/4'],duration:'8'},{keys:['F/4'],duration:'2'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['A/3'],duration:'2'},{keys:['F/3'],duration:'2'}] },
+          { chord: 'C7',  beats: 4, melody: [{keys:['G/3'],duration:'4'},{keys:['E/3'],duration:'8'},{keys:['G/3'],duration:'8'},{keys:['C/4'],duration:'2'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['F/3'],duration:'4'},{keys:['D/3'],duration:'4'},{keys:['Bb/3'],duration:'2'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['C/4'],duration:'4'},{keys:['A/3'],duration:'4'},{keys:['F/3'],duration:'2'}] },
+          { chord: 'C7',  beats: 4, melody: [{keys:['G/3'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['E/3'],duration:'2'}] }
+        ],
+        layout: { measuresPerLine: 4, clef: 'bass' },
+        audio: {
+          type: 'synth',
+          voicings: {
+            'F7':  ['A3', 'C4', 'Eb4', 'F4'],
+            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4'],
+            'C7':  ['Bb3', 'C4', 'E4', 'G4']
+          },
+          bassNotes: {
+            'F7':  ['F2', 'A2', 'C3', 'A2'],
+            'Bb7': ['Bb2', 'D3', 'F3', 'D3'],
+            'C7':  ['C2', 'E2', 'G2', 'E2']
+          }
+        },
+        tips: {
+          beginner: [
+            'Professor Longhair\'s anthem. 12-bar blues in F with Fess\'s iconic triplet feel.',
+            'Use the F blues scale (F, Ab, Bb, B, C, Eb). This IS the sound of NOLA blues.',
+            'Triplet subdivision is everything. Count "1-trip-let, 2-trip-let..." while you play.',
+            'Play short, percussive notes. The rhumba feel comes from rhythm, not legato.',
+            'Fess played piano with a left-hand rhumba bass. Feel that 3:2 pulse.'
+          ],
+          intermediate: [
+            'The "Caribbean" feel comes from the triplet 16th placement — not quite straight, not swung.',
+            'On bar 9 (C7), the 3rd (E) clashes beautifully with Eb from the F blues scale. Use both.',
+            'Call-and-response: 2-bar phrase, 2-bar answer. Classic Fess style.',
+            'Use the major 6th (D) over F7 for the bright, festive NOLA sound.',
+            'Listen to Dr. John, Art Neville, and Trombone Shorty for modern interpretations.'
+          ],
+          advanced: [
+            'Montuno-style comping from the piano inspires horn rhythmic phrasing. Lock with the clave.',
+            'Two-handed piano licks translate to octave jumps on horn — use the register.',
+            'Quote "Iko Iko" or "Mardi Gras Mambo" — they\'re cousins of this tune.',
+            'The blues scale + major 3rd (A) over F7 gives the full bebop-meets-Fess sound.',
+            'For the out chorus, double-time 16ths over the triplet bass for maximum excitement.'
+          ]
+        }
+      },
+
+      'its-later': {
+        id: 'its-later',
+        title: 'It\'s Later Than You Think',
+        composer: 'Carr/Magidson',
+        key: 'Bb',
+        timeSignature: '4/4',
+        defaultTempo: 120,
+        tempoRange: [90, 160],
+        measures: [
+          { chord: 'Bb7', beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['C/4'],duration:'2'},{keys:['Bb/3'],duration:'2'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['C/4'],duration:'2'},{keys:['A/3'],duration:'2'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['A/3'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'4'}] },
+          { chord: 'F7',  beats: 4, melody: [{keys:['Eb/4'],duration:'2'},{keys:['C/4'],duration:'2'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['D/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['F/4'],duration:'4'}] },
+          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'w'}] }
+        ],
+        layout: { measuresPerLine: 4, clef: 'bass' },
+        audio: {
+          type: 'synth',
+          voicings: {
+            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4'],
+            'F7':  ['A3', 'C4', 'Eb4', 'F4']
+          },
+          bassNotes: {
+            'Bb7': ['Bb2', 'D3', 'F3', 'D3'],
+            'F7':  ['F2', 'A2', 'C3', 'A2']
+          }
+        },
+        tips: {
+          beginner: [
+            '"Enjoy Yourself (It\'s Later Than You Think)" — brass band swing standard.',
+            'Simple I-V changes in Bb. Bb major scale works throughout.',
+            'Play the melody first — it\'s singable and tells you the story.',
+            'The tune is philosophical but happy. Keep the feel light and bouncy.',
+            'Swing the eighth notes — this is NOLA second line meets early swing.'
+          ],
+          intermediate: [
+            'Second line groove works, but so does medium swing. Try both feels.',
+            'Guide tones on F7: A (3rd) and Eb (b7) — pivot between them.',
+            'Add chromatic approach notes to target chord tones on strong beats.',
+            'Trade 4s with another horn — this tune loves conversational phrasing.',
+            'Listen to Preservation Hall\'s version for the traditional brass band take.'
+          ],
+          advanced: [
+            'The form repeats — build three choruses: melody, paraphrase, double-time.',
+            'Bb bebop dominant (Bb C D Eb F G Ab A) adds chromatic motion over everything.',
+            'On the ii-V into Bb, try a Cm7-F7 bebop line approaching the 3rd of Bb.',
+            'Quote "Let the Good Times Roll" or other NOLA party tunes for wink-wink moments.',
+            'For the final chorus, high-register octave-up melody with section playing harmony.'
+          ]
+        }
+      },
+
+      // ====================================================================
+      // PRACTICE FUNDAMENTALS — generic progressions, de-prioritized.
+      // ====================================================================
+
       'bb-blues': {
         id: 'bb-blues',
         title: '12-Bar Bb Blues',
@@ -2728,8 +3096,8 @@
     // APP STATE
     // =========================================================================
 
-    let currentProgression = PROGRESSIONS['bb-blues'];
-    let currentMode = 'symbols'; // Start with simplest mode for Phase 1
+    let currentProgression = PROGRESSIONS['do-whatcha-wanna'];
+    let currentMode = 'licks'; // Default to guided licks
     let currentLevel = 'beginner'; // 'beginner', 'intermediate', 'advanced'
     let isPlaying = false;
     let isLooping = true;
@@ -2751,7 +3119,7 @@
       { label: 'Hard Swing', value: 0.7 },
       { label: 'Second Line', value: 0.55, secondLine: true }
     ];
-    let currentSwing = 0; // index into SWING_SETTINGS
+    let currentSwing = 3; // default to Second Line feel — this is a NOLA app
     let showSlidePositions = true; // show trombone slide positions
 
     // Instrument / Transposition
@@ -3493,6 +3861,9 @@
       } else if (currentMode === 'licks' && currentLevel === 'advanced') {
         // Advanced licks: up to 8 eighth notes — need wide measures
         measuresPerLine = isNarrow ? 1 : 2;
+      } else if (currentMode === 'melody') {
+        // Melody lines can be dense with eighth notes; give them room
+        measuresPerLine = isNarrow ? 2 : Math.min(prog.layout.measuresPerLine, 4);
       } else {
         measuresPerLine = isNarrow ? 2 : prog.layout.measuresPerLine;
       }
@@ -3562,6 +3933,8 @@
         notes = makeLickNotes(measure.chord, measureIdx);
       } else if (currentMode === 'tones') {
         notes = makeChordToneNotes(measure.chord);
+      } else if (currentMode === 'melody') {
+        notes = makeMelodyNotes(measure);
       } else {
         notes = makeSlashNotes();
       }
@@ -3630,6 +4003,23 @@
             note.addModifier(ann, 0);
           }
         }
+        return note;
+      });
+    }
+
+    function makeMelodyNotes(measure) {
+      // Melody data lives on the measure itself: measure.melody = [{keys:['D/4'], duration:'4'}, ...]
+      if (!measure.melody || !measure.melody.length) return makeSlashNotes();
+      const clef = currentInstrument.clef;
+      const restKey = clef === 'bass' ? 'd/4' : 'b/4';
+      return measure.melody.map(n => {
+        const isRest = n.duration.endsWith('r');
+        if (isRest) {
+          return new VF.StaveNote({ clef, keys: [restKey], duration: n.duration });
+        }
+        const transposedKeys = n.keys.map(k => transposeVexKey(k));
+        const note = new VF.StaveNote({ clef, keys: transposedKeys, duration: n.duration });
+        addAccidentals(note, transposedKeys);
         return note;
       });
     }
@@ -4104,8 +4494,24 @@
 
     let lickEventIds = [];
 
+    // Returns the array of notes for a measure given the current mode
+    function getPlayableNotesForMeasure(measure) {
+      if (currentMode === 'melody') {
+        return measure.melody || null;
+      }
+      if (currentMode === 'licks') {
+        const levelLicks = LICKS[currentLevel];
+        if (!levelLicks) return null;
+        const licks = levelLicks[measure.chord];
+        if (!licks || !licks.length) return null;
+        const lick = licks[(chorusCount - 1) % licks.length];
+        return lick.notes;
+      }
+      return null;
+    }
+
     async function playLickDemo() {
-      if (currentMode !== 'licks') return;
+      if (currentMode !== 'licks' && currentMode !== 'melody') return;
       await initAudio();
 
       // Toggle off if already playing
@@ -4119,19 +4525,16 @@
       const myGen = lickPlayGeneration;
       updateHearLickBtn();
 
-      // If Transport is running, schedule on Transport so lick syncs to the beat
+      // If Transport is running, schedule on Transport so it syncs to the beat
       if (isPlaying) {
         lickEventIds = [];
         let beatOffset = 0;
         const prog = currentProgression;
         prog.measures.forEach(measure => {
-          const levelLicks = LICKS[currentLevel];
-          if (!levelLicks) { beatOffset += 4; return; }
-          const licks = levelLicks[measure.chord];
-          if (!licks || !licks.length) { beatOffset += 4; return; }
-          const lick = licks[(chorusCount - 1) % licks.length];
+          const notes = getPlayableNotesForMeasure(measure);
+          if (!notes || !notes.length) { beatOffset += 4; return; }
 
-          lick.notes.forEach(n => {
+          notes.forEach(n => {
             const beats = durationToBeats(n.duration);
             const isRest = n.duration.endsWith('r');
             if (!isRest) {
@@ -4168,13 +4571,10 @@
 
         const prog = currentProgression;
         prog.measures.forEach(measure => {
-          const levelLicks = LICKS[currentLevel];
-          if (!levelLicks) { offset += 4 * beatSec; return; }
-          const licks = levelLicks[measure.chord];
-          if (!licks || !licks.length) { offset += 4 * beatSec; return; }
-          const lick = licks[(chorusCount - 1) % licks.length];
+          const notes = getPlayableNotesForMeasure(measure);
+          if (!notes || !notes.length) { offset += 4 * beatSec; return; }
 
-          lick.notes.forEach(n => {
+          notes.forEach(n => {
             const beats = durationToBeats(n.duration);
             const isRest = n.duration.endsWith('r');
             if (!isRest) {
@@ -4213,7 +4613,8 @@
       if (!btn) return;
       btn.classList.toggle('playing', isPlayingLick);
       icon.className = isPlayingLick ? 'bi bi-stop-fill' : 'bi bi-headphones';
-      label.textContent = isPlayingLick ? 'Stop' : 'Hear Lick';
+      const defaultLabel = currentMode === 'melody' ? 'Hear Melody' : 'Hear Lick';
+      label.textContent = isPlayingLick ? 'Stop' : defaultLabel;
     }
 
     function scheduleProgression() {
@@ -4445,10 +4846,14 @@
           currentMode = btn.dataset.mode;
           document.getElementById('noteLegend').style.display = currentMode === 'tones' ? 'flex' : 'none';
           document.getElementById('levelBar').style.display = currentMode === 'licks' ? 'flex' : 'none';
-          document.getElementById('hearLickRow').style.display = currentMode === 'licks' ? 'flex' : 'none';
+          // Hear Lick/Melody button shows for both licks and melody modes
+          const hearRow = document.getElementById('hearLickRow');
+          const hearLabel = document.getElementById('hearLickLabel');
+          hearRow.style.display = (currentMode === 'licks' || currentMode === 'melody') ? 'flex' : 'none';
+          if (hearLabel) hearLabel.textContent = currentMode === 'melody' ? 'Hear Melody' : 'Hear Lick';
           updateSlideToggleVisibility();
           // Stop lick demo if switching away from licks mode
-          if (currentMode !== 'licks' && isPlayingLick) stopLickDemo();
+          if (currentMode !== 'licks' && currentMode !== 'melody' && isPlayingLick) stopLickDemo();
           gamification.trackModeUsed(currentMode);
           renderNotation();
         });
@@ -4554,12 +4959,26 @@
     // =========================================================================
 
     function init() {
-      // Default to symbols mode in UI
+      // Sync UI to currentMode (default: licks)
       document.querySelectorAll('.mode-btn').forEach(b => {
-        b.classList.toggle('active', b.dataset.mode === 'symbols');
+        b.classList.toggle('active', b.dataset.mode === currentMode);
       });
-      // Ensure hear-lick row and slide toggle match mode state
-      document.getElementById('hearLickRow').style.display = currentMode === 'licks' ? 'flex' : 'none';
+      // Sync progression dropdown to currentProgression
+      document.getElementById('progressionSelect').value = currentProgression.id;
+      // Apply progression's tempo range + default tempo
+      if (currentProgression.tempoRange) {
+        const ts = document.getElementById('tempoSlider');
+        ts.min = currentProgression.tempoRange[0];
+        ts.max = currentProgression.tempoRange[1];
+        ts.value = currentProgression.defaultTempo;
+        document.getElementById('tempoBpm').textContent = currentProgression.defaultTempo + ' BPM';
+      }
+      // Ensure level bar, hear-lick row, slide toggle match mode state
+      document.getElementById('levelBar').style.display = currentMode === 'licks' ? 'flex' : 'none';
+      const hearRow = document.getElementById('hearLickRow');
+      const hearLabel = document.getElementById('hearLickLabel');
+      hearRow.style.display = (currentMode === 'licks' || currentMode === 'melody') ? 'flex' : 'none';
+      if (hearLabel) hearLabel.textContent = currentMode === 'melody' ? 'Hear Melody' : 'Hear Lick';
       updateSlideToggleVisibility();
 
       gamification.init();
