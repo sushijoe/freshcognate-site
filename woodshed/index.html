@@ -1064,11 +1064,20 @@
       </button>
     </div>
     <select class="progression-select" id="progressionSelect">
-      <option value="bb-blues">12-Bar Bb Blues</option>
-      <option value="f-blues">12-Bar F Blues</option>
-      <option value="eb-blues">12-Bar Eb Blues</option>
-      <option value="c-minor-blues">Minor Blues in C</option>
-      <option value="ii-v-i-bb">ii-V-I in Bb</option>
+      <optgroup label="Blues">
+        <option value="bb-blues">12-Bar Bb Blues</option>
+        <option value="f-blues">12-Bar F Blues</option>
+        <option value="eb-blues">12-Bar Eb Blues</option>
+        <option value="c-minor-blues">Minor Blues in C</option>
+      </optgroup>
+      <optgroup label="Jazz">
+        <option value="ii-v-i-bb">ii-V-I in Bb</option>
+      </optgroup>
+      <optgroup label="New Orleans">
+        <option value="nola-second-line">Second Line in Bb</option>
+        <option value="nola-funk">NOLA Funk in Eb</option>
+        <option value="nola-traditional">Brass Band Trad in Bb</option>
+      </optgroup>
     </select>
   </header>
 
@@ -1273,6 +1282,7 @@
         <button class="swing-btn active" data-swing="0">Straight</button>
         <button class="swing-btn" data-swing="1">Light Swing</button>
         <button class="swing-btn" data-swing="2">Hard Swing</button>
+        <button class="swing-btn" data-swing="3">Second Line</button>
       </div>
     </div>
   </div>
@@ -1594,6 +1604,180 @@
             'Digital patterns through minor chords: 1-2-b3-5 on Cm7 and Fm7.',
             'Listen to Wayne Shorter, McCoy Tyner, and Joe Henderson for minor blues vocabulary.',
             'Try superimposing EbMaj7 arpeggios over Cm7 — this outlines the b3-5-b7-9.'
+          ]
+        }
+      },
+
+      // =====================================================================
+      // NEW ORLEANS BRASS BAND
+      // =====================================================================
+
+      'nola-second-line': {
+        id: 'nola-second-line',
+        title: 'Second Line in Bb',
+        key: 'Bb',
+        timeSignature: '4/4',
+        defaultTempo: 132,
+        tempoRange: [100, 180],
+        measures: [
+          { chord: 'Bb7', beats: 4 },
+          { chord: 'Bb7', beats: 4 },
+          { chord: 'Eb7', beats: 4 },
+          { chord: 'Eb7', beats: 4 },
+          { chord: 'F7',  beats: 4 },
+          { chord: 'Eb7', beats: 4 },
+          { chord: 'Bb7', beats: 4 },
+          { chord: 'F7',  beats: 4 }
+        ],
+        layout: { measuresPerLine: 4, clef: 'bass' },
+        audio: {
+          type: 'synth',
+          voicings: {
+            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4'],
+            'Eb7': ['Bb3', 'Db4', 'Eb4', 'G4'],
+            'F7':  ['A3', 'C4', 'Eb4', 'F4']
+          },
+          bassNotes: {
+            'Bb7': ['Bb2', 'D3', 'F3', 'D3'],
+            'Eb7': ['Eb2', 'G2', 'Bb2', 'G2'],
+            'F7':  ['F2', 'A2', 'C3', 'A2']
+          }
+        },
+        tips: {
+          beginner: [
+            'This is the 8-bar second line form — the backbone of New Orleans brass band music.',
+            'The I-IV-V in Bb is the most common NOLA key. Learn these three chords cold.',
+            'Listen for the "second line" bounce — dotted rhythms and syncopation define the feel.',
+            'Start by playing roots on the downbeats. Feel the groove before adding notes.',
+            'Think Rebirth Brass Band, Hot 8, Dirty Dozen — this is their home turf.'
+          ],
+          intermediate: [
+            'The Bb blues scale (Bb, Db, Eb, E, F, Ab) is your best friend over all three chords.',
+            'Use call-and-response: play a 2-bar riff, leave 2 bars of space, then answer it.',
+            'Accent the "and" of beats — this is what gives second line its bounce.',
+            'Connect Bb7 to Eb7 by walking down: Bb, Ab, G, Gb into Eb on the downbeat.',
+            'The turnaround (bars 7-8: Bb7 to F7) sets up the repeat. Build energy there.'
+          ],
+          advanced: [
+            'Layer pentatonic patterns: Bb minor pentatonic over Bb7, Eb minor pentatonic over Eb7.',
+            'Use rhythmic displacement — start a lick on the "and" of 4 and let it spill into the next bar.',
+            'Double-time feel: play 16th-note runs over the groove to build excitement.',
+            'Quote the melody style — short, punchy, repetitive riffs that the whole band can catch.',
+            'Listen to Rebirth\'s "Do Watcha Wanna" and Dirty Dozen\'s "My Feet Can\'t Fail Me Now" for vocabulary.'
+          ]
+        }
+      },
+
+      'nola-funk': {
+        id: 'nola-funk',
+        title: 'NOLA Funk in Eb',
+        key: 'Eb',
+        timeSignature: '4/4',
+        defaultTempo: 108,
+        tempoRange: [80, 150],
+        measures: [
+          { chord: 'Eb7', beats: 4 },
+          { chord: 'Ab7', beats: 4 },
+          { chord: 'Eb7', beats: 4 },
+          { chord: 'Eb7', beats: 4 },
+          { chord: 'Ab7', beats: 4 },
+          { chord: 'Ab7', beats: 4 },
+          { chord: 'Bb7', beats: 4 },
+          { chord: 'Bb7', beats: 4 }
+        ],
+        layout: { measuresPerLine: 4, clef: 'bass' },
+        audio: {
+          type: 'synth',
+          voicings: {
+            'Eb7': ['Bb3', 'Db4', 'Eb4', 'G4'],
+            'Ab7': ['Ab3', 'C4', 'Eb4', 'Gb4'],
+            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4']
+          },
+          bassNotes: {
+            'Eb7': ['Eb2', 'G2', 'Bb2', 'Eb3'],
+            'Ab7': ['Ab2', 'C3', 'Eb3', 'C3'],
+            'Bb7': ['Bb2', 'D3', 'F3', 'D3']
+          }
+        },
+        tips: {
+          beginner: [
+            'NOLA funk is all about the groove — lock in with the rhythm section before soloing.',
+            'Eb is a favorite brass band key. The Eb blues scale covers all three chords.',
+            'Keep it simple: short rhythmic riffs are more powerful than long lines.',
+            'Leave space! Funk breathes. Two notes in the right spot beat twenty in the wrong spot.',
+            'Listen to the Soul Rebels and Galactic for this groove.'
+          ],
+          intermediate: [
+            'The Eb minor pentatonic (Eb, Gb, Ab, Bb, Db) is your foundation here.',
+            'Add the major 3rd (G) over Eb7 for a sweet/sour blues sound.',
+            'Use rhythmic motifs: pick a 1-bar rhythm and transpose it through the chord changes.',
+            'The Ab7 in bars 5-6 is where you can build — lean into the Gb (b7) for tension.',
+            'Syncopation is king: anticipate the downbeat by playing on the "and" of 4.'
+          ],
+          advanced: [
+            'Layer in chromatic approach notes — Ab to A to Bb gives classic NOLA funk grit.',
+            'Use octave displacement: jump a riff up an octave for the "answer" in call-and-response.',
+            'Over Bb7 (bars 7-8), use the whole-tone scale (Bb, C, D, E, G, A) for a floaty contrast.',
+            'Trombone smears and lip bends define the NOLA sound — approximate with grace notes.',
+            'Study Troy "Trombone Shorty" Andrews and the Stooges Brass Band for modern NOLA funk.'
+          ]
+        }
+      },
+
+      'nola-traditional': {
+        id: 'nola-traditional',
+        title: 'Brass Band Trad in Bb',
+        key: 'Bb',
+        timeSignature: '4/4',
+        defaultTempo: 116,
+        tempoRange: [80, 160],
+        measures: [
+          { chord: 'BbMaj7', beats: 4 },
+          { chord: 'BbMaj7', beats: 4 },
+          { chord: 'Eb7',    beats: 4 },
+          { chord: 'Eb7',    beats: 4 },
+          { chord: 'Bb7',    beats: 4 },
+          { chord: 'F7',     beats: 4 },
+          { chord: 'BbMaj7', beats: 4 },
+          { chord: 'F7',     beats: 4 }
+        ],
+        layout: { measuresPerLine: 4, clef: 'bass' },
+        audio: {
+          type: 'synth',
+          voicings: {
+            'BbMaj7': ['A3', 'Bb3', 'D4', 'F4'],
+            'Eb7':    ['Bb3', 'Db4', 'Eb4', 'G4'],
+            'Bb7':    ['Bb3', 'D4', 'F4', 'Ab4'],
+            'F7':     ['A3', 'C4', 'Eb4', 'F4']
+          },
+          bassNotes: {
+            'BbMaj7': ['Bb2', 'D3', 'F3', 'D3'],
+            'Eb7':    ['Eb2', 'G2', 'Bb2', 'G2'],
+            'Bb7':    ['Bb2', 'D3', 'F3', 'D3'],
+            'F7':     ['F2', 'A2', 'C3', 'A2']
+          }
+        },
+        tips: {
+          beginner: [
+            'This 8-bar form is based on traditional brass band hymns and spirituals.',
+            'The BbMaj7 is "home" — it has a major 7th (A) that sounds warm and resolved.',
+            'Bars 5-6 (Bb7 to F7) add tension before coming home to BbMaj7.',
+            'Think "When the Saints" energy — melodic, singable, joyful.',
+            'Start by playing the Bb major scale (Bb, C, D, Eb, F, G, A) over the whole form.'
+          ],
+          intermediate: [
+            'Over BbMaj7, emphasize the A natural (major 7th) — this note defines the major sound.',
+            'When Bb7 arrives in bar 5, the Ab replaces the A. Hear that shift from major to dominant.',
+            'Use the Bb major pentatonic (Bb, C, D, F, G) over BbMaj7 — bright and happy.',
+            'Over Eb7, target the G (3rd) and Db (b7) — these are the guide tones.',
+            'The V-I turnaround (F7 → BbMaj7) is where you want to resolve — land on Bb or D.'
+          ],
+          advanced: [
+            'Mix major and blues sounds: alternate Bb major pentatonic with Bb blues scale.',
+            'Use the #4 (E natural) as a passing tone between Eb and F for a classic brass band color.',
+            'Over the Bb7 bar, borrow from the bebop scale: Bb, C, D, Eb, F, G, Ab, A — 8 notes to the octave.',
+            'Create call-and-response between registers: low riff in bars 1-2, high answer in bars 3-4.',
+            'Listen to the Preservation Hall Jazz Band and Treme Brass Band for this traditional vocabulary.'
           ]
         }
       }
@@ -2502,7 +2686,8 @@
     const SWING_SETTINGS = [
       { label: 'Straight', value: 0 },
       { label: 'Light Swing', value: 0.4 },
-      { label: 'Hard Swing', value: 0.7 }
+      { label: 'Hard Swing', value: 0.7 },
+      { label: 'Second Line', value: 0.55, secondLine: true }
     ];
     let currentSwing = 0; // index into SWING_SETTINGS
     let showSlidePositions = true; // show trombone slide positions
@@ -2577,6 +2762,9 @@
         { id: 'ii-v-i-master',   name: 'ii-V-I Master',         desc: '50 choruses on ii-V-I',                  icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['ii-v-i-bb']||{}).choruses >= 50 },
         { id: 'eb-master',       name: 'Eb Blues Master',       desc: '50 choruses on Eb Blues',                icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['eb-blues']||{}).choruses >= 50 },
         { id: 'minor-master',    name: 'Minor Blues Master',    desc: '50 choruses on Minor Blues',             icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['c-minor-blues']||{}).choruses >= 50 },
+        { id: 'nola-master',     name: 'Second Line Master',   desc: '50 choruses on Second Line',            icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['nola-second-line']||{}).choruses >= 50 },
+        { id: 'funk-master',     name: 'NOLA Funk Master',     desc: '50 choruses on NOLA Funk',              icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['nola-funk']||{}).choruses >= 50 },
+        { id: 'trad-master',     name: 'Brass Band Master',    desc: '50 choruses on Brass Band Trad',        icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['nola-traditional']||{}).choruses >= 50 },
         // Fun
         { id: 'night-owl',       name: 'Night Owl',              desc: 'Practice after 10 PM',                   icon: 'bi-moon-stars',        cat: 'fun',         check: d => d.stats._nightOwl },
         { id: 'early-bird',      name: 'Early Bird',             desc: 'Practice before 7 AM',                   icon: 'bi-sunrise',           cat: 'fun',         check: d => d.stats._earlyBird },
@@ -3999,26 +4187,65 @@
           }, `0:${beatOffset + b}:0`);
         }
 
-        // Jazz ride pattern: hits on each beat + skip-note on "and" of 2 and 4
-        for (let b = 0; b < 4; b++) {
+        const isSecondLine = SWING_SETTINGS[currentSwing] && SWING_SETTINGS[currentSwing].secondLine;
+
+        if (isSecondLine) {
+          // Second line drum pattern: snare on "and" of 2, accented hi-hat pattern
+          // Beat 1: kick
+          Tone.Transport.schedule(time => {
+            kick.triggerAttackRelease('C1', '8n', time);
+          }, `0:${beatOffset}:0`);
+          // "and" of 1: hat
+          Tone.Transport.schedule(time => {
+            hihat.triggerAttackRelease('32n', time, 0.3);
+          }, `0:${beatOffset}:2`);
+          // Beat 2: hat
           Tone.Transport.schedule(time => {
             hihat.triggerAttackRelease('16n', time);
-          }, `0:${beatOffset + b}:0`);
-          // Skip note (lighter) on "and" of beats 2 and 4 — swing makes this groove
-          if (b === 1 || b === 3) {
+          }, `0:${beatOffset + 1}:0`);
+          // "and" of 2: SNARE (the signature second line accent)
+          Tone.Transport.schedule(time => {
+            kick.triggerAttackRelease('D2', '16n', time, 0.7);
+            hihat.triggerAttackRelease('16n', time, 0.5);
+          }, `0:${beatOffset + 1}:2`);
+          // Beat 3: kick
+          Tone.Transport.schedule(time => {
+            kick.triggerAttackRelease('C1', '8n', time, 0.6);
+          }, `0:${beatOffset + 2}:0`);
+          // "and" of 3: hat
+          Tone.Transport.schedule(time => {
+            hihat.triggerAttackRelease('32n', time, 0.3);
+          }, `0:${beatOffset + 2}:2`);
+          // Beat 4: hat + light kick
+          Tone.Transport.schedule(time => {
+            hihat.triggerAttackRelease('16n', time);
+            kick.triggerAttackRelease('C1', '16n', time, 0.3);
+          }, `0:${beatOffset + 3}:0`);
+          // "and" of 4: hat accent
+          Tone.Transport.schedule(time => {
+            hihat.triggerAttackRelease('16n', time, 0.4);
+          }, `0:${beatOffset + 3}:2`);
+        } else {
+          // Jazz ride pattern: hits on each beat + skip-note on "and" of 2 and 4
+          for (let b = 0; b < 4; b++) {
             Tone.Transport.schedule(time => {
-              hihat.triggerAttackRelease('32n', time, 0.25);
-            }, `0:${beatOffset + b}:2`);
+              hihat.triggerAttackRelease('16n', time);
+            }, `0:${beatOffset + b}:0`);
+            if (b === 1 || b === 3) {
+              Tone.Transport.schedule(time => {
+                hihat.triggerAttackRelease('32n', time, 0.25);
+              }, `0:${beatOffset + b}:2`);
+            }
           }
-        }
 
-        // Kick: gentle pulse on 1, feathered on 3
-        Tone.Transport.schedule(time => {
-          kick.triggerAttackRelease('C1', '8n', time);
-        }, `0:${beatOffset}:0`);
-        Tone.Transport.schedule(time => {
-          kick.triggerAttackRelease('C1', '8n', time, 0.4);
-        }, `0:${beatOffset + 2}:0`);
+          // Kick: gentle pulse on 1, feathered on 3
+          Tone.Transport.schedule(time => {
+            kick.triggerAttackRelease('C1', '8n', time);
+          }, `0:${beatOffset}:0`);
+          Tone.Transport.schedule(time => {
+            kick.triggerAttackRelease('C1', '8n', time, 0.4);
+          }, `0:${beatOffset + 2}:0`);
+        }
 
         beatOffset += measure.beats;
       });
