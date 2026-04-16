@@ -20,13 +20,14 @@
       --accent-dim: #c43d1f;
       --accent2: #c850c0;         /* Fuscia/purple accent */
       --accent2-dim: #a040a0;
-      --text-primary: #eef0f5;
-      --text-secondary: #8ea0be;
+      --text-primary: #f0f2f7;
+      --text-secondary: #a0b5d0;  /* Brighter for better contrast */
       --highlight: rgba(232, 74, 39, 0.18);
       --highlight-border: rgba(232, 74, 39, 0.65);
       --chord-tone: #e84a27;      /* Orange for chord tones */
       --scale-tone: #c850c0;      /* Purple for scale tones */
       --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --section-border: rgba(255,255,255,0.06);
     }
 
     * { box-sizing: border-box; }
@@ -48,28 +49,38 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 16px;
+      padding: 10px 16px;
       background: var(--bg-surface);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      min-height: 48px;
+      border-bottom: 1px solid var(--section-border);
+      min-height: 50px;
       flex-shrink: 0;
     }
 
     .app-title {
-      font-size: 20px;
-      font-weight: 700;
+      font-size: 18px;
+      font-weight: 800;
       color: var(--accent);
-      letter-spacing: 1px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .progression-select {
       background: var(--bg-card);
       color: var(--text-primary);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 8px;
-      padding: 6px 12px;
-      font-size: 14px;
+      padding: 7px 12px;
+      font-size: 13px;
       max-width: 200px;
+      cursor: pointer;
+    }
+
+    .progression-select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(232, 74, 39, 0.2);
     }
 
     /* Mode toggle */
@@ -78,12 +89,13 @@
       padding: 8px 16px;
       gap: 0;
       background: var(--bg-surface);
+      border-bottom: 1px solid var(--section-border);
       flex-shrink: 0;
     }
 
     .mode-btn {
       flex: 1;
-      padding: 8px 4px;
+      padding: 9px 4px;
       font-size: 12px;
       font-weight: 600;
       text-align: center;
@@ -92,6 +104,7 @@
       border: 1px solid rgba(255,255,255,0.08);
       cursor: pointer;
       transition: all 0.2s;
+      letter-spacing: 0.3px;
     }
 
     .mode-btn:first-child { border-radius: 8px 0 0 8px; }
@@ -99,30 +112,31 @@
 
     .mode-btn.active {
       background: var(--accent);
-      color: #121220;
+      color: #fff;
       border-color: var(--accent);
+      box-shadow: 0 2px 8px rgba(232, 74, 39, 0.25);
     }
 
     /* Level bar */
     .level-bar {
       display: flex;
-      padding: 4px 16px 6px;
+      padding: 6px 16px 8px;
       gap: 8px;
       background: var(--bg-surface);
-      border-bottom: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid var(--section-border);
       flex-shrink: 0;
     }
 
     .level-btn {
       flex: 1;
-      padding: 5px 4px;
+      padding: 6px 4px;
       font-size: 11px;
       font-weight: 600;
       text-align: center;
-      background: transparent;
+      background: rgba(255,255,255,0.03);
       color: var(--text-secondary);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s;
     }
@@ -132,7 +146,8 @@
     .level-btn.active {
       background: rgba(200, 80, 192, 0.18);
       color: var(--accent2);
-      border-color: var(--accent2-dim);
+      border-color: var(--accent2);
+      box-shadow: 0 2px 8px rgba(200, 80, 192, 0.15);
     }
 
     /* Notation area */
@@ -140,11 +155,12 @@
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 4px 8px;
+      padding: 8px 10px;
       padding-bottom: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      background: var(--bg-dark);
     }
 
     #notation {
@@ -274,9 +290,9 @@
     .transport-bar {
       flex-shrink: 0;
       background: var(--bg-surface);
-      border-top: 1px solid rgba(255,255,255,0.08);
-      padding: 8px 16px;
-      padding-bottom: calc(8px + var(--safe-bottom));
+      border-top: 1px solid rgba(255,255,255,0.10);
+      padding: 10px 16px;
+      padding-bottom: calc(10px + var(--safe-bottom));
       z-index: 100;
     }
 
@@ -284,40 +300,44 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 8px;
+      gap: 14px;
+      margin-bottom: 10px;
     }
 
     .transport-btn {
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
-      border: none;
+      border: 1px solid rgba(255,255,255,0.08);
       background: var(--bg-card);
-      color: var(--text-primary);
-      font-size: 20px;
+      color: var(--text-secondary);
+      font-size: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: all 0.15s;
     }
 
-    .transport-btn:active { background: var(--accent-dim); }
+    .transport-btn:hover { border-color: rgba(255,255,255,0.15); color: var(--text-primary); }
+    .transport-btn:active { background: var(--accent-dim); color: #fff; }
 
     .transport-btn.play-btn {
       width: 56px;
       height: 56px;
       background: var(--accent);
-      color: #121220;
+      color: #fff;
       font-size: 24px;
+      border: none;
+      box-shadow: 0 3px 12px rgba(232, 74, 39, 0.35);
     }
 
     .transport-btn.play-btn:active { background: var(--accent-dim); }
 
     .transport-btn.active {
       background: var(--accent);
-      color: #121220;
+      color: #fff;
+      border-color: var(--accent);
     }
 
     .tempo-row {
@@ -327,10 +347,12 @@
     }
 
     .tempo-label {
-      font-size: 13px;
+      font-size: 12px;
+      font-weight: 600;
       color: var(--text-secondary);
-      min-width: 70px;
+      min-width: 50px;
       text-align: right;
+      letter-spacing: 0.3px;
     }
 
     .tempo-slider {
@@ -353,10 +375,11 @@
     }
 
     .tempo-bpm {
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 700;
       color: var(--accent);
-      min-width: 55px;
+      min-width: 60px;
+      letter-spacing: 0.5px;
     }
 
     /* Legend for Mode 2 */
@@ -422,29 +445,44 @@
     .instrument-row {
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 7px 10px;
       background: var(--bg-surface);
-      border-bottom: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid var(--section-border);
       flex-shrink: 0;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
     }
-
-    .instrument-row::-webkit-scrollbar { display: none; }
 
     .inst-btn {
-      display: flex; flex-direction: column; align-items: center; gap: 3px;
-      background: var(--bg-card); border: 1.5px solid rgba(255,255,255,0.08);
-      border-radius: 10px; padding: 6px 8px 5px; cursor: pointer;
-      min-width: 62px; flex-shrink: 0; transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 5px 11px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      letter-spacing: 0.2px;
     }
-    .inst-btn:hover { border-color: rgba(255,255,255,0.2); }
-    .inst-btn.active { background: rgba(232,74,39,0.15); border-color: var(--accent); }
-    .inst-btn svg { width: 28px; height: 28px; fill: var(--text-secondary); transition: fill 0.15s; }
-    .inst-btn.active svg { fill: var(--accent); }
-    .inst-btn-label { font-size: 9px; color: var(--text-secondary); text-align: center; line-height: 1.2; white-space: nowrap; }
-    .inst-btn.active .inst-btn-label { color: var(--accent); font-weight: 600; }
+
+    .inst-btn:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.15);
+      color: var(--text-primary);
+    }
+
+    .inst-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(232, 74, 39, 0.3);
+    }
 
     .instrument-select { display: none; }
 
@@ -452,7 +490,7 @@
     .hear-lick-row {
       display: flex;
       justify-content: center;
-      padding: 6px 16px 2px;
+      padding: 8px 16px 4px;
       background: var(--bg-surface);
       flex-shrink: 0;
     }
@@ -460,24 +498,27 @@
     .hear-lick-btn {
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 7px 18px;
+      gap: 7px;
+      padding: 8px 20px;
       font-size: 13px;
       font-weight: 600;
       color: var(--text-primary);
       background: var(--bg-card);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 20px;
       cursor: pointer;
       transition: all 0.2s;
+      letter-spacing: 0.3px;
     }
 
+    .hear-lick-btn:hover { border-color: rgba(255,255,255,0.2); }
     .hear-lick-btn:active { background: var(--accent-dim); }
 
     .hear-lick-btn.playing {
       background: var(--accent);
-      color: #121220;
+      color: #fff;
       border-color: var(--accent);
+      box-shadow: 0 2px 8px rgba(232, 74, 39, 0.25);
     }
 
     .hear-lick-btn i { font-size: 15px; }
@@ -487,14 +528,16 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-top: 6px;
+      margin-top: 8px;
     }
 
     .swing-label {
-      font-size: 13px;
+      font-size: 12px;
+      font-weight: 600;
       color: var(--text-secondary);
-      min-width: 70px;
+      min-width: 50px;
       text-align: right;
+      letter-spacing: 0.3px;
     }
 
     .swing-options {
@@ -505,7 +548,7 @@
 
     .swing-btn {
       flex: 1;
-      padding: 5px 4px;
+      padding: 6px 4px;
       font-size: 11px;
       font-weight: 600;
       text-align: center;
@@ -514,15 +557,17 @@
       border: 1px solid rgba(255,255,255,0.08);
       cursor: pointer;
       transition: all 0.2s;
+      letter-spacing: 0.2px;
     }
 
     .swing-btn:first-child { border-radius: 6px 0 0 6px; }
     .swing-btn:last-child { border-radius: 0 6px 6px 0; }
 
     .swing-btn.active {
-      background: rgba(200, 80, 192, 0.18);
+      background: rgba(200, 80, 192, 0.20);
       color: var(--accent2);
-      border-color: var(--accent2-dim);
+      border-color: var(--accent2);
+      box-shadow: 0 2px 6px rgba(200, 80, 192, 0.12);
     }
 
     /* ===== GAMIFICATION ===== */
@@ -1031,13 +1076,57 @@
     }
     .slide-toggle.active::after { transform: translateX(16px); }
 
+    /* ===== MOBILE-FIRST RESPONSIVE ===== */
     @media (max-width: 479px) {
-      .xp-micro-bar { width: 40px; }
+      /* Header — compact single line */
+      .app-header { padding: 6px 10px; min-height: 42px; }
+      .app-title { font-size: 13px; letter-spacing: 1px; white-space: nowrap; }
+      .progression-select { font-size: 12px; padding: 5px 8px; max-width: 155px; }
+      .header-stats { gap: 5px; }
+      .xp-micro-bar { width: 36px; }
       .xp-micro-label { display: none; }
-      .header-stats { gap: 6px; }
-      .app-title { font-size: 16px; }
+      .streak-badge { font-size: 12px; }
+      .stats-toggle-btn { font-size: 16px; padding: 2px; }
+
+      /* Instruments — compact wrap grid */
+      .instrument-row { padding: 5px 8px; gap: 4px; }
+      .inst-btn { padding: 4px 9px; font-size: 11px; border-radius: 14px; }
+
+      /* Mode / Level — tighter */
+      .mode-bar { padding: 5px 10px; }
+      .mode-btn { padding: 7px 4px; font-size: 11px; }
+      .level-bar { padding: 4px 10px 5px; gap: 6px; }
+      .level-btn { padding: 5px 4px; font-size: 10px; }
+
+      /* Hear Lick / Slide toggle — compact */
+      .hear-lick-row { padding: 5px 10px 2px; }
+      .hear-lick-btn { padding: 6px 14px; font-size: 12px; }
+      .slide-toggle-row { padding: 3px 14px; font-size: 12px; }
+
+      /* Notation — max space */
+      .notation-area { padding: 4px 4px 8px; }
+
+      /* Transport — compact */
+      .transport-bar { padding: 6px 10px; padding-bottom: calc(6px + var(--safe-bottom)); }
+      .transport-controls { gap: 10px; margin-bottom: 6px; }
+      .transport-btn { width: 38px; height: 38px; font-size: 16px; }
+      .transport-btn.play-btn { width: 48px; height: 48px; font-size: 22px; }
+      .tempo-row { gap: 8px; }
+      .tempo-label { font-size: 11px; min-width: 40px; }
+      .tempo-bpm { font-size: 12px; min-width: 52px; }
+      .swing-row { margin-top: 5px; gap: 8px; }
+      .swing-label { font-size: 11px; min-width: 40px; }
+      .swing-btn { padding: 5px 2px; font-size: 10px; }
+
+      /* Gamification */
       .achievements-grid { grid-template-columns: repeat(5, 1fr); gap: 6px; }
       .achievement-icon { width: 34px; height: 34px; font-size: 14px; }
+    }
+
+    /* Tablet and up — slightly more room */
+    @media (min-width: 480px) {
+      .inst-btn { padding: 6px 13px; font-size: 12px; }
+      .instrument-row { gap: 6px; padding: 8px 12px; }
     }
   </style>
 </head>
@@ -1117,42 +1206,15 @@
 
   <!-- Instrument Picker -->
   <div class="instrument-row" id="instrumentRow">
-    <button class="inst-btn" data-name="tuba" title="Tuba / Euphonium">
-      <svg viewBox="0 0 40 40"><path d="M20 4v12M17 4h6M15 16c-5 2-9 7-9 13 0 5 6 9 14 9s14-4 14-9c0-6-4-11-9-13M15 16h10M13 28a7 7 0 0114 0" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="inst-btn-label">Tuba</span>
-    </button>
-    <button class="inst-btn active" data-name="trombone" title="Trombone">
-      <svg viewBox="0 0 40 40"><path d="M4 20h22M4 24h22M26 14c5 0 10 3 10 8s-5 8-10 8M9 18v-6l4-4M9 26v6" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="inst-btn-label">Trombone</span>
-    </button>
-    <button class="inst-btn" data-name="horn" title="French Horn / Mellophone">
-      <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="12" stroke-width="2.2" stroke="currentColor" fill="none"/><circle cx="20" cy="20" r="5" stroke-width="2" stroke="currentColor" fill="none"/><path d="M32 20h4M8 20c0-6 5-12 12-12" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round"/></svg>
-      <span class="inst-btn-label">Horn</span>
-    </button>
-    <button class="inst-btn" data-name="trumpet" title="Trumpet">
-      <svg viewBox="0 0 40 40"><path d="M4 22h20M4 18h20M24 14c5 0 12 3 12 8s-7 8-12 8M10 16v-4M14 16v-5M18 16v-4" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="inst-btn-label">Trumpet</span>
-    </button>
-    <button class="inst-btn" data-name="bari-sax" title="Baritone Saxophone">
-      <svg viewBox="0 0 40 40"><path d="M15 4c0 0 1 1 1 3v13c0 3 5 6 7 10 2 5-2 8-7 8s-7-2-6-6c1-3 4-4 6-4M16 7l4-2M16 12l4-2M16 17l4-1M16 22l4-1" stroke-width="2.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="inst-btn-label">Bari Sax</span>
-    </button>
-    <button class="inst-btn" data-name="alto-sax" title="Alto Saxophone">
-      <svg viewBox="0 0 40 40"><path d="M18 4c0 0 1 1 1 3v10c0 2 3 8 5 12 2 5-1 9-6 9s-7-3-6-7c1-3 4-5 6-5M19 7l3-2M19 11l3-2M19 15l3-1" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="inst-btn-label">Alto Sax</span>
-    </button>
-    <button class="inst-btn" data-name="tenor-sax" title="Tenor Saxophone">
-      <svg viewBox="0 0 40 40"><path d="M16 4c0 0 1 1 1 3v12c0 2 4 7 6 11 2 5-1 8-6 8s-7-2-6-6c1-3 4-5 6-5M17 7l3-2M17 11l3-2M17 15l3-1M17 19l3-1" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="inst-btn-label">Tenor Sax</span>
-    </button>
-    <button class="inst-btn" data-name="clarinet" title="Clarinet">
-      <svg viewBox="0 0 40 40"><path d="M20 4v26c0 2-1 4-3 5s-5 0-5-3 3-4 5-4h3M18 8h4M18 13h4M18 18h4M18 23h4" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="inst-btn-label">Clarinet</span>
-    </button>
-    <button class="inst-btn" data-name="piano" title="Piano / Guitar / Flute">
-      <svg viewBox="0 0 40 40"><path d="M8 12h24v18H8zM8 12h24M14 12v11M20 12v11M26 12v11M12 12v7M17 12v7M23 12v7M29 12v7" stroke-width="1.8" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="inst-btn-label">Piano</span>
-    </button>
+    <button class="inst-btn" data-name="tuba" title="Tuba / Euphonium">Tuba</button>
+    <button class="inst-btn active" data-name="trombone" title="Trombone">Bone</button>
+    <button class="inst-btn" data-name="horn" title="French Horn / Mellophone">Horn</button>
+    <button class="inst-btn" data-name="trumpet" title="Trumpet">Trumpet</button>
+    <button class="inst-btn" data-name="bari-sax" title="Baritone Saxophone">Bari</button>
+    <button class="inst-btn" data-name="alto-sax" title="Alto Saxophone">Alto</button>
+    <button class="inst-btn" data-name="tenor-sax" title="Tenor Saxophone">Tenor</button>
+    <button class="inst-btn" data-name="clarinet" title="Clarinet">Clar</button>
+    <button class="inst-btn" data-name="piano" title="Piano / Guitar / Flute">Keys</button>
   </div>
 
   <!-- Mode toggle -->
@@ -3424,9 +3486,12 @@
       const prog = currentProgression;
       const containerWidth = container.clientWidth || 600;
       const isNarrow = containerWidth < 480;
-      // Chord Tones mode needs wider measures for legibility (many notes per bar)
+      // Dense modes need wider measures for legibility (many notes per bar)
       let measuresPerLine;
       if (currentMode === 'tones') {
+        measuresPerLine = isNarrow ? 1 : 2;
+      } else if (currentMode === 'licks' && currentLevel === 'advanced') {
+        // Advanced licks: up to 8 eighth notes — need wide measures
         measuresPerLine = isNarrow ? 1 : 2;
       } else {
         measuresPerLine = isNarrow ? 2 : prog.layout.measuresPerLine;
@@ -3970,12 +4035,12 @@
         volume: -16
       }).connect(reverb);
 
-      // Walking bass — filtered for round, upright-like tone
-      const bassFilter = new Tone.Filter(500, 'lowpass', -12).connect(masterVol);
+      // Tuba bass — warm, round brass tone with breathy attack
+      const bassFilter = new Tone.Filter(380, 'lowpass', -12).connect(masterVol);
       bass = new Tone.Synth({
-        oscillator: { type: 'fmsine', modulationType: 'sine', modulationIndex: 0.6, harmonicity: 1 },
-        envelope: { attack: 0.025, decay: 0.25, sustain: 0.4, release: 0.35 },
-        volume: -6
+        oscillator: { type: 'fmsine', modulationType: 'triangle', modulationIndex: 0.9, harmonicity: 1.005 },
+        envelope: { attack: 0.06, decay: 0.35, sustain: 0.55, release: 0.45 },
+        volume: -5
       }).connect(bassFilter);
 
       // Ride cymbal — bandpass-filtered noise for metallic shimmer
