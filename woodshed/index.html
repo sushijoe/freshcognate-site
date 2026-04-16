@@ -164,19 +164,21 @@
     #notation svg text {
       fill: var(--text-primary) !important;
     }
-    /* Staff lines — subtle so notes pop */
+    /* Staff lines — visible enough to read note positions clearly */
     #notation svg .vf-stave > path,
     #notation svg .vf-stave > line,
     #notation svg .vf-stave > rect {
-      stroke: rgba(255,255,255,0.25) !important;
+      stroke: rgba(255,255,255,0.45) !important;
+      stroke-width: 1px !important;
       fill: none !important;
     }
-    /* Barlines — slightly brighter than staff lines */
+    /* Barlines — prominent, clearly separate measures */
     #notation svg .vf-stavebarline path,
     #notation svg .vf-stavebarline line {
-      stroke: rgba(255,255,255,0.4) !important;
+      stroke: rgba(255,255,255,0.75) !important;
+      stroke-width: 1.5px !important;
     }
-    /* Clef, key signature, time signature — bright and clear */
+    /* Clef, key signature, time signature — white and bold */
     #notation svg .vf-clef path {
       fill: #ffffff !important;
       stroke: #ffffff !important;
@@ -189,13 +191,21 @@
       fill: #ffffff !important;
       stroke: #ffffff !important;
     }
-    /* Notes, stems, flags, accidentals — bright */
+    /* Notes, stems, flags, accidentals — full white for maximum contrast */
     #notation svg .vf-stavenote path,
     #notation svg .vf-notehead path,
     #notation svg .vf-stem path,
+    #notation svg .vf-flag path,
+    #notation svg .vf-beam path,
     #notation svg .vf-stavenote line {
-      fill: var(--text-primary) !important;
-      stroke: var(--text-primary) !important;
+      fill: #ffffff !important;
+      stroke: #ffffff !important;
+    }
+    /* Leger lines — bright and clear */
+    #notation svg .vf-ledger line,
+    #notation svg line.vf-ledger {
+      stroke: rgba(255,255,255,0.65) !important;
+      stroke-width: 1.2px !important;
     }
 
     .measure-highlight {
@@ -1096,37 +1106,41 @@
     <button class="share-btn" id="shareBtn"><i class="bi bi-share"></i> Share Progress</button>
   </div>
 
-  <!-- Instrument / Transposition -->
+  <!-- Instrument Picker -->
   <div class="instrument-row" id="instrumentRow">
-    <button class="inst-btn active" data-inst="bass-concert" title="Trombone / Tuba / Euphonium">
-      <svg viewBox="0 0 64 64"><path d="M14 52c0-2 1-3 3-4l2-18c0-2 1-4 3-5l4-3c1-1 2-3 2-5V12c0-2 2-4 4-4s4 2 4 4v5c0 2 1 4 2 5l4 3c2 1 3 3 3 5l2 18c2 1 3 2 3 4 0 3-7 6-18 6S14 55 14 52z"/></svg>
+    <button class="inst-btn" data-name="tuba" title="Tuba / Euphonium">
+      <svg viewBox="0 0 40 40"><path d="M20 4v12M17 4h6M15 16c-5 2-9 7-9 13 0 5 6 9 14 9s14-4 14-9c0-6-4-11-9-13M15 16h10M13 28a7 7 0 0114 0" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="inst-btn-label">Tuba</span>
+    </button>
+    <button class="inst-btn active" data-name="trombone" title="Trombone">
+      <svg viewBox="0 0 40 40"><path d="M4 20h22M4 24h22M26 14c5 0 10 3 10 8s-5 8-10 8M9 18v-6l4-4M9 26v6" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span class="inst-btn-label">Trombone</span>
     </button>
-    <button class="inst-btn" data-inst="treble-bb" title="Trumpet / Tenor Sax / Clarinet">
-      <svg viewBox="0 0 64 64"><path d="M12 38c0-4 3-8 8-10V14c0-2 1-3 3-3h2V8c0-1 1-2 2-2h10c1 0 2 1 2 2v3h2c2 0 3 1 3 3v14c5 2 8 6 8 10 0 8-9 14-20 14S12 46 12 38zM22 14v12h20V14H22z"/></svg>
-      <span class="inst-btn-label">Trumpet</span>
-    </button>
-    <button class="inst-btn" data-inst="treble-f" title="French Horn / Mellophone">
-      <svg viewBox="0 0 64 64"><path d="M32 6c14 0 24 10 24 22 0 10-6 18-16 21l-2-4c8-3 12-9 12-17C50 18 42 12 32 12S14 18 14 28c0 6 3 11 8 14v6H16V42c-5-4-8-10-8-14C8 16 18 6 32 6z M28 34c-3-2-6-5-6-8 0-5 4-10 10-10s10 5 10 10c0 3-3 6-6 8l-1 18h-6L28 34z"/></svg>
+    <button class="inst-btn" data-name="horn" title="French Horn / Mellophone">
+      <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="12" stroke-width="2.2" stroke="currentColor" fill="none"/><circle cx="20" cy="20" r="5" stroke-width="2" stroke="currentColor" fill="none"/><path d="M32 20h4M8 20c0-6 5-12 12-12" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round"/></svg>
       <span class="inst-btn-label">Horn</span>
     </button>
-    <button class="inst-btn" data-inst="treble-eb" title="Alto Sax / Bari Sax">
-      <svg viewBox="0 0 64 64"><path d="M28 8c0-1 1-2 3-2s3 1 3 2v4l6 22c1 4 2 7 2 10 0 7-5 14-14 14-8 0-12-5-12-10 0-4 2-7 5-9l4-2V24l-4 2c-1 0-2-1-2-2V16c0-1 1-2 2-2l4-2V8zM25 46c-2 1-3 3-3 5 0 3 3 6 7 6 5 0 8-4 8-8 0-2-1-5-2-8L31 27v14l-6 5z"/></svg>
+    <button class="inst-btn" data-name="trumpet" title="Trumpet">
+      <svg viewBox="0 0 40 40"><path d="M4 22h20M4 18h20M24 14c5 0 12 3 12 8s-7 8-12 8M10 16v-4M14 16v-5M18 16v-4" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="inst-btn-label">Trumpet</span>
+    </button>
+    <button class="inst-btn" data-name="alto-sax" title="Alto Saxophone">
+      <svg viewBox="0 0 40 40"><path d="M18 4c0 0 1 1 1 3v10c0 2 3 8 5 12 2 5-1 9-6 9s-7-3-6-7c1-3 4-5 6-5M19 7l3-2M19 11l3-2M19 15l3-1" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span class="inst-btn-label">Alto Sax</span>
     </button>
-    <button class="inst-btn" data-inst="treble-concert" title="Flute / Piano / Guitar">
-      <svg viewBox="0 0 64 64"><path d="M8 28h4v8H8v-8zM14 20c0-1 1-2 2-2h32c1 0 2 1 2 2v24c0 1-1 2-2 2H16c-1 0-2-1-2-2V20zm4 2v8h6v-8h-6zm8 0v8h6v-8h-6zm8 0v8h6v-8h-6zm8 0v8h6v-8h-6zM18 34v8h28v-8H18zM52 28h4v8h-4v-8z"/></svg>
-      <span class="inst-btn-label">Piano</span>
+    <button class="inst-btn" data-name="tenor-sax" title="Tenor Saxophone">
+      <svg viewBox="0 0 40 40"><path d="M16 4c0 0 1 1 1 3v12c0 2 4 7 6 11 2 5-1 8-6 8s-7-2-6-6c1-3 4-5 6-5M17 7l3-2M17 11l3-2M17 15l3-1M17 19l3-1" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="inst-btn-label">Tenor Sax</span>
+    </button>
+    <button class="inst-btn" data-name="bari-sax" title="Baritone Saxophone">
+      <svg viewBox="0 0 40 40"><path d="M15 4c0 0 1 1 1 3v13c0 3 5 6 7 10 2 5-2 8-7 8s-7-2-6-6c1-3 4-4 6-4M16 7l4-2M16 12l4-2M16 17l4-1M16 22l4-1" stroke-width="2.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="inst-btn-label">Bari Sax</span>
+    </button>
+    <button class="inst-btn" data-name="clarinet" title="Clarinet">
+      <svg viewBox="0 0 40 40"><path d="M20 4v26c0 2-1 4-3 5s-5 0-5-3 3-4 5-4h3M18 8h4M18 13h4M18 18h4M18 23h4" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="inst-btn-label">Clarinet</span>
     </button>
   </div>
-  <!-- Hidden select for JS compatibility -->
-  <select class="instrument-select" id="instrumentSelect" style="display:none">
-    <option value="bass-concert">Trombone / Tuba / Euph</option>
-    <option value="treble-bb">Trumpet / Tenor Sax / Clarinet</option>
-    <option value="treble-f">French Horn / Mellophone</option>
-    <option value="treble-eb">Alto Sax / Bari Sax</option>
-    <option value="treble-concert">Flute / Piano / Guitar</option>
-  </select>
 
   <!-- Mode toggle -->
   <div class="mode-bar">
@@ -2497,7 +2511,21 @@
       'treble-eb':       { id: 'treble-eb',       clef: 'treble', semitones: 9  },
       'treble-concert':  { id: 'treble-concert',  clef: 'treble', semitones: 12 }
     };
+
+    // Individual instruments map to transposition groups
+    const INSTRUMENT_LIST = [
+      { name: 'tuba',      label: 'Tuba',      transposition: 'bass-concert' },
+      { name: 'trombone',  label: 'Trombone',  transposition: 'bass-concert' },
+      { name: 'horn',      label: 'Horn',      transposition: 'treble-f' },
+      { name: 'trumpet',   label: 'Trumpet',   transposition: 'treble-bb' },
+      { name: 'alto-sax',  label: 'Alto Sax',  transposition: 'treble-eb' },
+      { name: 'tenor-sax', label: 'Tenor Sax', transposition: 'treble-bb' },
+      { name: 'bari-sax',  label: 'Bari Sax',  transposition: 'treble-eb' },
+      { name: 'clarinet',  label: 'Clarinet',  transposition: 'treble-bb' }
+    ];
+
     let currentInstrument = INSTRUMENTS['bass-concert'];
+    let currentInstrumentName = 'trombone';
 
     // =========================================================================
     // GAMIFICATION ENGINE
@@ -3211,7 +3239,7 @@
         measuresPerLine = isNarrow ? 2 : prog.layout.measuresPerLine;
       }
       const numLines = Math.ceil(prog.measures.length / measuresPerLine);
-      const lineHeight = 130;
+      const lineHeight = 145;
       const totalHeight = numLines * lineHeight + 45;
 
       const renderer = new VF.Renderer(container, VF.Renderer.Backends.SVG);
@@ -3324,7 +3352,7 @@
 
       // Same lick for same chord type per chorus (reinforces learning)
       const lick = licks[(chorusCount - 1) % licks.length];
-      const isTrombone = currentInstrument.id === 'bass-concert' && showSlidePositions;
+      const isTrombone = currentInstrumentName === 'trombone' && showSlidePositions;
       return lick.notes.map(n => {
         const isRest = n.duration.endsWith('r');
         if (isRest) {
@@ -4055,7 +4083,7 @@
     // =========================================================================
 
     function updateSlideToggleVisibility() {
-      const show = currentMode === 'licks' && currentInstrument.id === 'bass-concert';
+      const show = currentMode === 'licks' && currentInstrumentName === 'trombone';
       document.getElementById('slideToggleRow').style.display = show ? 'flex' : 'none';
     }
 
@@ -4091,19 +4119,15 @@
         btn.addEventListener('click', () => {
           document.querySelectorAll('.inst-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
-          const instId = btn.dataset.inst;
-          currentInstrument = INSTRUMENTS[instId] || INSTRUMENTS['bass-concert'];
-          // Keep hidden select in sync (for any code that reads it)
-          document.getElementById('instrumentSelect').value = instId;
+          const name = btn.dataset.name;
+          const entry = INSTRUMENT_LIST.find(i => i.name === name);
+          if (entry) {
+            currentInstrumentName = entry.name;
+            currentInstrument = INSTRUMENTS[entry.transposition] || INSTRUMENTS['bass-concert'];
+          }
           updateSlideToggleVisibility();
           renderNotation();
         });
-      });
-      // Hidden select fallback
-      document.getElementById('instrumentSelect').addEventListener('change', e => {
-        currentInstrument = INSTRUMENTS[e.target.value] || INSTRUMENTS['bass-concert'];
-        updateSlideToggleVisibility();
-        renderNotation();
       });
 
       // Hear Lick button
