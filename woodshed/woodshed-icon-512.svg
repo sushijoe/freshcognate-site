@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="80" fill="#13294b"/>
+  <g transform="translate(256,240)">
+    <!-- Musical note -->
+    <ellipse cx="-50" cy="55" rx="38" ry="28" fill="#e84a27" transform="rotate(-15)"/>
+    <rect x="-18" y="-120" width="10" height="175" fill="#e84a27" rx="5"/>
+    <path d="M-8,-120 Q80,-150 68,-80 Q55,-25 -8,-40Z" fill="#e84a27"/>
+    <!-- Staff lines -->
+    <line x1="-140" y1="-55" x2="140" y2="-55" stroke="#9898b0" stroke-width="3" opacity="0.4"/>
+    <line x1="-140" y1="-28" x2="140" y2="-28" stroke="#9898b0" stroke-width="3" opacity="0.4"/>
+    <line x1="-140" y1="0" x2="140" y2="0" stroke="#9898b0" stroke-width="3" opacity="0.4"/>
+    <line x1="-140" y1="28" x2="140" y2="28" stroke="#9898b0" stroke-width="3" opacity="0.4"/>
+    <line x1="-140" y1="55" x2="140" y2="55" stroke="#9898b0" stroke-width="3" opacity="0.4"/>
+  </g>
+  <text x="256" y="445" text-anchor="middle" fill="#e84a27" font-family="system-ui,sans-serif" font-size="48" font-weight="700" letter-spacing="4">WOODSHED</text>
+</svg>

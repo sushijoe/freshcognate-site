@@ -1,0 +1,4197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#e84a27">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>The Woodshed — Brass Improv Trainer</title>
+  <link rel="manifest" href="woodshed-manifest.json">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root {
+      /* University of Illinois: Illini Blue + Illini Orange */
+      --bg-dark: #0a1628;
+      --bg-surface: #13294b;
+      --bg-card: #1b3a6b;
+      --accent: #e84a27;          /* Illini Orange */
+      --accent-dim: #c43d1f;
+      --accent2: #c850c0;         /* Fuscia/purple accent */
+      --accent2-dim: #a040a0;
+      --text-primary: #eef0f5;
+      --text-secondary: #8ea0be;
+      --highlight: rgba(232, 74, 39, 0.18);
+      --highlight-border: rgba(232, 74, 39, 0.65);
+      --chord-tone: #e84a27;      /* Orange for chord tones */
+      --scale-tone: #c850c0;      /* Purple for scale tones */
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      min-height: 48px;
+      flex-shrink: 0;
+    }
+
+    .app-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 1px;
+    }
+
+    .progression-select {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 14px;
+      max-width: 200px;
+    }
+
+    /* Mode toggle */
+    .mode-bar {
+      display: flex;
+      padding: 8px 16px;
+      gap: 0;
+      background: var(--bg-surface);
+      flex-shrink: 0;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 8px 4px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      border: 1px solid rgba(255,255,255,0.08);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mode-btn:first-child { border-radius: 8px 0 0 8px; }
+    .mode-btn:last-child { border-radius: 0 8px 8px 0; }
+
+    .mode-btn.active {
+      background: var(--accent);
+      color: #121220;
+      border-color: var(--accent);
+    }
+
+    /* Level bar */
+    .level-bar {
+      display: flex;
+      padding: 4px 16px 6px;
+      gap: 8px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      flex-shrink: 0;
+    }
+
+    .level-btn {
+      flex: 1;
+      padding: 5px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-align: center;
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .level-btn i { margin-right: 3px; }
+
+    .level-btn.active {
+      background: rgba(200, 80, 192, 0.18);
+      color: var(--accent2);
+      border-color: var(--accent2-dim);
+    }
+
+    /* Notation area */
+    .notation-area {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 4px 8px;
+      padding-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #notation {
+      width: 100%;
+      max-width: 800px;
+      position: relative;
+      overflow: visible;
+    }
+
+    #notation svg {
+      width: 100%;
+      height: auto;
+    }
+
+    /* Make notation visible on dark background */
+    /* Chord symbol text — bright */
+    #notation svg text {
+      fill: var(--text-primary) !important;
+    }
+    /* Staff lines — subtle so notes pop */
+    #notation svg .vf-stave > path,
+    #notation svg .vf-stave > line,
+    #notation svg .vf-stave > rect {
+      stroke: rgba(255,255,255,0.25) !important;
+      fill: none !important;
+    }
+    /* Barlines — slightly brighter than staff lines */
+    #notation svg .vf-stavebarline path,
+    #notation svg .vf-stavebarline line {
+      stroke: rgba(255,255,255,0.4) !important;
+    }
+    /* Clef, key signature, time signature — bright and clear */
+    #notation svg .vf-clef path {
+      fill: #ffffff !important;
+      stroke: #ffffff !important;
+    }
+    #notation svg .vf-keysignature path {
+      fill: #ffffff !important;
+      stroke: #ffffff !important;
+    }
+    #notation svg .vf-timesignature path {
+      fill: #ffffff !important;
+      stroke: #ffffff !important;
+    }
+    /* Notes, stems, flags, accidentals — bright */
+    #notation svg .vf-stavenote path,
+    #notation svg .vf-notehead path,
+    #notation svg .vf-stem path,
+    #notation svg .vf-stavenote line {
+      fill: var(--text-primary) !important;
+      stroke: var(--text-primary) !important;
+    }
+
+    .measure-highlight {
+      position: absolute;
+      background: var(--highlight);
+      border: 2px solid var(--highlight-border);
+      border-radius: 4px;
+      pointer-events: none;
+      transition: left 0.08s, top 0.08s;
+      display: none;
+    }
+
+    /* Tips */
+    .tips-panel {
+      max-width: 800px;
+      width: 100%;
+      margin: 8px auto 0;
+      padding: 0 8px;
+    }
+
+    .tips-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      padding: 6px 0;
+    }
+
+    .tips-content {
+      display: none;
+      padding: 8px 0;
+    }
+
+    .tips-content.show { display: block; }
+
+    .tip-item {
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 4px 0;
+      line-height: 1.4;
+    }
+
+    .tip-item::before {
+      content: '\25B8 ';
+      color: var(--accent);
+    }
+
+    /* Chorus counter */
+    .chorus-counter {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 4px 0 0;
+    }
+
+    .chorus-counter span {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Transport bar */
+    .transport-bar {
+      flex-shrink: 0;
+      background: var(--bg-surface);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding: 8px 16px;
+      padding-bottom: calc(8px + var(--safe-bottom));
+      z-index: 100;
+    }
+
+    .transport-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .transport-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .transport-btn:active { background: var(--accent-dim); }
+
+    .transport-btn.play-btn {
+      width: 56px;
+      height: 56px;
+      background: var(--accent);
+      color: #121220;
+      font-size: 24px;
+    }
+
+    .transport-btn.play-btn:active { background: var(--accent-dim); }
+
+    .transport-btn.active {
+      background: var(--accent);
+      color: #121220;
+    }
+
+    .tempo-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tempo-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      min-width: 70px;
+      text-align: right;
+    }
+
+    .tempo-slider {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      background: var(--bg-card);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    .tempo-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+    }
+
+    .tempo-bpm {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      min-width: 55px;
+    }
+
+    /* Legend for Mode 2 */
+    .note-legend {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 4px 0;
+    }
+
+    .legend-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    .legend-dot.chord { background: var(--chord-tone); }
+    .legend-dot.scale { background: var(--scale-tone); }
+
+    /* Loading */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 1000;
+      transition: opacity 0.3s;
+    }
+
+    .loading-overlay.hidden {
+      display: none;
+    }
+
+    .loading-text {
+      color: var(--accent);
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    .loading-sub {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    .loading-sub { animation: pulse 1.5s infinite; }
+
+    /* ===== INSTRUMENT SELECTOR ===== */
+    .instrument-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 16px 6px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      flex-shrink: 0;
+    }
+
+    .instrument-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      white-space: nowrap;
+    }
+
+    .instrument-select {
+      flex: 1;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 13px;
+    }
+
+    /* ===== HEAR LICK ===== */
+    .hear-lick-row {
+      display: flex;
+      justify-content: center;
+      padding: 6px 16px 2px;
+      background: var(--bg-surface);
+      flex-shrink: 0;
+    }
+
+    .hear-lick-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .hear-lick-btn:active { background: var(--accent-dim); }
+
+    .hear-lick-btn.playing {
+      background: var(--accent);
+      color: #121220;
+      border-color: var(--accent);
+    }
+
+    .hear-lick-btn i { font-size: 15px; }
+
+    /* ===== SWING TOGGLE ===== */
+    .swing-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .swing-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      min-width: 70px;
+      text-align: right;
+    }
+
+    .swing-options {
+      display: flex;
+      gap: 0;
+      flex: 1;
+    }
+
+    .swing-btn {
+      flex: 1;
+      padding: 5px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-align: center;
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      border: 1px solid rgba(255,255,255,0.08);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .swing-btn:first-child { border-radius: 6px 0 0 6px; }
+    .swing-btn:last-child { border-radius: 0 6px 6px 0; }
+
+    .swing-btn.active {
+      background: rgba(200, 80, 192, 0.18);
+      color: var(--accent2);
+      border-color: var(--accent2-dim);
+    }
+
+    /* ===== GAMIFICATION ===== */
+
+    /* Header XP bar + streak */
+    .header-stats {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .xp-micro {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      min-width: 60px;
+    }
+
+    .xp-micro-label {
+      font-size: 9px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100px;
+    }
+
+    .xp-micro-bar {
+      width: 80px;
+      height: 5px;
+      background: var(--bg-card);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .xp-micro-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+
+    .streak-badge {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .streak-badge.hot { color: var(--accent); }
+
+    .stats-toggle-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+    }
+
+    .stats-toggle-btn:active { color: var(--accent); }
+
+    /* Stats dashboard panel */
+    .stats-panel {
+      display: none;
+      background: var(--bg-surface);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      max-height: 60vh;
+      overflow-y: auto;
+      padding: 12px 16px 16px;
+      flex-shrink: 0;
+    }
+
+    .stats-panel.open { display: block; }
+
+    .stats-section-label {
+      font-size: 10px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin: 12px 0 6px;
+    }
+
+    .stats-section-label:first-child { margin-top: 0; }
+
+    /* Profile header */
+    .stats-profile {
+      text-align: center;
+      padding-bottom: 10px;
+    }
+
+    .stats-level-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .stats-xp-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin: 4px 0;
+    }
+
+    .xp-bar-full {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-card);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .xp-bar-full-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    /* Quick stats row */
+    .quick-stats {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .stat-card {
+      flex: 1;
+      background: var(--bg-card);
+      border-radius: 8px;
+      padding: 10px 8px;
+      text-align: center;
+    }
+
+    .stat-card-num {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .stat-card-label {
+      font-size: 10px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* Streak calendar */
+    .streak-cal {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+      margin-top: 4px;
+    }
+
+    .streak-cal-day-label {
+      font-size: 9px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    .streak-cal-cell {
+      aspect-ratio: 1;
+      border-radius: 3px;
+      background: var(--bg-card);
+      max-width: 28px;
+    }
+
+    .streak-cal-cell.practiced {
+      background: var(--accent);
+    }
+
+    .streak-cal-cell.light { opacity: 0.4; }
+    .streak-cal-cell.medium { opacity: 0.7; }
+    .streak-cal-cell.heavy { opacity: 1.0; }
+
+    /* Achievements grid */
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .achievement-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      cursor: pointer;
+      position: relative;
+      margin: 0 auto;
+      transition: transform 0.15s;
+      border: 2px solid transparent;
+    }
+
+    .achievement-icon.unlocked {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: rgba(232, 74, 39, 0.12);
+    }
+
+    .achievement-icon:active { transform: scale(0.92); }
+
+    .achievement-tooltip {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 11px;
+      color: var(--text-primary);
+      white-space: nowrap;
+      z-index: 10;
+      pointer-events: none;
+      display: none;
+    }
+
+    .achievement-icon.show-tip .achievement-tooltip { display: block; }
+
+    /* Progression breakdown */
+    .prog-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 4px 0;
+    }
+
+    .prog-row-name {
+      font-size: 12px;
+      color: var(--text-primary);
+      width: 90px;
+      flex-shrink: 0;
+    }
+
+    .prog-row-bar {
+      flex: 1;
+      height: 6px;
+      background: var(--bg-card);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .prog-row-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 3px;
+    }
+
+    .prog-row-num {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 600;
+      width: 35px;
+      text-align: right;
+    }
+
+    /* Session history */
+    .session-list {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 6px;
+    }
+
+    .session-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 12px;
+    }
+
+    .session-item:last-child { border-bottom: none; }
+
+    .session-date {
+      color: var(--text-secondary);
+      min-width: 70px;
+      font-size: 11px;
+    }
+
+    .session-prog {
+      color: var(--text-primary);
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .session-meta {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      color: var(--text-secondary);
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    .session-meta .choruses { color: var(--accent); font-weight: 600; }
+    .session-meta .duration { color: var(--text-secondary); }
+
+    .no-sessions {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 12px;
+      padding: 12px 0;
+      font-style: italic;
+    }
+
+    /* Toast notifications */
+    .toast-container {
+      position: fixed;
+      top: 56px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      pointer-events: none;
+      width: 90%;
+      max-width: 320px;
+    }
+
+    .toast {
+      background: var(--bg-card);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-primary);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+      pointer-events: auto;
+    }
+
+    .toast.purple { border-left-color: var(--accent2); }
+    .toast .toast-icon { font-size: 18px; color: var(--accent); }
+    .toast.purple .toast-icon { color: var(--accent2); }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes toastOut {
+      from { opacity: 1; }
+      to { opacity: 0; transform: translateY(-10px); }
+    }
+
+    /* Mic / Pitch Detection */
+    .mic-btn.active { background: rgba(232,74,39,0.2); color: var(--accent); border-color: rgba(232,74,39,0.5); }
+
+    .pitch-display {
+      display: none; align-items: center; gap: 12px;
+      padding: 8px 16px;
+      background: var(--bg-surface);
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .pitch-display.active { display: flex; }
+
+    .pitch-note-name {
+      font-size: 26px; font-weight: 800; min-width: 52px;
+      text-align: center; font-family: 'Courier New', monospace;
+      color: var(--text-secondary); transition: color 0.15s;
+    }
+    .pitch-cents-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .pitch-cents-bar {
+      position: relative; width: 100%; height: 8px;
+      background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden;
+    }
+    .pitch-cents-center {
+      position: absolute; left: 50%; top: 0; bottom: 0;
+      width: 2px; background: rgba(255,255,255,0.25); transform: translateX(-50%);
+    }
+    .pitch-cents-marker {
+      position: absolute; top: -1px; width: 10px; height: 10px;
+      border-radius: 50%; background: var(--accent);
+      transform: translateX(-50%); transition: left 0.08s ease-out; left: 50%;
+    }
+    .pitch-cents-label { font-size: 10px; color: var(--text-secondary); font-family: monospace; }
+    .pitch-match { font-size: 12px; display: flex; align-items: center; gap: 4px; min-width: 90px; }
+    .pitch-match small { white-space: nowrap; }
+
+    /* Ear Training */
+    .ear-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px; font-size: 13px; font-weight: 600;
+      color: var(--text-primary); background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; cursor: pointer;
+    }
+    .ear-btn:hover { border-color: rgba(200,80,192,0.4); }
+
+    .ear-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7); z-index: 1000;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .ear-overlay.open { display: flex; }
+
+    .ear-panel {
+      background: var(--bg-surface); border-radius: 16px;
+      width: 100%; max-width: 400px;
+      border: 1px solid rgba(255,255,255,0.1); overflow: hidden;
+    }
+    .ear-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .ear-title { font-size: 16px; font-weight: 700; }
+    .ear-close {
+      background: none; border: none; color: var(--text-secondary);
+      font-size: 18px; cursor: pointer; padding: 4px;
+    }
+    .ear-tabs { display: flex; padding: 10px 16px 0; gap: 4px; }
+    .ear-tab {
+      flex: 1; padding: 8px; font-size: 13px; font-weight: 600;
+      background: transparent; border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text-secondary); border-radius: 8px; cursor: pointer;
+    }
+    .ear-tab.active { background: rgba(232,74,39,0.15); color: var(--accent); border-color: rgba(232,74,39,0.3); }
+
+    .ear-body { padding: 16px; text-align: center; }
+    .ear-prompt { font-size: 15px; margin-bottom: 12px; color: var(--text-primary); min-height: 24px; }
+    .ear-play-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 28px; font-size: 14px; font-weight: 700;
+      background: var(--accent); color: white; border: none;
+      border-radius: 24px; cursor: pointer; margin-bottom: 16px;
+    }
+    .ear-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px; }
+    .ear-option {
+      padding: 10px 4px; font-size: 12px; font-weight: 600;
+      background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text-primary); border-radius: 8px; cursor: pointer; transition: all 0.15s;
+    }
+    .ear-option:hover { border-color: rgba(255,255,255,0.3); }
+    .ear-option.correct { background: rgba(40,167,69,0.3); border-color: #28a745; color: #5cb85c; }
+    .ear-option.wrong { background: rgba(220,53,69,0.25); border-color: #dc3545; color: #e06070; }
+    .ear-option.disabled { pointer-events: none; opacity: 0.5; }
+    .ear-option.reveal { background: rgba(40,167,69,0.12); border-color: rgba(40,167,69,0.5); }
+    .ear-score {
+      font-size: 14px; color: var(--text-secondary); padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .ear-streak { margin-left: 12px; color: var(--accent); font-weight: 600; }
+
+    /* Share */
+    .share-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 12px; margin-top: 8px;
+      font-size: 14px; font-weight: 600;
+      background: rgba(232,74,39,0.12); color: var(--accent);
+      border: 1px solid rgba(232,74,39,0.25); border-radius: 10px; cursor: pointer;
+    }
+    .share-btn:hover { background: rgba(232,74,39,0.2); }
+
+    /* Practice suggestions */
+    .suggestions-list { display: flex; flex-direction: column; gap: 6px; }
+    .suggestion-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: rgba(232, 74, 39, 0.08);
+      border: 1px solid rgba(232, 74, 39, 0.15);
+      border-radius: 8px; padding: 10px 12px;
+      font-size: 13px; color: var(--text-primary);
+      line-height: 1.4;
+    }
+    .suggestion-item i { color: var(--accent); font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+    .no-suggestions { color: var(--text-secondary); font-size: 13px; font-style: italic; padding: 6px 0; }
+
+    /* Slide position toggle */
+    .slide-toggle-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px 16px 2px; font-size: 12px; color: var(--text-secondary);
+    }
+    .slide-toggle {
+      position: relative; width: 34px; height: 18px;
+      background: rgba(255,255,255,0.08); border-radius: 10px;
+      cursor: pointer; border: none; padding: 0;
+      transition: background 0.2s;
+    }
+    .slide-toggle.active { background: var(--accent); }
+    .slide-toggle::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: white; transition: transform 0.2s;
+    }
+    .slide-toggle.active::after { transform: translateX(16px); }
+
+    @media (max-width: 479px) {
+      .xp-micro-bar { width: 40px; }
+      .xp-micro-label { display: none; }
+      .header-stats { gap: 6px; }
+      .app-title { font-size: 16px; }
+      .achievements-grid { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+      .achievement-icon { width: 34px; height: 34px; font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loading-overlay" id="loading">
+    <div class="loading-text">THE WOODSHED</div>
+    <div class="loading-sub">Loading notation engine...</div>
+  </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-title">THE WOODSHED</div>
+    <div class="header-stats">
+      <div class="xp-micro">
+        <span class="xp-micro-label" id="headerLevelLabel">Lv.0 Listener</span>
+        <div class="xp-micro-bar"><div class="xp-micro-fill" id="headerXpFill" style="width:0%"></div></div>
+      </div>
+      <div class="streak-badge" id="headerStreak">
+        <i class="bi bi-fire"></i><span id="headerStreakNum">0</span>
+      </div>
+      <button class="stats-toggle-btn" id="statsToggle" title="Stats">
+        <i class="bi bi-bar-chart-line"></i>
+      </button>
+    </div>
+    <select class="progression-select" id="progressionSelect">
+      <option value="bb-blues">12-Bar Bb Blues</option>
+      <option value="f-blues">12-Bar F Blues</option>
+      <option value="eb-blues">12-Bar Eb Blues</option>
+      <option value="c-minor-blues">Minor Blues in C</option>
+      <option value="ii-v-i-bb">ii-V-I in Bb</option>
+    </select>
+  </header>
+
+  <!-- Stats Dashboard (collapsible) -->
+  <div class="stats-panel" id="statsPanel">
+    <div class="stats-profile">
+      <div class="stats-level-name" id="statsLevelName">Listener</div>
+      <div class="stats-xp-label" id="statsXpLabel">0 / 50 XP</div>
+      <div class="xp-bar-full"><div class="xp-bar-full-fill" id="statsXpFill" style="width:0%"></div></div>
+    </div>
+    <div class="quick-stats">
+      <div class="stat-card">
+        <div class="stat-card-num" id="statsChoruses">0</div>
+        <div class="stat-card-label"><i class="bi bi-music-note-beamed"></i> Choruses</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num" id="statsTime">0m</div>
+        <div class="stat-card-label"><i class="bi bi-clock"></i> Practice</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num" id="statsStreak">0</div>
+        <div class="stat-card-label"><i class="bi bi-fire"></i> Streak</div>
+      </div>
+    </div>
+    <div class="stats-section-label">Last 4 Weeks</div>
+    <div class="streak-cal" id="streakCal"></div>
+    <div class="stats-section-label">Achievements <span id="achieveCount">0/20</span></div>
+    <div class="achievements-grid" id="achieveGrid"></div>
+    <div class="stats-section-label">Progressions</div>
+    <div id="progBreakdown"></div>
+    <div class="stats-section-label">Practice Suggestions</div>
+    <div class="suggestions-list" id="practiceSuggestions"></div>
+    <div class="stats-section-label">Recent Sessions</div>
+    <div class="session-list" id="sessionHistory"></div>
+    <button class="share-btn" id="shareBtn"><i class="bi bi-share"></i> Share Progress</button>
+  </div>
+
+  <!-- Instrument / Transposition -->
+  <div class="instrument-row">
+    <span class="instrument-label">Instrument</span>
+    <select class="instrument-select" id="instrumentSelect">
+      <option value="bass-concert">Trombone / Tuba / Euph</option>
+      <option value="treble-bb">Trumpet / Tenor Sax / Clarinet</option>
+      <option value="treble-eb">Alto Sax / Bari Sax</option>
+      <option value="treble-concert">Flute / Piano / Guitar</option>
+    </select>
+  </div>
+
+  <!-- Mode toggle -->
+  <div class="mode-bar">
+    <button class="mode-btn active" data-mode="licks">Guided Licks</button>
+    <button class="mode-btn" data-mode="tones">Chord Tones</button>
+    <button class="mode-btn" data-mode="symbols">Symbols Only</button>
+  </div>
+
+  <!-- Level selector (visible only in Guided Licks mode) -->
+  <div class="level-bar" id="levelBar" style="display:none">
+    <button class="level-btn active" data-level="beginner">
+      <i class="bi bi-1-circle"></i> Beginner
+    </button>
+    <button class="level-btn" data-level="intermediate">
+      <i class="bi bi-2-circle"></i> Intermediate
+    </button>
+    <button class="level-btn" data-level="advanced">
+      <i class="bi bi-3-circle"></i> Advanced
+    </button>
+  </div>
+
+  <!-- Hear Lick (visible in Guided Licks mode) -->
+  <div class="hear-lick-row" id="hearLickRow" style="display:none">
+    <button class="hear-lick-btn" id="hearLickBtn">
+      <i class="bi bi-headphones" id="hearLickIcon"></i> <span id="hearLickLabel">Hear Lick</span>
+    </button>
+  </div>
+
+  <!-- Slide position toggle (trombone only, licks mode only) -->
+  <div class="slide-toggle-row" id="slideToggleRow" style="display:none">
+    <button class="slide-toggle" id="slideToggle" aria-label="Show slide positions"></button>
+    <span>Slide positions</span>
+  </div>
+
+  <!-- Notation -->
+  <div class="notation-area">
+    <div id="notation">
+      <div class="measure-highlight" id="highlight"></div>
+    </div>
+
+    <div class="note-legend" id="noteLegend" style="display:none">
+      <span><span class="legend-dot chord"></span> Chord tones (R, 3, 5, 7)</span>
+      <span><span class="legend-dot scale"></span> Scale tones</span>
+    </div>
+
+    <div class="chorus-counter" id="chorusCounter">
+      Chorus <span id="chorusNum">1</span>
+      <span style="margin-left:12px">
+        <button class="ear-btn" id="earTrainBtn"><i class="bi bi-ear"></i> Ear Training</button>
+      </span>
+    </div>
+
+    <!-- Ear Training Modal -->
+    <div class="ear-overlay" id="earOverlay">
+      <div class="ear-panel">
+        <div class="ear-header">
+          <span class="ear-title"><i class="bi bi-ear"></i> Ear Training</span>
+          <button class="ear-close" id="earClose"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="ear-tabs">
+          <button class="ear-tab active" data-quiz="intervals">Intervals</button>
+          <button class="ear-tab" data-quiz="chords">Chord Quality</button>
+        </div>
+        <div class="ear-body">
+          <div class="ear-prompt" id="earPrompt">Tap play to start</div>
+          <button class="ear-play-btn" id="earPlayBtn"><i class="bi bi-play-fill"></i> Play</button>
+          <div class="ear-options" id="earOptions"></div>
+          <div class="ear-score">
+            Score: <span id="earScore">0</span> / <span id="earTotal">0</span>
+            <span id="earStreak" class="ear-streak"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="tips-panel">
+      <button class="tips-toggle" id="tipsToggle">
+        <i class="bi bi-lightbulb"></i> Practice Tips
+        <i class="bi bi-chevron-down" id="tipsChevron"></i>
+      </button>
+      <div class="tips-content" id="tipsContent"></div>
+    </div>
+  </div>
+
+  <!-- Pitch Display (visible when mic active) -->
+  <div class="pitch-display" id="pitchDisplay">
+    <div class="pitch-note-name" id="pitchNoteName">—</div>
+    <div class="pitch-cents-wrap">
+      <div class="pitch-cents-bar">
+        <div class="pitch-cents-center"></div>
+        <div class="pitch-cents-marker" id="pitchCentsMarker"></div>
+      </div>
+      <div class="pitch-cents-label" id="pitchCentsLabel"></div>
+    </div>
+    <div class="pitch-match" id="pitchMatch"></div>
+  </div>
+
+  <!-- Transport -->
+  <div class="transport-bar">
+    <div class="transport-controls">
+      <button class="transport-btn" id="stopBtn" title="Stop">
+        <i class="bi bi-stop-fill"></i>
+      </button>
+      <button class="transport-btn play-btn" id="playBtn" title="Play">
+        <i class="bi bi-play-fill" id="playIcon"></i>
+      </button>
+      <button class="transport-btn active" id="loopBtn" title="Loop">
+        <i class="bi bi-repeat"></i>
+      </button>
+      <button class="transport-btn active" id="muteBtn" title="Mute">
+        <i class="bi bi-volume-mute-fill" id="muteIcon"></i>
+      </button>
+      <button class="transport-btn" id="micBtn" title="Microphone">
+        <i class="bi bi-mic" id="micIcon"></i>
+      </button>
+    </div>
+    <div class="tempo-row">
+      <span class="tempo-label">Tempo</span>
+      <input type="range" class="tempo-slider" id="tempoSlider" min="60" max="200" value="120">
+      <span class="tempo-bpm" id="tempoBpm">120 BPM</span>
+    </div>
+    <div class="swing-row">
+      <span class="swing-label">Feel</span>
+      <div class="swing-options">
+        <button class="swing-btn active" data-swing="0">Straight</button>
+        <button class="swing-btn" data-swing="1">Light Swing</button>
+        <button class="swing-btn" data-swing="2">Hard Swing</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/vexflow@4.2.5/build/cjs/vexflow.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tone@15.0.4/build/Tone.min.js"></script>
+  <script>
+  (function() {
+    'use strict';
+
+    // =========================================================================
+    // DATA MODEL
+    // =========================================================================
+
+    const PROGRESSIONS = {
+      'bb-blues': {
+        id: 'bb-blues',
+        title: '12-Bar Bb Blues',
+        key: 'Bb',
+        timeSignature: '4/4',
+        defaultTempo: 120,
+        tempoRange: [60, 200],
+        measures: [
+          { chord: 'Bb7', beats: 4 },
+          { chord: 'Bb7', beats: 4 },
+          { chord: 'Bb7', beats: 4 },
+          { chord: 'Bb7', beats: 4 },
+          { chord: 'Eb7', beats: 4 },
+          { chord: 'Eb7', beats: 4 },
+          { chord: 'Bb7', beats: 4 },
+          { chord: 'Bb7', beats: 4 },
+          { chord: 'F7',  beats: 4 },
+          { chord: 'Eb7', beats: 4 },
+          { chord: 'Bb7', beats: 4 },
+          { chord: 'F7',  beats: 4 }
+        ],
+        layout: { measuresPerLine: 4, clef: 'bass' },
+        audio: {
+          type: 'synth',
+          voicings: {
+            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4'],
+            'Eb7': ['Bb3', 'Db4', 'Eb4', 'G4'],
+            'F7':  ['A3', 'C4', 'Eb4', 'F4']
+          },
+          bassNotes: {
+            'Bb7': ['Bb2', 'D3', 'F3', 'D3'],
+            'Eb7': ['Eb2', 'G2', 'Bb2', 'G2'],
+            'F7':  ['F2', 'A2', 'C3', 'A2']
+          }
+        },
+        tips: {
+          beginner: [
+            'Play just the root of each chord on beat 1. Feel where the changes happen.',
+            'Hold long tones — whole notes and half notes. Listen to how each root sounds over the backing.',
+            'Once roots are easy, try adding the 5th. Root on beat 1, 5th on beat 3.',
+            'The 3rd is the note that gives the chord its character. Try root-3rd-5th patterns.',
+            'Count through the 12-bar form out loud: "1... 2... 3... 4..." for each measure.'
+          ],
+          intermediate: [
+            'The 3rd and 7th are guide tones — they define the chord. Target these on strong beats.',
+            'Try connecting chords with half-step approaches: play a half step below the next root.',
+            'The Bb blues scale (Bb, Db, Eb, E, F, Ab) works over the entire form.',
+            'On the Eb7 (bar 5), hear how the b7 (Db) pulls down while the 3rd (G) pushes up.',
+            'Mix arpeggios with scale fragments. Arpeggios outline the harmony, scales add melodic motion.',
+            'Try playing each lick, then improvise your own variation using the same chord tones.'
+          ],
+          advanced: [
+            'The bebop dominant scale adds a natural 7th as a passing tone between b7 and root.',
+            'Use double enclosures: approach a target note from a half step above AND below.',
+            'Digital patterns (1-2-3-5, 1-3-5-7) create angular bebop vocabulary.',
+            'On the turnaround (bar 12, F7), use chromatic motion to lead strongly back to Bb7.',
+            'Listen to J.J. Johnson, Curtis Fuller, and Slide Hampton for trombone bebop vocabulary.',
+            'Vary your rhythmic placement — start licks on the "and" of beats for a more modern feel.',
+            'Practice these licks in all 12 keys, not just Bb. The shapes should become automatic.'
+          ]
+        }
+      },
+
+      'f-blues': {
+        id: 'f-blues',
+        title: '12-Bar F Blues',
+        key: 'F',
+        timeSignature: '4/4',
+        defaultTempo: 120,
+        tempoRange: [60, 200],
+        measures: [
+          { chord: 'F7',  beats: 4 },
+          { chord: 'F7',  beats: 4 },
+          { chord: 'F7',  beats: 4 },
+          { chord: 'F7',  beats: 4 },
+          { chord: 'Bb7', beats: 4 },
+          { chord: 'Bb7', beats: 4 },
+          { chord: 'F7',  beats: 4 },
+          { chord: 'F7',  beats: 4 },
+          { chord: 'C7',  beats: 4 },
+          { chord: 'Bb7', beats: 4 },
+          { chord: 'F7',  beats: 4 },
+          { chord: 'C7',  beats: 4 }
+        ],
+        layout: { measuresPerLine: 4, clef: 'bass' },
+        audio: {
+          type: 'synth',
+          voicings: {
+            'F7':  ['A3', 'C4', 'Eb4', 'F4'],
+            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4'],
+            'C7':  ['Bb3', 'C4', 'E4', 'G4']
+          },
+          bassNotes: {
+            'F7':  ['F2', 'A2', 'C3', 'A2'],
+            'Bb7': ['Bb2', 'D3', 'F3', 'D3'],
+            'C7':  ['C2', 'E2', 'G2', 'E2']
+          }
+        },
+        tips: {
+          beginner: [
+            'F is concert pitch — no transposition needed on trombone.',
+            'The F blues uses F7, Bb7, and C7. Start by playing the root of each chord.',
+            'Notice that the Bb7 chord (bar 5) is the same chord from the Bb Blues — you already know it!',
+            'F is in 1st position on trombone. Use this home base to anchor your ear.',
+            'Try alternating between the root (F) and the 5th (C) on the F7 measures.'
+          ],
+          intermediate: [
+            'The F blues scale (F, Ab, Bb, B, C, Eb) works over the whole form.',
+            'Guide tones: on F7 the 3rd is A and b7 is Eb. On Bb7 the 3rd is D and b7 is Ab.',
+            'The C7 in bars 9 and 12 creates the strongest pull back to F — emphasize the E natural (3rd of C7).',
+            'Try connecting the F7 to Bb7 with a chromatic approach: play E natural into Bb on beat 1.',
+            'Practice the enclosure: approach a target note from a half step above, then a half step below.'
+          ],
+          advanced: [
+            'The F bebop dominant scale: F, G, A, Bb, C, D, Eb, E — the E natural is the bebop passing tone.',
+            'On C7 (bar 9), try tritone sub language — Gb7 arpeggios resolve beautifully to F.',
+            'Practice "playing the changes": make each chord audible in your line without the backing track.',
+            'Use enclosures targeting the 3rd of each chord — this is core bebop vocabulary.',
+            'Transcribe a J.J. Johnson solo on an F blues and learn it by ear before reading it.',
+            'Try starting phrases on beat 2 or the "and" of 4 for rhythmic variety.'
+          ]
+        }
+      },
+
+      'ii-v-i-bb': {
+        id: 'ii-v-i-bb',
+        title: 'ii-V-I in Bb',
+        key: 'Bb',
+        timeSignature: '4/4',
+        defaultTempo: 100,
+        tempoRange: [50, 180],
+        measures: [
+          { chord: 'Cm7',    beats: 4 },
+          { chord: 'F7',     beats: 4 },
+          { chord: 'BbMaj7', beats: 4 },
+          { chord: 'BbMaj7', beats: 4 },
+          { chord: 'Cm7',    beats: 4 },
+          { chord: 'F7',     beats: 4 },
+          { chord: 'BbMaj7', beats: 4 },
+          { chord: 'BbMaj7', beats: 4 },
+          { chord: 'Cm7',    beats: 4 },
+          { chord: 'F7',     beats: 4 },
+          { chord: 'BbMaj7', beats: 4 },
+          { chord: 'BbMaj7', beats: 4 }
+        ],
+        layout: { measuresPerLine: 4, clef: 'bass' },
+        audio: {
+          type: 'synth',
+          voicings: {
+            'Cm7':    ['Bb3', 'C4', 'Eb4', 'G4'],
+            'F7':     ['A3', 'C4', 'Eb4', 'F4'],
+            'BbMaj7': ['A3', 'Bb3', 'D4', 'F4']
+          },
+          bassNotes: {
+            'Cm7':    ['C2', 'Eb2', 'G2', 'Bb2'],
+            'F7':     ['F2', 'A2', 'C3', 'A2'],
+            'BbMaj7': ['Bb2', 'D3', 'F3', 'D3']
+          }
+        },
+        tips: {
+          beginner: [
+            'The ii-V-I is THE jazz progression. Almost every jazz standard uses it.',
+            'ii = Cm7 (minor), V = F7 (dominant), I = BbMaj7 (major). Three different chord qualities.',
+            'Start by playing just the root of each chord: C, F, Bb. Hear how they "resolve" to Bb.',
+            'The Cm7 has a minor 3rd (Eb) — it sounds darker. The BbMaj7 has a major 7th (A) — it sounds bright.',
+            'This form repeats the same 4 bars three times, so you get three tries per chorus!'
+          ],
+          intermediate: [
+            'The guide tone line: Eb (b7 of Cm7) → Eb (b7 of F7) → D (3rd of BbMaj7). Smooth voice leading!',
+            'Another guide tone: Bb (b7 of Cm7) → A (3rd of F7) → A (maj7 of BbMaj7). Half-step motion.',
+            'Try connecting Cm7 to F7 with a descending scale, then resolve to the 3rd of BbMaj7 (D).',
+            'On Cm7 use the C dorian scale (C, D, Eb, F, G, A, Bb). On F7 use F mixolydian.',
+            'Practice arpeggiating each chord up, then down, in continuous 8th notes across the barline.'
+          ],
+          advanced: [
+            'On Cm7-F7, try superimposing EbMaj7 arpeggios — this outlines the 3-5-7-9 of Cm7.',
+            'Use the diminished scale on F7 (F, Gb, Ab, A, B, C, D, Eb) for altered dominant sounds.',
+            'Practice digital patterns through the changes: 1-2-3-5 on each chord, connected smoothly.',
+            'Delay resolution: let your line on F7 spill into bar 1 of BbMaj7 before resolving.',
+            'Transcribe Clifford Brown, Freddie Hubbard, and J.J. Johnson ii-V-I lines.',
+            'Try playing the entire form on one breath at a slow tempo — this builds phrase continuity.'
+          ]
+        }
+      },
+
+      'eb-blues': {
+        id: 'eb-blues',
+        title: '12-Bar Eb Blues',
+        key: 'Eb',
+        timeSignature: '4/4',
+        defaultTempo: 120,
+        tempoRange: [60, 200],
+        measures: [
+          { chord: 'Eb7', beats: 4 },
+          { chord: 'Eb7', beats: 4 },
+          { chord: 'Eb7', beats: 4 },
+          { chord: 'Eb7', beats: 4 },
+          { chord: 'Ab7', beats: 4 },
+          { chord: 'Ab7', beats: 4 },
+          { chord: 'Eb7', beats: 4 },
+          { chord: 'Eb7', beats: 4 },
+          { chord: 'Bb7', beats: 4 },
+          { chord: 'Ab7', beats: 4 },
+          { chord: 'Eb7', beats: 4 },
+          { chord: 'Bb7', beats: 4 }
+        ],
+        layout: { measuresPerLine: 4, clef: 'bass' },
+        audio: {
+          type: 'synth',
+          voicings: {
+            'Eb7': ['Bb3', 'Db4', 'Eb4', 'G4'],
+            'Ab7': ['Ab3', 'C4', 'Eb4', 'Gb4'],
+            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4']
+          },
+          bassNotes: {
+            'Eb7': ['Eb2', 'G2', 'Bb2', 'G2'],
+            'Ab7': ['Ab2', 'C3', 'Eb3', 'C3'],
+            'Bb7': ['Bb2', 'D3', 'F3', 'D3']
+          }
+        },
+        tips: {
+          beginner: [
+            'Eb is a very common jazz key. Start by playing just the root of each chord on beat 1.',
+            'Hold long tones on each root: Eb, Ab, Bb. Listen to how they color the backing track.',
+            'The Eb blues scale (Eb, Gb, Ab, A, Bb, Db) works over the entire 12-bar form.',
+            'Eb is in 3rd position on trombone. Use this as your anchor pitch throughout.',
+            'Once roots feel easy, add the 5th: Eb+Bb, Ab+Eb, Bb+F. Root on beat 1, 5th on beat 3.'
+          ],
+          intermediate: [
+            'Guide tones define the harmony: on Eb7 the 3rd is G and the b7 is Db.',
+            'On the Ab7 (bar 5), the 3rd (C) and b7 (Gb) are your strongest target notes.',
+            'Try a chromatic approach into each chord change — play a half step below the new root.',
+            'The Eb blues scale connects all three chords. Mix scale fragments with arpeggios.',
+            'Practice smooth voice leading: Db (b7 of Eb7) moves to C (3rd of Ab7) by half step.',
+            'Play each lick, then improvise your own variation using the same chord tones.'
+          ],
+          advanced: [
+            'The Eb bebop dominant scale adds D natural as a passing tone between Db and Eb.',
+            'Use double enclosures: approach target notes from a half step above AND below.',
+            'Digital patterns (1-2-3-5) through each chord create angular bebop vocabulary.',
+            'On the turnaround (bar 12, Bb7), use chromatic motion to lead back to Eb7.',
+            'Listen to Curtis Fuller, J.J. Johnson, and Slide Hampton playing in Eb.',
+            'Vary rhythmic placement — start phrases on the "and" of beats for a modern feel.'
+          ]
+        }
+      },
+
+      'c-minor-blues': {
+        id: 'c-minor-blues',
+        title: 'Minor Blues in C',
+        key: 'Eb',
+        timeSignature: '4/4',
+        defaultTempo: 110,
+        tempoRange: [50, 180],
+        measures: [
+          { chord: 'Cm7', beats: 4 },
+          { chord: 'Cm7', beats: 4 },
+          { chord: 'Cm7', beats: 4 },
+          { chord: 'Cm7', beats: 4 },
+          { chord: 'Fm7', beats: 4 },
+          { chord: 'Fm7', beats: 4 },
+          { chord: 'Cm7', beats: 4 },
+          { chord: 'Cm7', beats: 4 },
+          { chord: 'G7',  beats: 4 },
+          { chord: 'Fm7', beats: 4 },
+          { chord: 'Cm7', beats: 4 },
+          { chord: 'G7',  beats: 4 }
+        ],
+        layout: { measuresPerLine: 4, clef: 'bass' },
+        audio: {
+          type: 'synth',
+          voicings: {
+            'Cm7': ['Bb3', 'C4', 'Eb4', 'G4'],
+            'Fm7': ['Ab3', 'C4', 'Eb4', 'F4'],
+            'G7':  ['B3', 'D4', 'F4', 'G4']
+          },
+          bassNotes: {
+            'Cm7': ['C2', 'Eb2', 'G2', 'Bb2'],
+            'Fm7': ['F2', 'Ab2', 'C3', 'Ab2'],
+            'G7':  ['G2', 'B2', 'D3', 'B2']
+          }
+        },
+        tips: {
+          beginner: [
+            'The minor blues has a darker, moodier sound than a major blues. Listen to that quality.',
+            'Start with just the roots: C for Cm7, F for Fm7, G for G7. Feel the form.',
+            'Cm7 is a minor chord — the b3 (Eb) gives it the dark character. Try root + Eb.',
+            'The C minor pentatonic (C, Eb, F, G, Bb) works over most of this form.',
+            'Count through all 12 bars: the Fm7 arrives in bar 5, and G7 creates tension in bar 9.'
+          ],
+          intermediate: [
+            'On Cm7, the guide tones are Eb (b3) and Bb (b7). These define the minor sound.',
+            'On Fm7, target Ab (b3) and Eb (b7). Notice Eb is shared with Cm7 — smooth connection.',
+            'The G7 in bar 9 is the V chord — its major 3rd (B natural) creates strong pull to Cm7.',
+            'Try the C blues scale (C, Eb, F, F#/Gb, G, Bb) over the Cm7 measures for color.',
+            'Practice connecting Fm7 back to Cm7 with a descending line landing on C or Eb.',
+            'The move from G7 to Cm7 is a V-i resolution — the strongest motion in minor keys.'
+          ],
+          advanced: [
+            'On Cm7, use the C dorian scale (C, D, Eb, F, G, A, Bb) — the A natural adds brightness.',
+            'On G7, try the G altered scale or G harmonic minor dominant for dark tension.',
+            'Use the B natural (3rd of G7) resolving down to Bb (b7 of Cm7) for classic voice leading.',
+            'Digital patterns through minor chords: 1-2-b3-5 on Cm7 and Fm7.',
+            'Listen to Wayne Shorter, McCoy Tyner, and Joe Henderson for minor blues vocabulary.',
+            'Try superimposing EbMaj7 arpeggios over Cm7 — this outlines the b3-5-b7-9.'
+          ]
+        }
+      }
+    };
+
+    // =========================================================================
+    // LICK LIBRARY — Graduated Curriculum
+    // =========================================================================
+    // Each level has 10 licks per chord, ordered from simplest to most complex.
+    // All measures of the same chord in a chorus get the SAME lick.
+    // Rests use duration suffix 'r' (e.g. '4r' = quarter rest).
+    // Beginner: Hear the chord. Whole/half/quarter notes, lots of space.
+    // Intermediate: Connect the changes. 8th notes, enclosures, blues scale.
+    // Advanced: Bebop language. Continuous 8ths, chromatic, digital patterns.
+    // Intermediate: 8th-note lines, enclosures, guide tones, blues scale, passing tones.
+    // Advanced:     Bebop language, chromatic approaches, triplets, wide intervals, altered tones.
+
+    const LICKS = {
+      // =======================================================================
+      // BEGINNER — 10 graduated licks per chord. Hear the chord tones.
+      // =======================================================================
+      beginner: {
+        'Bb7': [
+          { name: '1. Root only', notes: [
+            { keys: ['Bb/3'], duration: 'w' }
+          ]},
+          { name: '2. Root + space', notes: [
+            { keys: ['Bb/3'], duration: '2' },
+            { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '3. Root and 5th', notes: [
+            { keys: ['Bb/3'], duration: '2' },
+            { keys: ['F/4'], duration: '2' }
+          ]},
+          { name: '4. Triad up', notes: [
+            { keys: ['Bb/3'], duration: '4' },
+            { keys: ['D/4'], duration: '4' },
+            { keys: ['F/4'], duration: '4' },
+            { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Full arpeggio up', notes: [
+            { keys: ['Bb/3'], duration: '4' },
+            { keys: ['D/4'], duration: '4' },
+            { keys: ['F/4'], duration: '4' },
+            { keys: ['Ab/4'], duration: '4' }
+          ]},
+          { name: '6. Full arpeggio down', notes: [
+            { keys: ['Ab/4'], duration: '4' },
+            { keys: ['F/4'], duration: '4' },
+            { keys: ['D/4'], duration: '4' },
+            { keys: ['Bb/3'], duration: '4' }
+          ]},
+          { name: '7. Guide tones', notes: [
+            { keys: ['D/4'], duration: '2' },
+            { keys: ['Ab/4'], duration: '2' }
+          ]},
+          { name: '8. Pickup into root', notes: [
+            { keys: ['d/4'], duration: '2r' },
+            { keys: ['A/3'], duration: '4' },
+            { keys: ['Bb/3'], duration: '4' }
+          ]},
+          { name: '9. Call and response', notes: [
+            { keys: ['Bb/3'], duration: '4' },
+            { keys: ['D/4'], duration: '4' },
+            { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '10. Arpeggio + landing', notes: [
+            { keys: ['Bb/3'], duration: '4' },
+            { keys: ['D/4'], duration: '4' },
+            { keys: ['F/4'], duration: '2' }
+          ]}
+        ],
+        'Eb7': [
+          { name: '1. Root only', notes: [
+            { keys: ['Eb/3'], duration: 'w' }
+          ]},
+          { name: '2. Root + space', notes: [
+            { keys: ['Eb/3'], duration: '2' },
+            { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '3. Root and 5th', notes: [
+            { keys: ['Eb/3'], duration: '2' },
+            { keys: ['Bb/3'], duration: '2' }
+          ]},
+          { name: '4. Triad up', notes: [
+            { keys: ['Eb/3'], duration: '4' },
+            { keys: ['G/3'], duration: '4' },
+            { keys: ['Bb/3'], duration: '4' },
+            { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Full arpeggio up', notes: [
+            { keys: ['Eb/3'], duration: '4' },
+            { keys: ['G/3'], duration: '4' },
+            { keys: ['Bb/3'], duration: '4' },
+            { keys: ['Db/4'], duration: '4' }
+          ]},
+          { name: '6. Full arpeggio down', notes: [
+            { keys: ['Db/4'], duration: '4' },
+            { keys: ['Bb/3'], duration: '4' },
+            { keys: ['G/3'], duration: '4' },
+            { keys: ['Eb/3'], duration: '4' }
+          ]},
+          { name: '7. Guide tones', notes: [
+            { keys: ['G/3'], duration: '2' },
+            { keys: ['Db/4'], duration: '2' }
+          ]},
+          { name: '8. Pickup into root', notes: [
+            { keys: ['d/4'], duration: '2r' },
+            { keys: ['D/3'], duration: '4' },
+            { keys: ['Eb/3'], duration: '4' }
+          ]},
+          { name: '9. Call and response', notes: [
+            { keys: ['Eb/3'], duration: '4' },
+            { keys: ['G/3'], duration: '4' },
+            { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '10. Arpeggio + landing', notes: [
+            { keys: ['Eb/3'], duration: '4' },
+            { keys: ['G/3'], duration: '4' },
+            { keys: ['Bb/3'], duration: '2' }
+          ]}
+        ],
+        'F7': [
+          { name: '1. Root only', notes: [
+            { keys: ['F/3'], duration: 'w' }
+          ]},
+          { name: '2. Root + space', notes: [
+            { keys: ['F/3'], duration: '2' },
+            { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '3. Root and 5th', notes: [
+            { keys: ['F/3'], duration: '2' },
+            { keys: ['C/4'], duration: '2' }
+          ]},
+          { name: '4. Triad up', notes: [
+            { keys: ['F/3'], duration: '4' },
+            { keys: ['A/3'], duration: '4' },
+            { keys: ['C/4'], duration: '4' },
+            { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Full arpeggio up', notes: [
+            { keys: ['F/3'], duration: '4' },
+            { keys: ['A/3'], duration: '4' },
+            { keys: ['C/4'], duration: '4' },
+            { keys: ['Eb/4'], duration: '4' }
+          ]},
+          { name: '6. Full arpeggio down', notes: [
+            { keys: ['Eb/4'], duration: '4' },
+            { keys: ['C/4'], duration: '4' },
+            { keys: ['A/3'], duration: '4' },
+            { keys: ['F/3'], duration: '4' }
+          ]},
+          { name: '7. Guide tones', notes: [
+            { keys: ['A/3'], duration: '2' },
+            { keys: ['Eb/4'], duration: '2' }
+          ]},
+          { name: '8. Pickup into root', notes: [
+            { keys: ['d/4'], duration: '2r' },
+            { keys: ['E/3'], duration: '4' },
+            { keys: ['F/3'], duration: '4' }
+          ]},
+          { name: '9. Call and response', notes: [
+            { keys: ['F/3'], duration: '4' },
+            { keys: ['A/3'], duration: '4' },
+            { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '10. Arpeggio + landing', notes: [
+            { keys: ['F/3'], duration: '4' },
+            { keys: ['A/3'], duration: '4' },
+            { keys: ['C/4'], duration: '2' }
+          ]}
+        ],
+        'C7': [
+          { name: '1. Root only', notes: [{ keys: ['C/3'], duration: 'w' }]},
+          { name: '2. Root + space', notes: [{ keys: ['C/3'], duration: '2' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '3. Root and 5th', notes: [{ keys: ['C/3'], duration: '2' }, { keys: ['G/3'], duration: '2' }]},
+          { name: '4. Triad up', notes: [{ keys: ['C/3'], duration: '4' }, { keys: ['E/3'], duration: '4' }, { keys: ['G/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Full arpeggio up', notes: [{ keys: ['C/3'], duration: '4' }, { keys: ['E/3'], duration: '4' }, { keys: ['G/3'], duration: '4' }, { keys: ['Bb/3'], duration: '4' }]},
+          { name: '6. Full arpeggio down', notes: [{ keys: ['Bb/3'], duration: '4' }, { keys: ['G/3'], duration: '4' }, { keys: ['E/3'], duration: '4' }, { keys: ['C/3'], duration: '4' }]},
+          { name: '7. Guide tones', notes: [{ keys: ['E/3'], duration: '2' }, { keys: ['Bb/3'], duration: '2' }]},
+          { name: '8. Pickup into root', notes: [{ keys: ['d/4'], duration: '2r' }, { keys: ['B/2'], duration: '4' }, { keys: ['C/3'], duration: '4' }]},
+          { name: '9. Call and response', notes: [{ keys: ['C/3'], duration: '4' }, { keys: ['E/3'], duration: '4' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '10. Arpeggio + landing', notes: [{ keys: ['C/3'], duration: '4' }, { keys: ['E/3'], duration: '4' }, { keys: ['G/3'], duration: '2' }]}
+        ],
+        'Cm7': [
+          { name: '1. Root only', notes: [{ keys: ['C/3'], duration: 'w' }]},
+          { name: '2. Root + space', notes: [{ keys: ['C/3'], duration: '2' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '3. Root and 5th', notes: [{ keys: ['C/3'], duration: '2' }, { keys: ['G/3'], duration: '2' }]},
+          { name: '4. Minor triad up', notes: [{ keys: ['C/3'], duration: '4' }, { keys: ['Eb/3'], duration: '4' }, { keys: ['G/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Full arpeggio up', notes: [{ keys: ['C/3'], duration: '4' }, { keys: ['Eb/3'], duration: '4' }, { keys: ['G/3'], duration: '4' }, { keys: ['Bb/3'], duration: '4' }]},
+          { name: '6. Full arpeggio down', notes: [{ keys: ['Bb/3'], duration: '4' }, { keys: ['G/3'], duration: '4' }, { keys: ['Eb/3'], duration: '4' }, { keys: ['C/3'], duration: '4' }]},
+          { name: '7. Guide tones', notes: [{ keys: ['Eb/3'], duration: '2' }, { keys: ['Bb/3'], duration: '2' }]},
+          { name: '8. Pickup into root', notes: [{ keys: ['d/4'], duration: '2r' }, { keys: ['B/2'], duration: '4' }, { keys: ['C/3'], duration: '4' }]},
+          { name: '9. Call and response', notes: [{ keys: ['C/3'], duration: '4' }, { keys: ['Eb/3'], duration: '4' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '10. Arpeggio + landing', notes: [{ keys: ['C/3'], duration: '4' }, { keys: ['Eb/3'], duration: '4' }, { keys: ['G/3'], duration: '2' }]}
+        ],
+        'BbMaj7': [
+          { name: '1. Root only', notes: [{ keys: ['Bb/3'], duration: 'w' }]},
+          { name: '2. Root + space', notes: [{ keys: ['Bb/3'], duration: '2' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '3. Root and 5th', notes: [{ keys: ['Bb/3'], duration: '2' }, { keys: ['F/4'], duration: '2' }]},
+          { name: '4. Triad up', notes: [{ keys: ['Bb/3'], duration: '4' }, { keys: ['D/4'], duration: '4' }, { keys: ['F/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Full arpeggio up', notes: [{ keys: ['Bb/3'], duration: '4' }, { keys: ['D/4'], duration: '4' }, { keys: ['F/4'], duration: '4' }, { keys: ['A/4'], duration: '4' }]},
+          { name: '6. Full arpeggio down', notes: [{ keys: ['A/4'], duration: '4' }, { keys: ['F/4'], duration: '4' }, { keys: ['D/4'], duration: '4' }, { keys: ['Bb/3'], duration: '4' }]},
+          { name: '7. Guide tones', notes: [{ keys: ['D/4'], duration: '2' }, { keys: ['A/4'], duration: '2' }]},
+          { name: '8. Pickup into root', notes: [{ keys: ['d/4'], duration: '2r' }, { keys: ['A/3'], duration: '4' }, { keys: ['Bb/3'], duration: '4' }]},
+          { name: '9. Call and response', notes: [{ keys: ['Bb/3'], duration: '4' }, { keys: ['D/4'], duration: '4' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '10. Arpeggio + landing', notes: [{ keys: ['Bb/3'], duration: '4' }, { keys: ['D/4'], duration: '4' }, { keys: ['F/4'], duration: '2' }]}
+        ],
+        'Ab7': [
+          { name: '1. Root only', notes: [
+            { keys: ['Ab/3'], duration: 'w' }
+          ]},
+          { name: '2. Root + space', notes: [
+            { keys: ['Ab/3'], duration: '2' },
+            { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '3. Root and 5th', notes: [
+            { keys: ['Ab/3'], duration: '2' },
+            { keys: ['Eb/4'], duration: '2' }
+          ]},
+          { name: '4. Triad up', notes: [
+            { keys: ['Ab/3'], duration: '4' },
+            { keys: ['C/4'], duration: '4' },
+            { keys: ['Eb/4'], duration: '4' },
+            { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Full arpeggio up', notes: [
+            { keys: ['Ab/3'], duration: '4' },
+            { keys: ['C/4'], duration: '4' },
+            { keys: ['Eb/4'], duration: '4' },
+            { keys: ['Gb/4'], duration: '4' }
+          ]},
+          { name: '6. Full arpeggio down', notes: [
+            { keys: ['Gb/4'], duration: '4' },
+            { keys: ['Eb/4'], duration: '4' },
+            { keys: ['C/4'], duration: '4' },
+            { keys: ['Ab/3'], duration: '4' }
+          ]},
+          { name: '7. Guide tones', notes: [
+            { keys: ['C/4'], duration: '2' },
+            { keys: ['Gb/4'], duration: '2' }
+          ]},
+          { name: '8. Pickup into root', notes: [
+            { keys: ['d/4'], duration: '2r' },
+            { keys: ['G/3'], duration: '4' },
+            { keys: ['Ab/3'], duration: '4' }
+          ]},
+          { name: '9. Call and response', notes: [
+            { keys: ['Ab/3'], duration: '4' },
+            { keys: ['C/4'], duration: '4' },
+            { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '10. Arpeggio + landing', notes: [
+            { keys: ['Ab/3'], duration: '4' },
+            { keys: ['C/4'], duration: '4' },
+            { keys: ['Eb/4'], duration: '2' }
+          ]}
+        ],
+        'Fm7': [
+          { name: '1. Root only', notes: [
+            { keys: ['F/3'], duration: 'w' }
+          ]},
+          { name: '2. Root + space', notes: [
+            { keys: ['F/3'], duration: '2' },
+            { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '3. Root and 5th', notes: [
+            { keys: ['F/3'], duration: '2' },
+            { keys: ['C/4'], duration: '2' }
+          ]},
+          { name: '4. Minor triad up', notes: [
+            { keys: ['F/3'], duration: '4' },
+            { keys: ['Ab/3'], duration: '4' },
+            { keys: ['C/4'], duration: '4' },
+            { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Full arpeggio up', notes: [
+            { keys: ['F/3'], duration: '4' },
+            { keys: ['Ab/3'], duration: '4' },
+            { keys: ['C/4'], duration: '4' },
+            { keys: ['Eb/4'], duration: '4' }
+          ]},
+          { name: '6. Full arpeggio down', notes: [
+            { keys: ['Eb/4'], duration: '4' },
+            { keys: ['C/4'], duration: '4' },
+            { keys: ['Ab/3'], duration: '4' },
+            { keys: ['F/3'], duration: '4' }
+          ]},
+          { name: '7. Guide tones', notes: [
+            { keys: ['Ab/3'], duration: '2' },
+            { keys: ['Eb/4'], duration: '2' }
+          ]},
+          { name: '8. Pickup into root', notes: [
+            { keys: ['d/4'], duration: '2r' },
+            { keys: ['E/3'], duration: '4' },
+            { keys: ['F/3'], duration: '4' }
+          ]},
+          { name: '9. Call and response', notes: [
+            { keys: ['F/3'], duration: '4' },
+            { keys: ['Ab/3'], duration: '4' },
+            { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '10. Arpeggio + landing', notes: [
+            { keys: ['F/3'], duration: '4' },
+            { keys: ['Ab/3'], duration: '4' },
+            { keys: ['C/4'], duration: '2' }
+          ]}
+        ],
+        'G7': [
+          { name: '1. Root only', notes: [
+            { keys: ['G/3'], duration: 'w' }
+          ]},
+          { name: '2. Root + space', notes: [
+            { keys: ['G/3'], duration: '2' },
+            { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '3. Root and 5th', notes: [
+            { keys: ['G/3'], duration: '2' },
+            { keys: ['D/4'], duration: '2' }
+          ]},
+          { name: '4. Triad up', notes: [
+            { keys: ['G/3'], duration: '4' },
+            { keys: ['B/3'], duration: '4' },
+            { keys: ['D/4'], duration: '4' },
+            { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Full arpeggio up', notes: [
+            { keys: ['G/3'], duration: '4' },
+            { keys: ['B/3'], duration: '4' },
+            { keys: ['D/4'], duration: '4' },
+            { keys: ['F/4'], duration: '4' }
+          ]},
+          { name: '6. Full arpeggio down', notes: [
+            { keys: ['F/4'], duration: '4' },
+            { keys: ['D/4'], duration: '4' },
+            { keys: ['B/3'], duration: '4' },
+            { keys: ['G/3'], duration: '4' }
+          ]},
+          { name: '7. Guide tones', notes: [
+            { keys: ['B/3'], duration: '2' },
+            { keys: ['F/4'], duration: '2' }
+          ]},
+          { name: '8. Pickup into root', notes: [
+            { keys: ['d/4'], duration: '2r' },
+            { keys: ['F#/3'], duration: '4' },
+            { keys: ['G/3'], duration: '4' }
+          ]},
+          { name: '9. Call and response', notes: [
+            { keys: ['G/3'], duration: '4' },
+            { keys: ['B/3'], duration: '4' },
+            { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '10. Arpeggio + landing', notes: [
+            { keys: ['G/3'], duration: '4' },
+            { keys: ['B/3'], duration: '4' },
+            { keys: ['D/4'], duration: '2' }
+          ]}
+        ]
+      },
+
+      // =======================================================================
+      // INTERMEDIATE — 10 graduated licks. Connect changes with 8ths.
+      // =======================================================================
+      intermediate: {
+        'Bb7': [
+          { name: '1. Smooth arpeggio', notes: [
+            { keys: ['Bb/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['Ab/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '2. Scale approach', notes: [
+            { keys: ['Ab/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '3. Enclosure to root', notes: [
+            { keys: ['B/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '4. Blues scale riff', notes: [
+            { keys: ['Bb/3'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['E/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Guide tone melody', notes: [
+            { keys: ['D/4'], duration: '4' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['Ab/4'], duration: '2' }
+          ]},
+          { name: '6. Enclosure to 3rd', notes: [
+            { keys: ['Eb/4'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['D/4'], duration: '2' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '7. Descending scale', notes: [
+            { keys: ['F/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '8. Pickup line', notes: [
+            { keys: ['d/4'], duration: '8r' }, { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['D/4'], duration: '4' }
+          ]},
+          { name: '9. Mixed rhythm', notes: [
+            { keys: ['Bb/3'], duration: '4' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['d/4'], duration: '4r' }, { keys: ['Bb/3'], duration: '4' }
+          ]},
+          { name: '10. Approach + arpeggio', notes: [
+            { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['Ab/4'], duration: '4' }, { keys: ['F/4'], duration: '4' }
+          ]}
+        ],
+        'Eb7': [
+          { name: '1. Smooth arpeggio', notes: [
+            { keys: ['Eb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '2. Scale approach', notes: [
+            { keys: ['D/3'], duration: '8' }, { keys: ['Eb/3'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '3. Enclosure to root', notes: [
+            { keys: ['E/3'], duration: '8' }, { keys: ['D/3'], duration: '8' }, { keys: ['Eb/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '4. Blues approach', notes: [
+            { keys: ['Eb/3'], duration: '4' }, { keys: ['Gb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Guide tone melody', notes: [
+            { keys: ['G/3'], duration: '4' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Db/4'], duration: '2' }
+          ]},
+          { name: '6. Enclosure to 3rd', notes: [
+            { keys: ['Ab/3'], duration: '8' }, { keys: ['F#/3'], duration: '8' }, { keys: ['G/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '7. Descending scale', notes: [
+            { keys: ['Db/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Eb/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '8. Pickup line', notes: [
+            { keys: ['d/4'], duration: '8r' }, { keys: ['D/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['G/3'], duration: '4' }
+          ]},
+          { name: '9. Mixed rhythm', notes: [
+            { keys: ['Eb/3'], duration: '4' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['d/4'], duration: '4r' }, { keys: ['Eb/3'], duration: '4' }
+          ]},
+          { name: '10. Approach + arpeggio', notes: [
+            { keys: ['D/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['Db/4'], duration: '4' }, { keys: ['Bb/3'], duration: '4' }
+          ]}
+        ],
+        'F7': [
+          { name: '1. Smooth arpeggio', notes: [
+            { keys: ['F/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['C/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '2. Scale approach', notes: [
+            { keys: ['E/3'], duration: '8' }, { keys: ['F/3'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '3. Enclosure to root', notes: [
+            { keys: ['Gb/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['F/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '4. Blues curl', notes: [
+            { keys: ['F/3'], duration: '4' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['C/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Guide tone melody', notes: [
+            { keys: ['A/3'], duration: '4' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['Eb/4'], duration: '2' }
+          ]},
+          { name: '6. Enclosure to 3rd', notes: [
+            { keys: ['Bb/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['A/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '7. Descending scale', notes: [
+            { keys: ['C/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['F/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '8. Pickup line', notes: [
+            { keys: ['d/4'], duration: '8r' }, { keys: ['E/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['C/4'], duration: '4' }, { keys: ['A/3'], duration: '4' }
+          ]},
+          { name: '9. Mixed rhythm', notes: [
+            { keys: ['F/3'], duration: '4' }, { keys: ['A/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['d/4'], duration: '4r' }, { keys: ['F/3'], duration: '4' }
+          ]},
+          { name: '10. Approach + arpeggio', notes: [
+            { keys: ['E/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '4' }, { keys: ['C/4'], duration: '4' }
+          ]}
+        ],
+        'C7': [
+          { name: '1. Smooth arpeggio', notes: [{ keys: ['C/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '2. Scale approach', notes: [{ keys: ['B/2'], duration: '8' }, { keys: ['C/3'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '3. Enclosure to root', notes: [{ keys: ['Db/3'], duration: '8' }, { keys: ['B/2'], duration: '8' }, { keys: ['C/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '4. Blues curl', notes: [{ keys: ['C/3'], duration: '4' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Guide tone melody', notes: [{ keys: ['E/3'], duration: '4' }, { keys: ['F/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['Bb/3'], duration: '2' }]},
+          { name: '6. Enclosure to 3rd', notes: [{ keys: ['F/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['E/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '7. Descending scale', notes: [{ keys: ['G/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['D/3'], duration: '8' }, { keys: ['C/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '8. Pickup line', notes: [{ keys: ['d/4'], duration: '8r' }, { keys: ['B/2'], duration: '8' }, { keys: ['C/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }, { keys: ['E/3'], duration: '4' }]},
+          { name: '9. Mixed rhythm', notes: [{ keys: ['C/3'], duration: '4' }, { keys: ['E/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['d/4'], duration: '4r' }, { keys: ['C/3'], duration: '4' }]},
+          { name: '10. Approach + arpeggio', notes: [{ keys: ['B/2'], duration: '8' }, { keys: ['C/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['G/3'], duration: '4' }]}
+        ],
+        'Cm7': [
+          { name: '1. Smooth arpeggio', notes: [{ keys: ['C/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '2. Scale approach', notes: [{ keys: ['B/2'], duration: '8' }, { keys: ['C/3'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '3. Enclosure to root', notes: [{ keys: ['Db/3'], duration: '8' }, { keys: ['B/2'], duration: '8' }, { keys: ['C/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '4. Minor pentatonic', notes: [{ keys: ['C/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Guide tone melody', notes: [{ keys: ['Eb/3'], duration: '4' }, { keys: ['D/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['Bb/3'], duration: '2' }]},
+          { name: '6. Enclosure to b3', notes: [{ keys: ['E/3'], duration: '8' }, { keys: ['D/3'], duration: '8' }, { keys: ['Eb/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '7. Dorian descent', notes: [{ keys: ['Bb/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['Eb/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '8. Pickup line', notes: [{ keys: ['d/4'], duration: '8r' }, { keys: ['B/2'], duration: '8' }, { keys: ['C/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }, { keys: ['Eb/3'], duration: '4' }]},
+          { name: '9. Mixed rhythm', notes: [{ keys: ['C/3'], duration: '4' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['d/4'], duration: '4r' }, { keys: ['C/3'], duration: '4' }]},
+          { name: '10. Approach + arpeggio', notes: [{ keys: ['B/2'], duration: '8' }, { keys: ['C/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['G/3'], duration: '4' }]}
+        ],
+        'BbMaj7': [
+          { name: '1. Smooth arpeggio', notes: [{ keys: ['Bb/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['A/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '2. Scale approach', notes: [{ keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '3. Enclosure to root', notes: [{ keys: ['B/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '4. Lydian flavor', notes: [{ keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['E/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Guide tone melody', notes: [{ keys: ['D/4'], duration: '4' }, { keys: ['C/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['A/4'], duration: '2' }]},
+          { name: '6. Enclosure to 3rd', notes: [{ keys: ['Eb/4'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['D/4'], duration: '2' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '7. Descending scale', notes: [{ keys: ['F/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '8. Pickup line', notes: [{ keys: ['d/4'], duration: '8r' }, { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['D/4'], duration: '4' }]},
+          { name: '9. Mixed rhythm', notes: [{ keys: ['Bb/3'], duration: '4' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['d/4'], duration: '4r' }, { keys: ['Bb/3'], duration: '4' }]},
+          { name: '10. Approach + arpeggio', notes: [{ keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['A/4'], duration: '4' }, { keys: ['F/4'], duration: '4' }]}
+        ],
+        'Ab7': [
+          { name: '1. Smooth arpeggio', notes: [
+            { keys: ['Ab/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['Gb/4'], duration: '8' }, { keys: ['Eb/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '2. Scale approach', notes: [
+            { keys: ['G/3'], duration: '8' }, { keys: ['Ab/3'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '3. Enclosure to root', notes: [
+            { keys: ['A/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Ab/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '4. Blues scale riff', notes: [
+            { keys: ['Ab/3'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['Eb/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Guide tone melody', notes: [
+            { keys: ['C/4'], duration: '4' }, { keys: ['Db/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Gb/4'], duration: '2' }
+          ]},
+          { name: '6. Enclosure to 3rd', notes: [
+            { keys: ['Db/4'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['C/4'], duration: '2' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '7. Descending scale', notes: [
+            { keys: ['Eb/4'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['Ab/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '8. Pickup line', notes: [
+            { keys: ['d/4'], duration: '8r' }, { keys: ['G/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '4' }, { keys: ['C/4'], duration: '4' }
+          ]},
+          { name: '9. Mixed rhythm', notes: [
+            { keys: ['Ab/3'], duration: '4' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['d/4'], duration: '4r' }, { keys: ['Ab/3'], duration: '4' }
+          ]},
+          { name: '10. Approach + arpeggio', notes: [
+            { keys: ['G/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['Gb/4'], duration: '4' }, { keys: ['Eb/4'], duration: '4' }
+          ]}
+        ],
+        'Fm7': [
+          { name: '1. Smooth arpeggio', notes: [
+            { keys: ['F/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['C/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '2. Scale approach', notes: [
+            { keys: ['E/3'], duration: '8' }, { keys: ['F/3'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '3. Enclosure to root', notes: [
+            { keys: ['Gb/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['F/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '4. Minor pentatonic', notes: [
+            { keys: ['F/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Guide tone melody', notes: [
+            { keys: ['Ab/3'], duration: '4' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['Eb/4'], duration: '2' }
+          ]},
+          { name: '6. Enclosure to b3', notes: [
+            { keys: ['A/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Ab/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '7. Dorian descent', notes: [
+            { keys: ['Eb/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['Ab/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '8. Pickup line', notes: [
+            { keys: ['d/4'], duration: '8r' }, { keys: ['E/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['C/4'], duration: '4' }, { keys: ['Ab/3'], duration: '4' }
+          ]},
+          { name: '9. Mixed rhythm', notes: [
+            { keys: ['F/3'], duration: '4' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['d/4'], duration: '4r' }, { keys: ['F/3'], duration: '4' }
+          ]},
+          { name: '10. Approach + arpeggio', notes: [
+            { keys: ['E/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '4' }, { keys: ['C/4'], duration: '4' }
+          ]}
+        ],
+        'G7': [
+          { name: '1. Smooth arpeggio', notes: [
+            { keys: ['G/3'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['D/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '2. Scale approach', notes: [
+            { keys: ['F#/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['d/4'], duration: '2r' }
+          ]},
+          { name: '3. Enclosure to root', notes: [
+            { keys: ['Ab/3'], duration: '8' }, { keys: ['F#/3'], duration: '8' }, { keys: ['G/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '4. Blues curl', notes: [
+            { keys: ['G/3'], duration: '4' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['D/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Guide tone melody', notes: [
+            { keys: ['B/3'], duration: '4' }, { keys: ['C/4'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['F/4'], duration: '2' }
+          ]},
+          { name: '6. Enclosure to 3rd', notes: [
+            { keys: ['C/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['B/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '7. Descending scale', notes: [
+            { keys: ['D/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '8. Pickup line', notes: [
+            { keys: ['d/4'], duration: '8r' }, { keys: ['F#/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['D/4'], duration: '4' }, { keys: ['B/3'], duration: '4' }
+          ]},
+          { name: '9. Mixed rhythm', notes: [
+            { keys: ['G/3'], duration: '4' }, { keys: ['B/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['d/4'], duration: '4r' }, { keys: ['G/3'], duration: '4' }
+          ]},
+          { name: '10. Approach + arpeggio', notes: [
+            { keys: ['F#/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['D/4'], duration: '4' }
+          ]}
+        ]
+      },
+
+      // =======================================================================
+      // ADVANCED — 10 graduated licks. Bebop vocabulary.
+      // =======================================================================
+      advanced: {
+        'Bb7': [
+          { name: '1. Bebop scale down', notes: [
+            { keys: ['Bb/4'], duration: '8' }, { keys: ['Ab/4'], duration: '8' }, { keys: ['G/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['E/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }
+          ]},
+          { name: '2. Chromatic to 3rd', notes: [
+            { keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '3. Double enclosure', notes: [
+            { keys: ['Eb/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['D/4'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '4. 1-2-3-5 digital', notes: [
+            { keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['Ab/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Wide intervals', notes: [
+            { keys: ['Bb/3'], duration: '8' }, { keys: ['Ab/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['Bb/3'], duration: '2' }
+          ]},
+          { name: '6. Bebop scale up', notes: [
+            { keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['G/4'], duration: '8' }, { keys: ['Ab/4'], duration: '8' }, { keys: ['A/4'], duration: '8' }
+          ]},
+          { name: '7. Pickup bebop', notes: [
+            { keys: ['d/4'], duration: '8r' }, { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['Ab/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }
+          ]},
+          { name: '8. Altered approach', notes: [
+            { keys: ['Ab/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['D/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '9. Syncopated landing', notes: [
+            { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['Ab/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['Bb/3'], duration: '4' }
+          ]},
+          { name: '10. Honeysuckle lick', notes: [
+            { keys: ['D/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }
+          ]}
+        ],
+        'Eb7': [
+          { name: '1. Bebop scale down', notes: [
+            { keys: ['Eb/4'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }
+          ]},
+          { name: '2. Chromatic to 3rd', notes: [
+            { keys: ['Eb/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['Gb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '3. Double enclosure', notes: [
+            { keys: ['Ab/3'], duration: '8' }, { keys: ['F#/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '4. 1-2-3-5 digital', notes: [
+            { keys: ['Eb/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['Db/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Wide intervals', notes: [
+            { keys: ['Eb/3'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Eb/3'], duration: '2' }
+          ]},
+          { name: '6. Bebop scale up', notes: [
+            { keys: ['Eb/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }
+          ]},
+          { name: '7. Pickup bebop', notes: [
+            { keys: ['d/4'], duration: '8r' }, { keys: ['D/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }
+          ]},
+          { name: '8. Altered approach', notes: [
+            { keys: ['Db/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '9. Syncopated landing', notes: [
+            { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['Eb/3'], duration: '4' }
+          ]},
+          { name: '10. Chromatic turnaround', notes: [
+            { keys: ['Bb/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Gb/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['Eb/3'], duration: '4' }
+          ]}
+        ],
+        'F7': [
+          { name: '1. Bebop scale down', notes: [
+            { keys: ['F/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }
+          ]},
+          { name: '2. Chromatic to 3rd', notes: [
+            { keys: ['F/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['C/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '3. Double enclosure', notes: [
+            { keys: ['Gb/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['F/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '4. 1-2-3-5 digital', notes: [
+            { keys: ['F/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Wide intervals', notes: [
+            { keys: ['F/3'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['F/3'], duration: '2' }
+          ]},
+          { name: '6. Bebop scale up', notes: [
+            { keys: ['F/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['E/4'], duration: '8' }
+          ]},
+          { name: '7. Pickup bebop', notes: [
+            { keys: ['d/4'], duration: '8r' }, { keys: ['E/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['C/4'], duration: '4' }
+          ]},
+          { name: '8. Altered approach', notes: [
+            { keys: ['Eb/4'], duration: '8' }, { keys: ['E/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['A/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '9. Syncopated landing', notes: [
+            { keys: ['A/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['C/4'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['F/3'], duration: '4' }
+          ]},
+          { name: '10. Resolution line', notes: [
+            { keys: ['C/4'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['F/3'], duration: '4' }
+          ]}
+        ],
+        'C7': [
+          { name: '1. Bebop scale down', notes: [{ keys: ['C/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['F#/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['D/3'], duration: '8' }, { keys: ['C/3'], duration: '8' }]},
+          { name: '2. Chromatic to 3rd', notes: [{ keys: ['C/3'], duration: '8' }, { keys: ['D/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '3. Double enclosure', notes: [{ keys: ['Db/3'], duration: '8' }, { keys: ['B/2'], duration: '8' }, { keys: ['C/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '4. 1-2-3-5 digital', notes: [{ keys: ['C/3'], duration: '8' }, { keys: ['D/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Wide intervals', notes: [{ keys: ['C/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['C/3'], duration: '2' }]},
+          { name: '6. Bebop scale up', notes: [{ keys: ['C/3'], duration: '8' }, { keys: ['D/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['B/3'], duration: '8' }]},
+          { name: '7. Pickup bebop', notes: [{ keys: ['d/4'], duration: '8r' }, { keys: ['B/2'], duration: '8' }, { keys: ['C/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }]},
+          { name: '8. Tritone sub flavor', notes: [{ keys: ['Bb/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['Gb/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['F/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '9. Syncopated landing', notes: [{ keys: ['E/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['C/3'], duration: '4' }]},
+          { name: '10. Chromatic resolution', notes: [{ keys: ['G/3'], duration: '8' }, { keys: ['F#/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['D/3'], duration: '8' }, { keys: ['C/3'], duration: '4' }]}
+        ],
+        'Cm7': [
+          { name: '1. Bebop minor down', notes: [{ keys: ['C/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['D/3'], duration: '8' }, { keys: ['C/3'], duration: '8' }]},
+          { name: '2. Chromatic to b3', notes: [{ keys: ['C/3'], duration: '8' }, { keys: ['D/3'], duration: '8' }, { keys: ['E/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '3. Double enclosure to 5th', notes: [{ keys: ['Ab/3'], duration: '8' }, { keys: ['F#/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '4. 1-2-b3-5 digital', notes: [{ keys: ['C/3'], duration: '8' }, { keys: ['D/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Wide intervals', notes: [{ keys: ['C/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['C/3'], duration: '2' }]},
+          { name: '6. Dorian ascending', notes: [{ keys: ['C/3'], duration: '8' }, { keys: ['D/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }]},
+          { name: '7. Pickup bebop', notes: [{ keys: ['d/4'], duration: '8r' }, { keys: ['B/2'], duration: '8' }, { keys: ['C/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }]},
+          { name: '8. EbMaj7 superimposition', notes: [{ keys: ['Eb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '9. Syncopated landing', notes: [{ keys: ['Eb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['C/3'], duration: '4' }]},
+          { name: '10. Chromatic enclosure', notes: [{ keys: ['Ab/3'], duration: '8' }, { keys: ['F#/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }]}
+        ],
+        'BbMaj7': [
+          { name: '1. Bebop major down', notes: [{ keys: ['Bb/4'], duration: '8' }, { keys: ['A/4'], duration: '8' }, { keys: ['G/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['E/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }]},
+          { name: '2. Chromatic to 3rd', notes: [{ keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '3. Double enclosure to 3rd', notes: [{ keys: ['Eb/4'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['D/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '4. 1-2-3-5 digital', notes: [{ keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['A/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Wide intervals', notes: [{ keys: ['Bb/3'], duration: '8' }, { keys: ['A/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['Bb/3'], duration: '2' }]},
+          { name: '6. Bebop major up', notes: [{ keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['G/4'], duration: '8' }, { keys: ['Ab/4'], duration: '8' }, { keys: ['A/4'], duration: '8' }]},
+          { name: '7. Pickup bebop', notes: [{ keys: ['d/4'], duration: '8r' }, { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['A/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }]},
+          { name: '8. Lydian color', notes: [{ keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['E/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '9. Syncopated landing', notes: [{ keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['A/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['Bb/3'], duration: '4' }]},
+          { name: '10. Dm7 superimposition', notes: [{ keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['A/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['D/4'], duration: '4' }]}
+        ],
+        'Ab7': [
+          { name: '1. Bebop scale down', notes: [
+            { keys: ['Ab/4'], duration: '8' }, { keys: ['Gb/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }
+          ]},
+          { name: '2. Chromatic to 3rd', notes: [
+            { keys: ['Ab/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '3. Double enclosure', notes: [
+            { keys: ['Db/4'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['C/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '4. 1-2-3-5 digital', notes: [
+            { keys: ['Ab/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['Gb/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Wide intervals', notes: [
+            { keys: ['Ab/3'], duration: '8' }, { keys: ['Gb/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Ab/3'], duration: '2' }
+          ]},
+          { name: '6. Bebop scale up', notes: [
+            { keys: ['Ab/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['Gb/4'], duration: '8' }, { keys: ['G/4'], duration: '8' }
+          ]},
+          { name: '7. Pickup bebop', notes: [
+            { keys: ['d/4'], duration: '8r' }, { keys: ['G/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['Gb/4'], duration: '8' }, { keys: ['Eb/4'], duration: '4' }
+          ]},
+          { name: '8. Altered approach', notes: [
+            { keys: ['Gb/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['C/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '9. Syncopated landing', notes: [
+            { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['Gb/4'], duration: '8' }, { keys: ['Eb/4'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['Ab/3'], duration: '4' }
+          ]},
+          { name: '10. Chromatic turnaround', notes: [
+            { keys: ['Eb/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['Ab/3'], duration: '4' }
+          ]}
+        ],
+        'Fm7': [
+          { name: '1. Bebop minor down', notes: [
+            { keys: ['F/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }
+          ]},
+          { name: '2. Chromatic to b3', notes: [
+            { keys: ['F/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['C/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '3. Double enclosure to 5th', notes: [
+            { keys: ['Db/4'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['C/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '4. 1-2-b3-5 digital', notes: [
+            { keys: ['F/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Wide intervals', notes: [
+            { keys: ['F/3'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['F/3'], duration: '2' }
+          ]},
+          { name: '6. Dorian ascending', notes: [
+            { keys: ['F/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }
+          ]},
+          { name: '7. Pickup bebop', notes: [
+            { keys: ['d/4'], duration: '8r' }, { keys: ['E/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['C/4'], duration: '4' }
+          ]},
+          { name: '8. AbMaj7 superimposition', notes: [
+            { keys: ['Ab/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['G/4'], duration: '8' }, { keys: ['Eb/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '9. Syncopated landing', notes: [
+            { keys: ['Ab/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['C/4'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['F/3'], duration: '4' }
+          ]},
+          { name: '10. Chromatic enclosure', notes: [
+            { keys: ['Db/4'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['C/4'], duration: '4' }
+          ]}
+        ],
+        'G7': [
+          { name: '1. Bebop scale down', notes: [
+            { keys: ['G/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['E/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }
+          ]},
+          { name: '2. Chromatic to 3rd', notes: [
+            { keys: ['G/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['D/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '3. Double enclosure', notes: [
+            { keys: ['C/4'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['B/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '4. 1-2-3-5 digital', notes: [
+            { keys: ['G/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '5. Wide intervals', notes: [
+            { keys: ['G/3'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['G/3'], duration: '2' }
+          ]},
+          { name: '6. Bebop scale up', notes: [
+            { keys: ['G/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['E/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['F#/4'], duration: '8' }
+          ]},
+          { name: '7. Pickup bebop', notes: [
+            { keys: ['d/4'], duration: '8r' }, { keys: ['F#/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['D/4'], duration: '4' }
+          ]},
+          { name: '8. Tritone sub flavor', notes: [
+            { keys: ['F/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['C/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }
+          ]},
+          { name: '9. Syncopated landing', notes: [
+            { keys: ['B/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['D/4'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['G/3'], duration: '4' }
+          ]},
+          { name: '10. Resolution to minor', notes: [
+            { keys: ['D/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['Ab/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['F/3'], duration: '4' }
+          ]}
+        ]
+      }
+
+    };
+
+    const CHORD_TONES = {
+      'Bb7': {
+        chord: ['Bb/2', 'D/3', 'F/3', 'Ab/3', 'Bb/3', 'D/4', 'F/4', 'Ab/4'],
+        scale: ['C/3', 'Eb/3', 'G/3', 'C/4', 'Eb/4']
+      },
+      'Eb7': {
+        chord: ['Eb/3', 'G/3', 'Bb/3', 'Db/4', 'Eb/4', 'G/4'],
+        scale: ['F/3', 'Ab/3', 'C/4', 'F/4']
+      },
+      'F7': {
+        chord: ['F/3', 'A/3', 'C/4', 'Eb/4', 'F/4'],
+        scale: ['G/3', 'Bb/3', 'D/4']
+      },
+      'C7': {
+        chord: ['C/3', 'E/3', 'G/3', 'Bb/3', 'C/4', 'E/4', 'G/4'],
+        scale: ['D/3', 'F/3', 'A/3', 'D/4', 'F/4']
+      },
+      'Cm7': {
+        chord: ['C/3', 'Eb/3', 'G/3', 'Bb/3', 'C/4', 'Eb/4', 'G/4'],
+        scale: ['D/3', 'F/3', 'A/3', 'D/4', 'F/4']
+      },
+      'BbMaj7': {
+        chord: ['Bb/2', 'D/3', 'F/3', 'A/3', 'Bb/3', 'D/4', 'F/4', 'A/4'],
+        scale: ['C/3', 'Eb/3', 'G/3', 'C/4', 'Eb/4', 'G/4']
+      },
+      'Ab7': {
+        chord: ['Ab/2', 'C/3', 'Eb/3', 'Gb/3', 'Ab/3', 'C/4', 'Eb/4', 'Gb/4'],
+        scale: ['Bb/2', 'Db/3', 'F/3', 'Bb/3', 'Db/4', 'F/4']
+      },
+      'Fm7': {
+        chord: ['F/3', 'Ab/3', 'C/4', 'Eb/4', 'F/4', 'Ab/4'],
+        scale: ['G/3', 'Bb/3', 'D/4', 'G/4']
+      },
+      'G7': {
+        chord: ['G/2', 'B/2', 'D/3', 'F/3', 'G/3', 'B/3', 'D/4', 'F/4'],
+        scale: ['A/2', 'C/3', 'E/3', 'A/3', 'C/4', 'E/4']
+      }
+    };
+
+    // =========================================================================
+    // TROMBONE SLIDE POSITIONS (concert pitch)
+    // =========================================================================
+
+    const SLIDE_POSITIONS = {
+      'E/2': 7, 'F/2': 6, 'F#/2': 5, 'Gb/2': 5, 'G/2': 4, 'G#/2': 3,
+      'Ab/2': 3, 'A/2': 2, 'A#/2': 1, 'Bb/2': 1, 'B/2': 7,
+      'C/3': 6, 'C#/3': 5, 'Db/3': 5, 'D/3': 4, 'D#/3': 3, 'Eb/3': 3,
+      'E/3': 2, 'F/3': 1, 'F#/3': 5, 'Gb/3': 5, 'G/3': 4, 'G#/3': 3,
+      'Ab/3': 3, 'A/3': 2, 'A#/3': 1, 'Bb/3': 1, 'B/3': 4,
+      'C/4': 3, 'C#/4': 2, 'Db/4': 2, 'D/4': 1, 'D#/4': 3, 'Eb/4': 3,
+      'E/4': 2, 'F/4': 1, 'F#/4': 5, 'Gb/4': 5, 'G/4': 4, 'G#/4': 3,
+      'Ab/4': 3, 'A/4': 2, 'A#/4': 1, 'Bb/4': 1
+    };
+
+    // =========================================================================
+    // APP STATE
+    // =========================================================================
+
+    let currentProgression = PROGRESSIONS['bb-blues'];
+    let currentMode = 'symbols'; // Start with simplest mode for Phase 1
+    let currentLevel = 'beginner'; // 'beginner', 'intermediate', 'advanced'
+    let isPlaying = false;
+    let isLooping = true;
+    let chorusCount = 1;
+    let currentMeasure = -1;
+    let measureBounds = [];
+    let audioReady = false;
+    let isMuted = true; // Start muted
+    let masterVol = null;
+    let piano, bass, hihat, kick;
+    let lickSynth = null;
+    let isPlayingLick = false;
+    let lickPlayGeneration = 0;
+
+    // Swing feel
+    const SWING_SETTINGS = [
+      { label: 'Straight', value: 0 },
+      { label: 'Light Swing', value: 0.4 },
+      { label: 'Hard Swing', value: 0.7 }
+    ];
+    let currentSwing = 0; // index into SWING_SETTINGS
+    let showSlidePositions = true; // show trombone slide positions
+
+    // Instrument / Transposition
+    const INSTRUMENTS = {
+      'bass-concert':    { id: 'bass-concert',    clef: 'bass',   semitones: 0  },
+      'treble-bb':       { id: 'treble-bb',       clef: 'treble', semitones: 2  },
+      'treble-eb':       { id: 'treble-eb',       clef: 'treble', semitones: 9  },
+      'treble-concert':  { id: 'treble-concert',  clef: 'treble', semitones: 12 }
+    };
+    let currentInstrument = INSTRUMENTS['bass-concert'];
+
+    // =========================================================================
+    // GAMIFICATION ENGINE
+    // =========================================================================
+
+    const gamification = (function() {
+      const STORAGE_KEY = 'woodshed_progress';
+
+      const XP_LEVELS = [
+        { level: 0,  name: 'Listener',          xp: 0 },
+        { level: 1,  name: 'Woodshedder',       xp: 50 },
+        { level: 2,  name: 'Tone Seeker',        xp: 150 },
+        { level: 3,  name: 'Groove Apprentice',   xp: 350 },
+        { level: 4,  name: 'Changes Runner',      xp: 650 },
+        { level: 5,  name: 'Bebopper',            xp: 1100 },
+        { level: 6,  name: 'Session Player',      xp: 1800 },
+        { level: 7,  name: 'First Call',           xp: 2800 },
+        { level: 8,  name: 'Cats',                 xp: 4200 },
+        { level: 9,  name: 'Monster',              xp: 6500 },
+        { level: 10, name: 'Legend',               xp: 10000 }
+      ];
+
+      const ACHIEVEMENTS = [
+        // Consistency
+        { id: 'first-steps',     name: 'First Steps',            desc: 'Complete your first session',            icon: 'bi-play-circle',       cat: 'consistency', check: d => d.stats.totalSessions >= 1 },
+        { id: 'hour-of-power',   name: 'Hour of Power',          desc: '1 hour total practice',                  icon: 'bi-clock-history',     cat: 'consistency', check: d => d.stats.totalPracticeSec >= 3600 },
+        { id: 'five-hour-club',  name: 'Five-Hour Club',         desc: '5 hours total practice',                 icon: 'bi-hourglass-split',   cat: 'consistency', check: d => d.stats.totalPracticeSec >= 18000 },
+        { id: 'hot-streak',      name: 'Hot Streak',             desc: '3-day practice streak',                  icon: 'bi-fire',              cat: 'consistency', check: d => d.streak.longest >= 3 },
+        { id: 'iron-discipline', name: 'Iron Discipline',        desc: '7-day practice streak',                  icon: 'bi-calendar-check',    cat: 'consistency', check: d => d.streak.longest >= 7 },
+        { id: 'month-woodshed',  name: 'Month of Woodshedding',  desc: '30-day practice streak',                 icon: 'bi-calendar-heart',    cat: 'consistency', check: d => d.streak.longest >= 30 },
+        // Choruses
+        { id: 'first-chorus',    name: 'First Chorus',           desc: 'Complete your first chorus',             icon: 'bi-music-note',        cat: 'choruses',    check: d => d.stats.totalChoruses >= 1 },
+        { id: 'ten-rounds',      name: 'Ten Rounds',             desc: '10 choruses total',                      icon: 'bi-music-note-list',   cat: 'choruses',    check: d => d.stats.totalChoruses >= 10 },
+        { id: 'century',         name: 'Century',                desc: '100 choruses total',                     icon: 'bi-trophy',            cat: 'choruses',    check: d => d.stats.totalChoruses >= 100 },
+        { id: 'five-hundred',    name: 'Five Hundred',           desc: '500 choruses total',                     icon: 'bi-star-fill',         cat: 'choruses',    check: d => d.stats.totalChoruses >= 500 },
+        // Exploration
+        { id: 'all-blues',       name: 'All Blues',              desc: 'Play all progressions',                  icon: 'bi-collection',        cat: 'explore',     check: d => Object.values(d.stats.progressions).filter(p => p.choruses > 0).length >= Object.keys(PROGRESSIONS).length },
+        { id: 'mode-explorer',   name: 'Mode Explorer',          desc: 'Use all 3 modes',                        icon: 'bi-compass',           cat: 'explore',     check: d => Object.values(d.stats.modes).filter(m => m.choruses > 0).length >= 3 },
+        { id: 'level-up',        name: 'Level Up',               desc: 'Practice at all 3 difficulty levels',    icon: 'bi-bar-chart-steps',   cat: 'explore',     check: d => Object.values(d.stats.levels).filter(l => l.choruses > 0).length >= 3 },
+        { id: 'renaissance',     name: 'Renaissance Player',     desc: 'All progression/mode/level combos',       icon: 'bi-globe',             cat: 'explore',     check: d => (d.stats.combos || []).length >= Object.keys(PROGRESSIONS).length * 9 },
+        // Mastery
+        { id: 'bb-master',       name: 'Bb Blues Master',        desc: '50 choruses on Bb Blues',                icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['bb-blues']||{}).choruses >= 50 },
+        { id: 'f-master',        name: 'F Blues Master',         desc: '50 choruses on F Blues',                 icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['f-blues']||{}).choruses >= 50 },
+        { id: 'ii-v-i-master',   name: 'ii-V-I Master',         desc: '50 choruses on ii-V-I',                  icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['ii-v-i-bb']||{}).choruses >= 50 },
+        { id: 'eb-master',       name: 'Eb Blues Master',       desc: '50 choruses on Eb Blues',                icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['eb-blues']||{}).choruses >= 50 },
+        { id: 'minor-master',    name: 'Minor Blues Master',    desc: '50 choruses on Minor Blues',             icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['c-minor-blues']||{}).choruses >= 50 },
+        // Fun
+        { id: 'night-owl',       name: 'Night Owl',              desc: 'Practice after 10 PM',                   icon: 'bi-moon-stars',        cat: 'fun',         check: d => d.stats._nightOwl },
+        { id: 'early-bird',      name: 'Early Bird',             desc: 'Practice before 7 AM',                   icon: 'bi-sunrise',           cat: 'fun',         check: d => d.stats._earlyBird },
+        { id: 'marathon',        name: 'Marathon',               desc: '30+ minute session',                     icon: 'bi-stopwatch',         cat: 'fun',         check: d => d.stats._marathon }
+      ];
+
+      // --- Private state ---
+      let data = null;
+      let sessionStartTime = null;
+      let pauseStartTime = null;
+      let totalPausedMs = 0;
+      let modesUsedThisSession = new Set();
+      let progressionsToday = new Set();
+      let sessionActive = false;
+      let saveTimer = null;
+
+      // --- Helpers ---
+      function todayStr() {
+        return new Date().toISOString().slice(0, 10);
+      }
+
+      function formatTime(sec) {
+        if (sec < 60) return sec + 's';
+        const m = Math.floor(sec / 60);
+        if (m < 60) return m + 'm';
+        const h = Math.floor(m / 60);
+        return h + 'h ' + (m % 60) + 'm';
+      }
+
+      // --- Persistence ---
+      function createDefaults() {
+        const progs = {};
+        Object.keys(PROGRESSIONS).forEach(id => {
+          progs[id] = { choruses: 0, practiceSec: 0, sessions: 0 };
+        });
+        return {
+          schemaVersion: 1,
+          userId: null,
+          syncedAt: null,
+          stats: {
+            totalPracticeSec: 0,
+            totalChoruses: 0,
+            totalSessions: 0,
+            progressions: progs,
+            modes: { symbols: { choruses: 0 }, licks: { choruses: 0 }, tones: { choruses: 0 } },
+            levels: { beginner: { choruses: 0 }, intermediate: { choruses: 0 }, advanced: { choruses: 0 } },
+            combos: [],
+            _nightOwl: false,
+            _earlyBird: false,
+            _marathon: false
+          },
+          xp: { total: 0, level: 0, levelName: 'Listener' },
+          streak: { current: 0, longest: 0, lastPracticeDate: null, history: [] },
+          achievements: {},
+          sessions: []
+        };
+      }
+
+      function load() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            data = JSON.parse(raw);
+            // Ensure new progressions exist in stats
+            Object.keys(PROGRESSIONS).forEach(id => {
+              if (!data.stats.progressions[id]) {
+                data.stats.progressions[id] = { choruses: 0, practiceSec: 0, sessions: 0 };
+              }
+            });
+            if (!data.stats.combos) data.stats.combos = [];
+            if (data.stats._nightOwl === undefined) data.stats._nightOwl = false;
+            if (data.stats._earlyBird === undefined) data.stats._earlyBird = false;
+            if (data.stats._marathon === undefined) data.stats._marathon = false;
+          } else {
+            data = createDefaults();
+          }
+        } catch (e) {
+          data = createDefaults();
+        }
+      }
+
+      function save() {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
+        }, 300);
+      }
+
+      // --- XP Engine ---
+      function awardXP(amount) {
+        data.xp.total += amount;
+        checkLevelUp();
+        save();
+        updateHeaderXP();
+      }
+
+      function checkLevelUp() {
+        const oldLevel = data.xp.level;
+        for (let i = XP_LEVELS.length - 1; i >= 0; i--) {
+          if (data.xp.total >= XP_LEVELS[i].xp) {
+            data.xp.level = XP_LEVELS[i].level;
+            data.xp.levelName = XP_LEVELS[i].name;
+            break;
+          }
+        }
+        if (data.xp.level > oldLevel) {
+          showToast('level', 'Level Up! You\'re now ' + (data.xp.level <= 1 ? 'a ' : '') + data.xp.levelName, 'bi-arrow-up-circle-fill');
+        }
+      }
+
+      function xpForNextLevel() {
+        const next = XP_LEVELS.find(l => l.xp > data.xp.total);
+        return next ? next.xp : XP_LEVELS[XP_LEVELS.length - 1].xp;
+      }
+
+      function xpForCurrentLevel() {
+        let xp = 0;
+        for (let i = XP_LEVELS.length - 1; i >= 0; i--) {
+          if (data.xp.total >= XP_LEVELS[i].xp) { xp = XP_LEVELS[i].xp; break; }
+        }
+        return xp;
+      }
+
+      // --- Streak ---
+      function updateStreak() {
+        const today = todayStr();
+        if (data.streak.lastPracticeDate === today) return; // Already counted today
+
+        const last = data.streak.lastPracticeDate;
+        if (last) {
+          const lastDate = new Date(last + 'T00:00:00');
+          const todayDate = new Date(today + 'T00:00:00');
+          const diffDays = Math.round((todayDate - lastDate) / 86400000);
+          if (diffDays === 1) {
+            data.streak.current++;
+          } else {
+            data.streak.current = 1;
+          }
+        } else {
+          data.streak.current = 1;
+        }
+
+        data.streak.lastPracticeDate = today;
+        if (data.streak.current > data.streak.longest) {
+          data.streak.longest = data.streak.current;
+          if (data.streak.current === 3 || data.streak.current === 7 || data.streak.current === 30) {
+            showToast('streak', data.streak.current + '-Day Streak!', 'bi-fire');
+          }
+        }
+
+        // History (cap at 90)
+        if (!data.streak.history.includes(today)) {
+          data.streak.history.push(today);
+          if (data.streak.history.length > 90) data.streak.history.shift();
+        }
+
+        updateHeaderStreak();
+        save();
+      }
+
+      // --- Achievements ---
+      function checkAchievements() {
+        const newlyUnlocked = [];
+        ACHIEVEMENTS.forEach(a => {
+          if (!data.achievements[a.id] || !data.achievements[a.id].unlocked) {
+            if (a.check(data)) {
+              data.achievements[a.id] = { unlocked: true, unlockedAt: new Date().toISOString() };
+              newlyUnlocked.push(a);
+            }
+          }
+        });
+        newlyUnlocked.forEach(a => {
+          showToast('achievement', a.name, a.icon);
+        });
+        if (newlyUnlocked.length > 0) save();
+      }
+
+      // --- Session Tracking ---
+      function startSession(progId, mode, level) {
+        if (sessionActive) return;
+        sessionActive = true;
+        sessionStartTime = Date.now();
+        pauseStartTime = null;
+        totalPausedMs = 0;
+        modesUsedThisSession = new Set([mode]);
+        progressionsToday = new Set();
+
+        // First session of the day bonus
+        const today = todayStr();
+        const todaySessions = data.sessions.filter(s => s.startedAt && s.startedAt.startsWith(today));
+        if (todaySessions.length === 0) {
+          awardXP(20);
+        }
+
+        // Time-based fun achievements
+        const hour = new Date().getHours();
+        if (hour >= 22 || hour < 4) data.stats._nightOwl = true;
+        if (hour >= 4 && hour < 7) data.stats._earlyBird = true;
+
+        checkAchievements();
+      }
+
+      function onPause() {
+        if (sessionActive && !pauseStartTime) {
+          pauseStartTime = Date.now();
+        }
+      }
+
+      function onResume() {
+        if (pauseStartTime) {
+          totalPausedMs += Date.now() - pauseStartTime;
+          pauseStartTime = null;
+        }
+      }
+
+      function endSession() {
+        if (!sessionActive || !sessionStartTime) return;
+        sessionActive = false;
+
+        // Account for pause
+        if (pauseStartTime) {
+          totalPausedMs += Date.now() - pauseStartTime;
+          pauseStartTime = null;
+        }
+
+        const durationMs = Date.now() - sessionStartTime - totalPausedMs;
+        const durationSec = Math.max(0, Math.round(durationMs / 1000));
+
+        // Duration-based XP
+        if (durationSec >= 1800) { awardXP(50); data.stats._marathon = true; }
+        else if (durationSec >= 900) awardXP(25);
+        else if (durationSec >= 300) awardXP(10);
+
+        // Update stats
+        data.stats.totalPracticeSec += durationSec;
+        data.stats.totalSessions++;
+
+        const progId = currentProgression.id;
+        if (data.stats.progressions[progId]) {
+          data.stats.progressions[progId].practiceSec += durationSec;
+          data.stats.progressions[progId].sessions++;
+        }
+
+        // Write session record (cap at 100)
+        data.sessions.push({
+          id: 's_' + Date.now(),
+          startedAt: new Date(sessionStartTime).toISOString(),
+          endedAt: new Date().toISOString(),
+          durationSec: durationSec,
+          choruses: chorusCount - 1,
+          progression: progId,
+          level: currentLevel,
+          mode: currentMode
+        });
+        if (data.sessions.length > 100) data.sessions.shift();
+
+        checkAchievements();
+        save();
+        sessionStartTime = null;
+      }
+
+      function onChorusComplete(progId, mode, level) {
+        // Core stats
+        data.stats.totalChoruses++;
+        if (data.stats.progressions[progId]) data.stats.progressions[progId].choruses++;
+        if (data.stats.modes[mode]) data.stats.modes[mode].choruses++;
+        if (data.stats.levels[level]) data.stats.levels[level].choruses++;
+
+        // Track combo for Renaissance Player
+        const combo = progId + '|' + mode + '|' + level;
+        if (!data.stats.combos.includes(combo)) {
+          data.stats.combos.push(combo);
+        }
+
+        // XP by level
+        const xpMap = { beginner: 5, intermediate: 7, advanced: 10 };
+        awardXP(xpMap[level] || 5);
+
+        // New progression today bonus
+        const today = todayStr();
+        if (!progressionsToday.has(progId)) {
+          progressionsToday.add(progId);
+          if (progressionsToday.size > 1) awardXP(15);
+        }
+
+        // Streak
+        updateStreak();
+
+        // Achievements
+        checkAchievements();
+        save();
+      }
+
+      function trackModeUsed(mode) {
+        if (!modesUsedThisSession.has(mode) && sessionActive) {
+          modesUsedThisSession.add(mode);
+          awardXP(5);
+        }
+      }
+
+      function trackLevelUsed(level) { /* tracked via onChorusComplete */ }
+      function trackProgressionUsed(progId) { /* tracked via onChorusComplete */ }
+
+      // --- UI Rendering ---
+      function updateHeaderXP() {
+        const curLvXp = xpForCurrentLevel();
+        const nextLvXp = xpForNextLevel();
+        const range = nextLvXp - curLvXp;
+        const progress = range > 0 ? ((data.xp.total - curLvXp) / range) * 100 : 100;
+
+        const label = document.getElementById('headerLevelLabel');
+        const fill = document.getElementById('headerXpFill');
+        if (label) label.textContent = 'Lv.' + data.xp.level + ' ' + data.xp.levelName;
+        if (fill) fill.style.width = Math.min(100, progress) + '%';
+      }
+
+      function updateHeaderStreak() {
+        const num = document.getElementById('headerStreakNum');
+        const badge = document.getElementById('headerStreak');
+        if (num) num.textContent = data.streak.current;
+        if (badge) badge.classList.toggle('hot', data.streak.current >= 3);
+      }
+
+      function getPracticeSuggestions() {
+        const suggestions = [];
+
+        // Least-practiced progression
+        const progEntries = Object.keys(PROGRESSIONS).map(id => ({
+          id, title: PROGRESSIONS[id].title,
+          choruses: (data.stats.progressions[id] || {}).choruses || 0
+        }));
+        progEntries.sort((a, b) => a.choruses - b.choruses);
+        const least = progEntries[0];
+        const most = progEntries[progEntries.length - 1];
+        if (least && most && most.choruses > 0 && least.choruses < most.choruses * 0.4) {
+          suggestions.push({ icon: 'bi-signpost-2',
+            text: 'Try ' + least.title + ' — only ' + least.choruses + ' choruses so far' });
+        }
+
+        // Unused modes
+        const modeNames = { licks: 'Guided Licks', tones: 'Chord Tones', symbols: 'Symbols Only' };
+        const unusedModes = ['licks', 'tones', 'symbols'].filter(m =>
+          !((data.stats.modes[m] || {}).choruses));
+        if (unusedModes.length > 0) {
+          suggestions.push({ icon: 'bi-compass',
+            text: 'Explore ' + modeNames[unusedModes[0]] + ' mode — it\'s untouched!' });
+        }
+
+        // Unused levels (only if all modes explored)
+        const unusedLevels = ['beginner', 'intermediate', 'advanced'].filter(l =>
+          !((data.stats.levels[l] || {}).choruses));
+        if (unusedLevels.length > 0 && unusedModes.length === 0) {
+          const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
+          suggestions.push({ icon: 'bi-bar-chart-steps',
+            text: 'Challenge yourself at ' + capitalize(unusedLevels[unusedLevels.length - 1]) + ' level' });
+        }
+
+        // Tempo nudge
+        if (data.stats.totalChoruses >= 20 && data.stats.totalChoruses < 150) {
+          suggestions.push({ icon: 'bi-speedometer2',
+            text: 'Try bumping tempo up 10 BPM from your comfort zone' });
+        }
+
+        // Streak encouragement
+        if (data.streak.current > 0 && data.streak.current < 7) {
+          suggestions.push({ icon: 'bi-fire',
+            text: data.streak.current + '-day streak! Keep it going for a 7-day badge' });
+        } else if (data.streak.current === 0 && data.stats.totalSessions > 0) {
+          suggestions.push({ icon: 'bi-fire',
+            text: 'Start a streak — come back tomorrow too!' });
+        }
+
+        return suggestions.slice(0, 3);
+      }
+
+      function renderStatsPanel() {
+        // Level
+        const el = (id) => document.getElementById(id);
+        el('statsLevelName').textContent = data.xp.levelName;
+
+        const curLvXp = xpForCurrentLevel();
+        const nextLvXp = xpForNextLevel();
+        const range = nextLvXp - curLvXp;
+        const pct = range > 0 ? ((data.xp.total - curLvXp) / range) * 100 : 100;
+        el('statsXpLabel').textContent = data.xp.total + ' / ' + nextLvXp + ' XP';
+        el('statsXpFill').style.width = Math.min(100, pct) + '%';
+
+        // Quick stats
+        el('statsChoruses').textContent = data.stats.totalChoruses;
+        el('statsTime').textContent = formatTime(data.stats.totalPracticeSec);
+        el('statsStreak').textContent = data.streak.current;
+
+        // Streak calendar (last 28 days)
+        const cal = el('streakCal');
+        cal.innerHTML = '';
+        const dayLabels = ['M','T','W','T','F','S','S'];
+        dayLabels.forEach(d => {
+          const lbl = document.createElement('div');
+          lbl.className = 'streak-cal-day-label';
+          lbl.textContent = d;
+          cal.appendChild(lbl);
+        });
+
+        const today = new Date();
+        // Find the Monday 4 weeks ago
+        const startDay = new Date(today);
+        startDay.setDate(startDay.getDate() - 27 - ((startDay.getDay() + 6) % 7));
+        for (let i = 0; i < 28; i++) {
+          const d = new Date(startDay);
+          d.setDate(d.getDate() + i);
+          const ds = d.toISOString().slice(0, 10);
+          const cell = document.createElement('div');
+          cell.className = 'streak-cal-cell';
+          if (data.streak.history.includes(ds)) {
+            cell.classList.add('practiced', 'heavy');
+          }
+          if (d > today) cell.style.opacity = '0.15';
+          cal.appendChild(cell);
+        }
+
+        // Achievements
+        const grid = el('achieveGrid');
+        grid.innerHTML = '';
+        let unlocked = 0;
+        ACHIEVEMENTS.forEach(a => {
+          const isUnlocked = data.achievements[a.id] && data.achievements[a.id].unlocked;
+          if (isUnlocked) unlocked++;
+          const icon = document.createElement('div');
+          icon.className = 'achievement-icon' + (isUnlocked ? ' unlocked' : '');
+          icon.innerHTML = '<i class="bi ' + (isUnlocked ? a.icon : 'bi-lock-fill') + '"></i>' +
+            '<div class="achievement-tooltip">' + a.name + (isUnlocked ? '' : ' — ' + a.desc) + '</div>';
+          icon.addEventListener('click', () => {
+            // Toggle tooltip
+            document.querySelectorAll('.achievement-icon.show-tip').forEach(el => {
+              if (el !== icon) el.classList.remove('show-tip');
+            });
+            icon.classList.toggle('show-tip');
+          });
+          grid.appendChild(icon);
+        });
+        el('achieveCount').textContent = unlocked + '/' + ACHIEVEMENTS.length;
+
+        // Progression breakdown
+        const progDiv = el('progBreakdown');
+        progDiv.innerHTML = '';
+        const maxChoruses = Math.max(1, ...Object.values(data.stats.progressions).map(p => p.choruses));
+        Object.keys(PROGRESSIONS).forEach(id => {
+          const p = data.stats.progressions[id] || { choruses: 0 };
+          const pct = (p.choruses / maxChoruses) * 100;
+          progDiv.innerHTML += '<div class="prog-row">' +
+            '<span class="prog-row-name">' + PROGRESSIONS[id].title + '</span>' +
+            '<div class="prog-row-bar"><div class="prog-row-fill" style="width:' + pct + '%"></div></div>' +
+            '<span class="prog-row-num">' + p.choruses + '</span></div>';
+        });
+
+        // Practice suggestions
+        const sugDiv = el('practiceSuggestions');
+        const suggestions = getPracticeSuggestions();
+        if (suggestions.length === 0) {
+          sugDiv.innerHTML = '<div class="no-suggestions">Keep playing — suggestions appear as you build history.</div>';
+        } else {
+          sugDiv.innerHTML = suggestions.map(s =>
+            '<div class="suggestion-item"><i class="bi ' + s.icon + '"></i><span>' + s.text + '</span></div>'
+          ).join('');
+        }
+
+        // Session history (most recent first, last 20)
+        const histDiv = el('sessionHistory');
+        const recentSessions = (data.sessions || []).slice(-20).reverse();
+        if (recentSessions.length === 0) {
+          histDiv.innerHTML = '<div class="no-sessions">No sessions yet — hit Play!</div>';
+        } else {
+          const modeIcons = { licks: 'bi-music-note-beamed', tones: 'bi-collection', symbols: 'bi-slash-circle' };
+          histDiv.innerHTML = recentSessions.map(s => {
+            const d = new Date(s.startedAt);
+            const dateStr = (d.getMonth()+1) + '/' + d.getDate() + ' ' +
+              d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+            const progTitle = PROGRESSIONS[s.progression] ? PROGRESSIONS[s.progression].title : s.progression;
+            const dur = formatTime(s.durationSec || 0);
+            const modeIcon = modeIcons[s.mode] || 'bi-music-note';
+            return '<div class="session-item">' +
+              '<span class="session-date">' + dateStr + '</span>' +
+              '<span class="session-prog"><i class="bi ' + modeIcon + '"></i> ' + progTitle + '</span>' +
+              '<span class="session-meta"><span class="choruses">' + (s.choruses || 0) + '×</span>' +
+              '<span class="duration">' + dur + '</span></span></div>';
+          }).join('');
+        }
+      }
+
+      function showToast(type, message, icon) {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = 'toast' + (type === 'achievement' ? ' purple' : '');
+        toast.innerHTML = '<i class="toast-icon bi ' + icon + '"></i><span>' + message + '</span>';
+        container.appendChild(toast);
+        setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3200);
+      }
+
+      // --- Init ---
+      function init() {
+        load();
+        updateHeaderXP();
+        updateHeaderStreak();
+
+        // Stats toggle
+        document.getElementById('statsToggle').addEventListener('click', () => {
+          const panel = document.getElementById('statsPanel');
+          panel.classList.toggle('open');
+          if (panel.classList.contains('open')) renderStatsPanel();
+        });
+
+        // Close tooltip on outside click
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.achievement-icon')) {
+            document.querySelectorAll('.achievement-icon.show-tip').forEach(el => el.classList.remove('show-tip'));
+          }
+        });
+      }
+
+      return {
+        init, startSession, endSession, onChorusComplete, onPause, onResume,
+        trackModeUsed, trackLevelUsed, trackProgressionUsed,
+        // Public accessors for Phase 5 features
+        showToastPublic: showToast,
+        getData: () => data,
+        formatTimePublic: formatTime,
+        awardXPPublic: awardXP,
+        getAchievementCount: () => ACHIEVEMENTS.length
+      };
+    })();
+
+    // =========================================================================
+    // VEXFLOW NOTATION
+    // =========================================================================
+
+    const VF = Vex.Flow;
+
+    // =========================================================================
+    // KEY SIGNATURES & TRANSPOSITION
+    // =========================================================================
+
+    const KEY_SIGNATURES = {
+      'C':  { flats: [], sharps: [] },
+      'Db': { flats: ['B','E','A','D','G'], sharps: [] },
+      'D':  { flats: [], sharps: ['F','C'] },
+      'Eb': { flats: ['B','E','A'], sharps: [] },
+      'E':  { flats: [], sharps: ['F','C','G','D'] },
+      'F':  { flats: ['B'], sharps: [] },
+      'F#': { flats: [], sharps: ['F','C','G','D','A','E'] },
+      'Gb': { flats: ['B','E','A','D','G','C'], sharps: [] },
+      'G':  { flats: [], sharps: ['F'] },
+      'Ab': { flats: ['B','E','A','D'], sharps: [] },
+      'A':  { flats: [], sharps: ['F','C','G'] },
+      'Bb': { flats: ['B','E'], sharps: [] },
+      'B':  { flats: [], sharps: ['F','C','G','D','A'] }
+    };
+
+    const NOTE_TO_SEMI = { 'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11 };
+    const SHARP_NOTES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+    const FLAT_NOTES  = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+    const SEMI_TO_KEY = ['C','Db','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+
+    function keyToSemitone(key) {
+      const base = NOTE_TO_SEMI[key[0]];
+      if (key.length === 1) return base;
+      if (key[1] === 'b') return ((base - 1) + 12) % 12;
+      if (key[1] === '#') return (base + 1) % 12;
+      return base;
+    }
+
+    function getTransposedKey() {
+      const semi = currentInstrument.semitones;
+      if (semi === 0) return currentProgression.key;
+      const concertSemi = keyToSemitone(currentProgression.key);
+      return SEMI_TO_KEY[(concertSemi + semi) % 12];
+    }
+
+    function getKeySig() {
+      const key = getTransposedKey();
+      return KEY_SIGNATURES[key] || { flats: [], sharps: [] };
+    }
+
+    function transposeVexKey(vexKey) {
+      const semi = currentInstrument.semitones;
+      if (semi === 0) return vexKey;
+      const [noteName, octStr] = vexKey.split('/');
+      const letter = noteName[0];
+      const acc = noteName.substring(1);
+      let baseSemi = NOTE_TO_SEMI[letter];
+      if (acc === 'b') baseSemi--;
+      else if (acc === '#') baseSemi++;
+      else if (acc === 'bb') baseSemi -= 2;
+
+      const absSemi = parseInt(octStr) * 12 + baseSemi + semi;
+      const newOct = Math.floor(absSemi / 12);
+      const newSemi = ((absSemi % 12) + 12) % 12;
+
+      // Choose flat/sharp spelling based on transposed key
+      const keySig = getKeySig();
+      const useFlats = keySig.flats.length > 0 || keySig.sharps.length === 0;
+      const names = useFlats ? FLAT_NOTES : SHARP_NOTES;
+      return names[newSemi] + '/' + newOct;
+    }
+
+    function transposeChordName(chordName) {
+      const semi = currentInstrument.semitones;
+      if (semi === 0) return chordName;
+      const match = chordName.match(/^([A-G][b#]?)(.*)/);
+      if (!match) return chordName;
+      const root = match[1];
+      const quality = match[2];
+      let rootSemi = NOTE_TO_SEMI[root[0]];
+      if (root.length > 1 && root[1] === 'b') rootSemi--;
+      if (root.length > 1 && root[1] === '#') rootSemi++;
+      const newSemi = ((rootSemi + semi) % 12 + 12) % 12;
+      const keySig = getKeySig();
+      const useFlats = keySig.flats.length > 0 || keySig.sharps.length === 0;
+      const names = useFlats ? FLAT_NOTES : SHARP_NOTES;
+      return names[newSemi] + quality;
+    }
+
+    function addAccidentals(note, keys) {
+      const keySig = getKeySig();
+      keys.forEach((key, ki) => {
+        const noteName = key.split('/')[0];
+        const letter = noteName[0];
+        const acc = noteName.length > 1 ? noteName.substring(1) : '';
+
+        const isFlattedByKey = keySig.flats.includes(letter);
+        const isSharpedByKey = keySig.sharps.includes(letter);
+
+        if (isFlattedByKey && acc === 'b') {
+          // Key sig covers this flat
+        } else if (isFlattedByKey && acc === '') {
+          note.addModifier(new VF.Accidental('n'), ki);
+        } else if (isSharpedByKey && acc === '#') {
+          // Key sig covers this sharp
+        } else if (isSharpedByKey && acc === '') {
+          note.addModifier(new VF.Accidental('n'), ki);
+        } else if (acc === 'b') {
+          note.addModifier(new VF.Accidental('b'), ki);
+        } else if (acc === '#') {
+          note.addModifier(new VF.Accidental('#'), ki);
+        }
+      });
+      return note;
+    }
+
+    function renderNotation() {
+      const container = document.getElementById('notation');
+      const highlightEl = document.getElementById('highlight');
+      container.innerHTML = '';
+      container.appendChild(highlightEl); // Re-attach after clearing
+      measureBounds = [];
+
+      const prog = currentProgression;
+      const containerWidth = container.clientWidth || 600;
+      const isNarrow = containerWidth < 480;
+      // Chord Tones mode needs wider measures for legibility (many notes per bar)
+      let measuresPerLine;
+      if (currentMode === 'tones') {
+        measuresPerLine = isNarrow ? 1 : 2;
+      } else {
+        measuresPerLine = isNarrow ? 2 : prog.layout.measuresPerLine;
+      }
+      const numLines = Math.ceil(prog.measures.length / measuresPerLine);
+      const lineHeight = 130;
+      const totalHeight = numLines * lineHeight + 45;
+
+      const renderer = new VF.Renderer(container, VF.Renderer.Backends.SVG);
+      renderer.resize(containerWidth, totalHeight);
+      const context = renderer.getContext();
+
+      // Layout: first measure on each line gets extra width for clef (+ key sig on line 1)
+      const clefWidth = 40;
+      const keySigWidth = 25;
+      const timeSigWidth = 30;
+
+      for (let i = 0; i < prog.measures.length; i++) {
+        const measure = prog.measures[i];
+        const line = Math.floor(i / measuresPerLine);
+        const col = i % measuresPerLine;
+        const isFirstInLine = col === 0;
+        const isFirstMeasure = i === 0;
+        const isFirstLine = line === 0;
+
+        // Calculate extra width needed for this line's first measure
+        const extraFirst = clefWidth + keySigWidth + (isFirstMeasure ? timeSigWidth : 0);
+        const baseWidth = (containerWidth - extraFirst) / Math.max(measuresPerLine - (measuresPerLine > 1 ? 0 : 0), 1);
+        let x, w;
+        if (measuresPerLine === 1) {
+          x = 0;
+          w = containerWidth;
+        } else {
+          const firstW = baseWidth + extraFirst;
+          const otherW = (containerWidth - firstW) / (measuresPerLine - 1);
+          if (isFirstInLine) {
+            x = 0;
+            w = firstW;
+          } else {
+            x = firstW + (col - 1) * otherW;
+            w = otherW;
+          }
+        }
+
+        const y = line * lineHeight + 25;
+        const clef = currentInstrument.clef;
+        const displayKey = getTransposedKey();
+        const stave = new VF.Stave(x, y, w);
+        if (isFirstInLine) {
+          stave.addClef(clef);
+          stave.addKeySignature(displayKey);
+        }
+        if (isFirstMeasure) stave.addTimeSignature('4/4');
+        stave.setContext(context).draw();
+
+        renderMeasure(context, stave, measure, i, w, isFirstInLine, isFirstMeasure);
+
+        measureBounds.push({ x, y, width: w, height: lineHeight - 20 });
+      }
+
+      updateHighlight();
+    }
+
+    function renderMeasure(context, stave, measure, measureIdx, staveWidth, hasClef, hasTimeSig) {
+      // Notes voice
+      let notes;
+      if (currentMode === 'licks') {
+        notes = makeLickNotes(measure.chord, measureIdx);
+      } else if (currentMode === 'tones') {
+        notes = makeChordToneNotes(measure.chord);
+      } else {
+        notes = makeSlashNotes();
+      }
+
+      // Chord symbol as TextNote voice (transposed for instrument)
+      const chordText = new VF.TextNote({
+        text: transposeChordName(measure.chord),
+        duration: 'w',
+        line: -1,
+        font: { family: 'Arial', size: 14, weight: 'bold' }
+      });
+      chordText.setContext(context);
+      chordText.setJustification(VF.TextNote.Justification.LEFT);
+
+      const noteVoice = new VF.Voice({ num_beats: 4, beat_value: 4 }).setStrict(false).addTickables(notes);
+      const textVoice = new VF.Voice({ num_beats: 4, beat_value: 4 }).setStrict(false).addTickables([chordText]);
+
+      const padding = (hasClef ? 60 : 0) + (hasTimeSig ? 30 : 0) + 10;
+      const formatWidth = Math.max(staveWidth - padding - 10, 80);
+
+      new VF.Formatter()
+        .joinVoices([noteVoice])
+        .joinVoices([textVoice])
+        .format([noteVoice, textVoice], formatWidth);
+
+      noteVoice.draw(context, stave);
+      textVoice.draw(context, stave);
+    }
+
+    function makeSlashNotes() {
+      const clef = currentInstrument.clef;
+      const slashKey = clef === 'bass' ? 'b/3' : 'b/4';
+      return [0,1,2,3].map(() =>
+        new VF.StaveNote({ clef, keys: [slashKey], duration: '4', type: 's' })
+      );
+    }
+
+    function makeLickNotes(chordName, measureIdx) {
+      const levelLicks = LICKS[currentLevel];
+      if (!levelLicks) return makeSlashNotes();
+      const licks = levelLicks[chordName];
+      if (!licks || !licks.length) return makeSlashNotes();
+
+      const clef = currentInstrument.clef;
+      const restKey = clef === 'bass' ? 'd/4' : 'b/4';
+
+      // Same lick for same chord type per chorus (reinforces learning)
+      const lick = licks[(chorusCount - 1) % licks.length];
+      const isTrombone = currentInstrument.id === 'bass-concert' && showSlidePositions;
+      return lick.notes.map(n => {
+        const isRest = n.duration.endsWith('r');
+        if (isRest) {
+          return new VF.StaveNote({ clef, keys: [restKey], duration: n.duration });
+        }
+        const transposedKeys = n.keys.map(k => transposeVexKey(k));
+        const note = new VF.StaveNote({ clef, keys: transposedKeys, duration: n.duration });
+        addAccidentals(note, transposedKeys);
+
+        // Slide position annotation (trombone only)
+        if (isTrombone && n.keys.length > 0) {
+          const pos = SLIDE_POSITIONS[n.keys[0]];
+          if (pos !== undefined) {
+            const ann = new VF.Annotation(String(pos))
+              .setFont('Arial', 11, 'bold')
+              .setVerticalJustification(VF.Annotation.VerticalJustify.BOTTOM);
+            note.addModifier(ann, 0);
+          }
+        }
+        return note;
+      });
+    }
+
+    function makeChordToneNotes(chordName) {
+      const data = CHORD_TONES[chordName];
+      if (!data) return makeSlashNotes();
+
+      // Merge chord + scale tones, tag each, sort by pitch
+      const chordSet = new Set(data.chord);
+      const allNotes = [
+        ...data.chord.map(k => ({ key: k, isChord: true })),
+        ...data.scale.map(k => ({ key: k, isChord: false }))
+      ];
+
+      // Sort by octave then note name (simple pitch sort)
+      const noteOrder = { 'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6 };
+      allNotes.sort((a, b) => {
+        const [aName, aOct] = a.key.split('/');
+        const [bName, bOct] = b.key.split('/');
+        const octDiff = parseInt(aOct) - parseInt(bOct);
+        if (octDiff !== 0) return octDiff;
+        return (noteOrder[aName[0]] || 0) - (noteOrder[bName[0]] || 0);
+      });
+
+      // Pick a practical range — exactly 8 notes to fill the measure with 8th notes
+      // Pad with chord tone repetitions if fewer than 8 available
+      let selected = allNotes.slice(0, 8);
+      while (selected.length < 8) {
+        selected.push({ ...selected[selected.length % (data.chord.length || 1)], isChord: true });
+      }
+
+      // Assign durations to fill exactly 4 beats
+      // 8 notes = all 8th notes, 7 = one quarter + six 8ths, etc.
+      const durations = [];
+      let remaining = 8; // 8 eighth-notes = 4 beats
+      for (let i = 0; i < selected.length; i++) {
+        if (i === selected.length - 1) {
+          // Last note gets whatever is left
+          durations.push(remaining);
+        } else {
+          durations.push(1); // 1 eighth note
+          remaining -= 1;
+        }
+      }
+
+      const durationMap = { 1: '8', 2: '4', 3: '4d', 4: '2', 6: '2d', 8: 'w' };
+
+      const clef = currentInstrument.clef;
+      return selected.map((n, i) => {
+        const dur = durationMap[durations[i]] || '8';
+        const transKey = transposeVexKey(n.key);
+        const note = new VF.StaveNote({ clef, keys: [transKey], duration: dur });
+        // Color: orange for chord tones, purple for scale tones
+        const color = n.isChord ? 'var(--accent, #e84a27)' : 'var(--accent2, #c850c0)';
+        note.setStyle({ fillStyle: color, strokeStyle: color });
+        addAccidentals(note, [transKey]);
+        // Add dot for dotted durations
+        if (dur.endsWith('d')) {
+          note.addDotToAll();
+        }
+        return note;
+      });
+    }
+
+    // =========================================================================
+    // HIGHLIGHT
+    // =========================================================================
+
+    function updateHighlight() {
+      const el = document.getElementById('highlight');
+      if (currentMeasure < 0 || currentMeasure >= measureBounds.length) {
+        el.style.display = 'none';
+        return;
+      }
+      const b = measureBounds[currentMeasure];
+      el.style.display = 'block';
+      el.style.left = b.x + 'px';
+      el.style.top = b.y + 'px';
+      el.style.width = b.width + 'px';
+      el.style.height = b.height + 'px';
+    }
+
+    function setMeasure(idx) {
+      currentMeasure = idx;
+      updateHighlight();
+    }
+
+    // =========================================================================
+    // MIC / PITCH DETECTION
+    // =========================================================================
+
+    let micActive = false;
+    let micStream = null;
+    let micAnalyser = null;
+    let micAnimFrame = null;
+
+    function autoCorrelate(buf, sampleRate) {
+      const SIZE = buf.length;
+      const MAX_SAMPLES = Math.floor(SIZE / 2);
+      let bestOffset = -1, bestCorr = 0, foundGood = false;
+      let rms = 0;
+      for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
+      rms = Math.sqrt(rms / SIZE);
+      if (rms < 0.008) return -1;
+
+      let lastCorr = 1;
+      const correlations = new Array(MAX_SAMPLES);
+      for (let offset = 0; offset < MAX_SAMPLES; offset++) {
+        let corr = 0;
+        for (let i = 0; i < MAX_SAMPLES; i++) corr += Math.abs(buf[i] - buf[i + offset]);
+        corr = 1 - corr / MAX_SAMPLES;
+        correlations[offset] = corr;
+        if (corr > 0.9 && corr > lastCorr) {
+          foundGood = true;
+          if (corr > bestCorr) { bestCorr = corr; bestOffset = offset; }
+        } else if (foundGood) {
+          const shift = (correlations[bestOffset + 1] - correlations[bestOffset - 1]) / correlations[bestOffset];
+          return sampleRate / (bestOffset + 8 * shift);
+        }
+        lastCorr = corr;
+      }
+      return bestCorr > 0.01 ? sampleRate / bestOffset : -1;
+    }
+
+    const PITCH_NOTE_NAMES = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+
+    function freqToNote(freq) {
+      if (freq <= 0) return null;
+      const noteNum = 12 * Math.log2(freq / 440) + 69;
+      const rounded = Math.round(noteNum);
+      const cents = Math.round((noteNum - rounded) * 100);
+      return {
+        name: PITCH_NOTE_NAMES[((rounded % 12) + 12) % 12],
+        octave: Math.floor(rounded / 12) - 1,
+        cents, midi: rounded
+      };
+    }
+
+    async function startMic() {
+      try {
+        await initAudio();
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const source = Tone.context.createMediaStreamSource(micStream);
+        micAnalyser = Tone.context.createAnalyser();
+        micAnalyser.fftSize = 4096;
+        source.connect(micAnalyser);
+        micActive = true;
+        document.getElementById('pitchDisplay').classList.add('active');
+        document.getElementById('micBtn').classList.add('active');
+        document.getElementById('micIcon').className = 'bi bi-mic-fill';
+        detectPitchLoop();
+      } catch (e) {
+        gamification.showToastPublic('info', 'Mic access denied', 'bi-mic-mute');
+      }
+    }
+
+    function stopMic() {
+      micActive = false;
+      if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+      if (micAnimFrame) { cancelAnimationFrame(micAnimFrame); micAnimFrame = null; }
+      document.getElementById('pitchDisplay').classList.remove('active');
+      document.getElementById('micBtn').classList.remove('active');
+      document.getElementById('micIcon').className = 'bi bi-mic';
+      document.getElementById('pitchNoteName').textContent = '—';
+    }
+
+    function detectPitchLoop() {
+      if (!micActive || !micAnalyser) return;
+      const buffer = new Float32Array(micAnalyser.fftSize);
+      micAnalyser.getFloatTimeDomainData(buffer);
+      const freq = autoCorrelate(buffer, Tone.context.sampleRate);
+      updatePitchDisplay(freq > 0 ? freqToNote(freq) : null);
+      micAnimFrame = requestAnimationFrame(detectPitchLoop);
+    }
+
+    function updatePitchDisplay(note) {
+      const nameEl = document.getElementById('pitchNoteName');
+      const centsLabel = document.getElementById('pitchCentsLabel');
+      const marker = document.getElementById('pitchCentsMarker');
+      const matchEl = document.getElementById('pitchMatch');
+
+      if (!note) {
+        nameEl.textContent = '—';
+        nameEl.style.color = 'var(--text-secondary)';
+        centsLabel.textContent = '';
+        marker.style.left = '50%';
+        matchEl.innerHTML = '';
+        return;
+      }
+
+      nameEl.textContent = note.name + note.octave;
+      centsLabel.textContent = (note.cents >= 0 ? '+' : '') + note.cents + '\u00A2';
+      marker.style.left = Math.max(2, Math.min(98, 50 + note.cents)) + '%';
+
+      // Match against current chord's tones
+      if (currentMeasure >= 0 && currentMeasure < currentProgression.measures.length) {
+        const chord = currentProgression.measures[currentMeasure].chord;
+        const tones = CHORD_TONES[chord];
+        if (tones) {
+          const isChord = tones.chord.some(k => k.split('/')[0] === note.name);
+          const isScale = tones.scale.some(k => k.split('/')[0] === note.name);
+          if (isChord) {
+            nameEl.style.color = 'var(--accent)';
+            matchEl.innerHTML = '<i class="bi bi-check-circle-fill" style="color:var(--accent)"></i><small>Chord tone</small>';
+          } else if (isScale) {
+            nameEl.style.color = 'var(--accent2)';
+            matchEl.innerHTML = '<i class="bi bi-circle-fill" style="color:var(--accent2)"></i><small>Scale tone</small>';
+          } else {
+            nameEl.style.color = 'var(--text-secondary)';
+            matchEl.innerHTML = '<i class="bi bi-x-circle" style="color:var(--text-secondary)"></i><small>Outside</small>';
+          }
+        }
+      } else {
+        // No active chord — just show tuner
+        const inTune = Math.abs(note.cents) <= 10;
+        nameEl.style.color = inTune ? 'var(--accent)' : 'var(--text-secondary)';
+        matchEl.innerHTML = inTune
+          ? '<i class="bi bi-check-circle-fill" style="color:var(--accent)"></i><small>In tune</small>'
+          : '<small>' + (note.cents > 0 ? 'Sharp' : 'Flat') + '</small>';
+      }
+    }
+
+    // =========================================================================
+    // EAR TRAINING
+    // =========================================================================
+
+    const EAR_INTERVALS = [
+      { name: 'Minor 2nd', semi: 1, abbr: 'm2' },
+      { name: 'Major 2nd', semi: 2, abbr: 'M2' },
+      { name: 'Minor 3rd', semi: 3, abbr: 'm3' },
+      { name: 'Major 3rd', semi: 4, abbr: 'M3' },
+      { name: 'Perfect 4th', semi: 5, abbr: 'P4' },
+      { name: 'Tritone', semi: 6, abbr: 'TT' },
+      { name: 'Perfect 5th', semi: 7, abbr: 'P5' },
+      { name: 'Octave', semi: 12, abbr: 'P8' }
+    ];
+
+    const EAR_CHORDS = [
+      { name: 'Major 7', abbr: 'Maj7', intervals: [0, 4, 7, 11] },
+      { name: 'Dominant 7', abbr: 'Dom7', intervals: [0, 4, 7, 10] },
+      { name: 'Minor 7', abbr: 'min7', intervals: [0, 3, 7, 10] },
+      { name: 'Half-dim', abbr: 'm7b5', intervals: [0, 3, 6, 10] }
+    ];
+
+    let earQuizType = 'intervals';
+    let earCurrentQuiz = null;
+    let earScore = 0;
+    let earTotal = 0;
+    let earQuizStreak = 0;
+    let earAnswered = false;
+
+    function generateEarQuiz() {
+      earAnswered = false;
+      if (earQuizType === 'intervals') {
+        const startMidi = 48 + Math.floor(Math.random() * 12);
+        const interval = EAR_INTERVALS[Math.floor(Math.random() * EAR_INTERVALS.length)];
+        earCurrentQuiz = { notes: [startMidi, startMidi + interval.semi], answer: interval, type: 'intervals' };
+        renderEarOptions(EAR_INTERVALS.map(i => i.abbr));
+        document.getElementById('earPrompt').textContent = 'What interval do you hear?';
+      } else {
+        const startMidi = 48 + Math.floor(Math.random() * 12);
+        const chord = EAR_CHORDS[Math.floor(Math.random() * EAR_CHORDS.length)];
+        earCurrentQuiz = { notes: chord.intervals.map(i => startMidi + i), answer: chord, type: 'chords' };
+        renderEarOptions(EAR_CHORDS.map(c => c.abbr));
+        document.getElementById('earPrompt').textContent = 'What chord quality do you hear?';
+      }
+    }
+
+    function renderEarOptions(options) {
+      const el = document.getElementById('earOptions');
+      el.innerHTML = options.map(o =>
+        '<button class="ear-option" data-answer="' + o + '">' + o + '</button>'
+      ).join('');
+      el.querySelectorAll('.ear-option').forEach(btn => {
+        btn.addEventListener('click', () => checkEarAnswer(btn));
+      });
+    }
+
+    async function playEarQuiz() {
+      if (!earCurrentQuiz) generateEarQuiz();
+      await initAudio();
+      const now = Tone.now();
+      if (earCurrentQuiz.type === 'intervals') {
+        lickSynth.triggerAttackRelease(Tone.Frequency(earCurrentQuiz.notes[0], 'midi').toNote(), 0.5, now);
+        lickSynth.triggerAttackRelease(Tone.Frequency(earCurrentQuiz.notes[1], 'midi').toNote(), 0.5, now + 0.7);
+      } else {
+        earCurrentQuiz.notes.forEach((midi, i) => {
+          lickSynth.triggerAttackRelease(Tone.Frequency(midi, 'midi').toNote(), 0.4, now + i * 0.35);
+        });
+      }
+    }
+
+    function checkEarAnswer(btn) {
+      if (earAnswered) return;
+      earAnswered = true;
+      earTotal++;
+      const answer = btn.dataset.answer;
+      const correct = earCurrentQuiz.type === 'intervals'
+        ? earCurrentQuiz.answer.abbr
+        : earCurrentQuiz.answer.abbr;
+      const isCorrect = answer === correct;
+
+      if (isCorrect) {
+        earScore++;
+        earQuizStreak++;
+        btn.classList.add('correct');
+        gamification.awardXPPublic(3);
+      } else {
+        earQuizStreak = 0;
+        btn.classList.add('wrong');
+        // Reveal correct answer
+        document.querySelectorAll('.ear-option').forEach(b => {
+          if (b.dataset.answer === correct) b.classList.add('reveal');
+          else if (!b.classList.contains('wrong')) b.classList.add('disabled');
+        });
+      }
+
+      document.getElementById('earScore').textContent = earScore;
+      document.getElementById('earTotal').textContent = earTotal;
+      document.getElementById('earStreak').textContent = earQuizStreak > 1
+        ? earQuizStreak + ' streak' : '';
+      document.getElementById('earPrompt').textContent = isCorrect
+        ? 'Correct!' : 'It was ' + correct;
+
+      // Auto-advance after delay
+      setTimeout(() => {
+        if (document.getElementById('earOverlay').classList.contains('open')) {
+          generateEarQuiz();
+        }
+      }, isCorrect ? 1000 : 2000);
+    }
+
+    function openEarTraining() {
+      document.getElementById('earOverlay').classList.add('open');
+      earScore = 0;
+      earTotal = 0;
+      earQuizStreak = 0;
+      document.getElementById('earScore').textContent = '0';
+      document.getElementById('earTotal').textContent = '0';
+      document.getElementById('earStreak').textContent = '';
+      generateEarQuiz();
+    }
+
+    function closeEarTraining() {
+      document.getElementById('earOverlay').classList.remove('open');
+      earCurrentQuiz = null;
+      if (earTotal > 0) {
+        gamification.showToastPublic('info',
+          'Ear training: ' + earScore + '/' + earTotal + ' correct', 'bi-ear');
+      }
+    }
+
+    // =========================================================================
+    // SHARE
+    // =========================================================================
+
+    async function shareProgress() {
+      const d = gamification.getData();
+      if (!d) return;
+      const unlocked = Object.values(d.achievements).filter(a => a.unlocked).length;
+      const text = '\uD83C\uDFBA The Woodshed\n' +
+        'Level ' + d.xp.level + ': ' + d.xp.levelName + '\n' +
+        (d.streak.current > 0 ? d.streak.current + '-day streak \uD83D\uDD25\n' : '') +
+        d.stats.totalChoruses + ' choruses | ' + gamification.formatTimePublic(d.stats.totalPracticeSec) + ' practiced\n' +
+        unlocked + '/' + gamification.getAchievementCount() + ' achievements';
+
+      if (navigator.share) {
+        try { await navigator.share({ title: 'The Woodshed', text }); } catch (e) { /* cancelled */ }
+      } else {
+        try {
+          await navigator.clipboard.writeText(text);
+          gamification.showToastPublic('info', 'Copied to clipboard!', 'bi-clipboard-check');
+        } catch (e) {
+          gamification.showToastPublic('info', 'Could not copy', 'bi-x-circle');
+        }
+      }
+    }
+
+    // =========================================================================
+    // TONE.JS AUDIO
+    // =========================================================================
+
+    async function initAudio() {
+      if (audioReady) return;
+      await Tone.start();
+
+      masterVol = new Tone.Volume(isMuted ? -Infinity : 0).toDestination();
+
+      // Room reverb for piano (warm jazz club feel)
+      const reverb = new Tone.Freeverb({
+        roomSize: 0.45, dampening: 3500, wet: 0.14
+      }).connect(masterVol);
+
+      // Rhodes-like electric piano (FM synthesis)
+      piano = new Tone.PolySynth(Tone.FMSynth, {
+        harmonicity: 3.01,
+        modulationIndex: 1.2,
+        oscillator: { type: 'sine' },
+        envelope: { attack: 0.005, decay: 0.6, sustain: 0.15, release: 0.9 },
+        modulation: { type: 'square' },
+        modulationEnvelope: { attack: 0.01, decay: 0.25, sustain: 0, release: 0.5 },
+        volume: -16
+      }).connect(reverb);
+
+      // Walking bass — filtered for round, upright-like tone
+      const bassFilter = new Tone.Filter(500, 'lowpass', -12).connect(masterVol);
+      bass = new Tone.Synth({
+        oscillator: { type: 'fmsine', modulationType: 'sine', modulationIndex: 0.6, harmonicity: 1 },
+        envelope: { attack: 0.025, decay: 0.25, sustain: 0.4, release: 0.35 },
+        volume: -6
+      }).connect(bassFilter);
+
+      // Ride cymbal — bandpass-filtered noise for metallic shimmer
+      const rideFilter = new Tone.Filter(7500, 'bandpass', -12).connect(masterVol);
+      hihat = new Tone.NoiseSynth({
+        noise: { type: 'white' },
+        envelope: { attack: 0.001, decay: 0.18, sustain: 0.01, release: 0.12 },
+        volume: -22
+      }).connect(rideFilter);
+
+      // Kick — subtle, felt not heard (jazz style)
+      kick = new Tone.MembraneSynth({
+        pitchDecay: 0.04, octaves: 5,
+        oscillator: { type: 'sine' },
+        envelope: { attack: 0.001, decay: 0.15, sustain: 0, release: 0.15 },
+        volume: -20
+      }).connect(masterVol);
+
+      // Lick playback voice — warm brass-like tone, goes direct to output (not affected by mute)
+      lickSynth = new Tone.MonoSynth({
+        oscillator: { type: 'sawtooth' },
+        filter: { type: 'lowpass', frequency: 1500, rolloff: -12 },
+        filterEnvelope: {
+          attack: 0.06, decay: 0.3, sustain: 0.4, release: 0.3,
+          baseFrequency: 300, octaves: 3
+        },
+        envelope: { attack: 0.05, decay: 0.2, sustain: 0.5, release: 0.4 },
+        volume: -8
+      }).toDestination();
+
+      audioReady = true;
+    }
+
+    // =========================================================================
+    // LICK PLAYBACK ("Hear It")
+    // =========================================================================
+
+    function durationToBeats(durStr) {
+      let d = durStr;
+      const isRest = d.endsWith('r');
+      if (isRest) d = d.slice(0, -1);
+      const isDotted = d.endsWith('d');
+      if (isDotted) d = d.slice(0, -1);
+      let beats;
+      switch (d) {
+        case 'w': beats = 4; break;
+        case '2': beats = 2; break;
+        case '4': beats = 1; break;
+        case '8': beats = 0.5; break;
+        case '16': beats = 0.25; break;
+        default: beats = 1;
+      }
+      if (isDotted) beats *= 1.5;
+      return beats;
+    }
+
+    function vexToTone(vexKey) {
+      // 'Bb/3' → 'Bb3', 'D/4' → 'D4'
+      return vexKey.replace('/', '');
+    }
+
+    async function playLickDemo() {
+      if (currentMode !== 'licks') return;
+      await initAudio();
+
+      // Toggle off if already playing
+      if (isPlayingLick) {
+        stopLickDemo();
+        return;
+      }
+
+      isPlayingLick = true;
+      lickPlayGeneration++;
+      const myGen = lickPlayGeneration;
+      updateHearLickBtn();
+
+      const bpm = parseInt(document.getElementById('tempoSlider').value);
+      const beatSec = 60 / bpm;
+      const now = Tone.now() + 0.05;
+      let offset = 0;
+
+      const prog = currentProgression;
+      prog.measures.forEach(measure => {
+        const levelLicks = LICKS[currentLevel];
+        if (!levelLicks) { offset += 4 * beatSec; return; }
+        const licks = levelLicks[measure.chord];
+        if (!licks || !licks.length) { offset += 4 * beatSec; return; }
+        const lick = licks[(chorusCount - 1) % licks.length];
+
+        lick.notes.forEach(n => {
+          const beats = durationToBeats(n.duration);
+          const isRest = n.duration.endsWith('r');
+          if (!isRest) {
+            const noteName = vexToTone(n.keys[0]);
+            const dur = beats * beatSec * 0.85; // slight gap between notes
+            lickSynth.triggerAttackRelease(noteName, dur, now + offset);
+          }
+          offset += beats * beatSec;
+        });
+      });
+
+      // Auto-reset after playback finishes
+      const totalMs = offset * 1000 + 300;
+      setTimeout(() => {
+        if (myGen === lickPlayGeneration) {
+          isPlayingLick = false;
+          updateHearLickBtn();
+        }
+      }, totalMs);
+    }
+
+    function stopLickDemo() {
+      lickPlayGeneration++;
+      isPlayingLick = false;
+      if (lickSynth) lickSynth.triggerRelease(Tone.now());
+      updateHearLickBtn();
+    }
+
+    function updateHearLickBtn() {
+      const btn = document.getElementById('hearLickBtn');
+      const icon = document.getElementById('hearLickIcon');
+      const label = document.getElementById('hearLickLabel');
+      if (!btn) return;
+      btn.classList.toggle('playing', isPlayingLick);
+      icon.className = isPlayingLick ? 'bi bi-stop-fill' : 'bi bi-headphones';
+      label.textContent = isPlayingLick ? 'Stop' : 'Hear Lick';
+    }
+
+    function scheduleProgression() {
+      Tone.Transport.cancel();
+      Tone.Transport.timeSignature = [4, 4];
+      // Apply swing feel
+      Tone.Transport.swing = SWING_SETTINGS[currentSwing].value;
+      Tone.Transport.swingSubdivision = '8n';
+
+      const prog = currentProgression;
+      const totalBeats = prog.measures.reduce((s, m) => s + m.beats, 0);
+      let beatOffset = 0;
+
+      prog.measures.forEach((measure, mi) => {
+        const voicing = prog.audio.voicings[measure.chord];
+        const bassLine = prog.audio.bassNotes[measure.chord];
+
+        // Highlight
+        Tone.Transport.schedule(time => {
+          Tone.Draw.schedule(() => setMeasure(mi), time);
+        }, `0:${beatOffset}:0`);
+
+        // Piano comp on 2 and 4
+        for (let b = 1; b < 4; b += 2) {
+          const beat = beatOffset + b;
+          Tone.Transport.schedule(time => {
+            piano.triggerAttackRelease(voicing, '8n', time);
+          }, `0:${beat}:0`);
+        }
+
+        // Walking bass
+        for (let b = 0; b < 4; b++) {
+          const note = bassLine[b % bassLine.length];
+          Tone.Transport.schedule(time => {
+            bass.triggerAttackRelease(note, '4n', time);
+          }, `0:${beatOffset + b}:0`);
+        }
+
+        // Jazz ride pattern: hits on each beat + skip-note on "and" of 2 and 4
+        for (let b = 0; b < 4; b++) {
+          Tone.Transport.schedule(time => {
+            hihat.triggerAttackRelease('16n', time);
+          }, `0:${beatOffset + b}:0`);
+          // Skip note (lighter) on "and" of beats 2 and 4 — swing makes this groove
+          if (b === 1 || b === 3) {
+            Tone.Transport.schedule(time => {
+              hihat.triggerAttackRelease('32n', time, 0.25);
+            }, `0:${beatOffset + b}:2`);
+          }
+        }
+
+        // Kick: gentle pulse on 1, feathered on 3
+        Tone.Transport.schedule(time => {
+          kick.triggerAttackRelease('C1', '8n', time);
+        }, `0:${beatOffset}:0`);
+        Tone.Transport.schedule(time => {
+          kick.triggerAttackRelease('C1', '8n', time, 0.4);
+        }, `0:${beatOffset + 2}:0`);
+
+        beatOffset += measure.beats;
+      });
+
+      // Chorus end — schedule on the last beat of the form so it fires before loopEnd
+      // (Events at exactly loopEnd get skipped when Transport loops)
+      const chorusDuration = `0:${totalBeats}:0`;
+      const lastBeat = `0:${totalBeats - 1}:0`;
+      Tone.Transport.schedule(time => {
+        const doUpdate = () => {
+          chorusCount++;
+          document.getElementById('chorusNum').textContent = chorusCount;
+          if (currentMode === 'licks') renderNotation();
+          gamification.onChorusComplete(currentProgression.id, currentMode, currentLevel);
+        };
+        setTimeout(doUpdate, 0);
+      }, lastBeat);
+
+      Tone.Transport.loopEnd = chorusDuration;
+      Tone.Transport.loop = isLooping;
+    }
+
+    async function play() {
+      await initAudio();
+      if (sessionStartTime_g) {
+        // Resuming from pause — don't reschedule, just resume Transport
+        gamification.onResume();
+      } else {
+        // Fresh start — schedule the progression
+        scheduleProgression();
+        gamification.startSession(currentProgression.id, currentMode, currentLevel);
+      }
+      Tone.Transport.bpm.value = parseInt(document.getElementById('tempoSlider').value);
+      Tone.Transport.start();
+      isPlaying = true;
+      document.getElementById('playIcon').className = 'bi bi-pause-fill';
+    }
+
+    // Track whether a gamification session has started (to distinguish resume from fresh start)
+    let sessionStartTime_g = false;
+
+    function pause() {
+      Tone.Transport.pause();
+      isPlaying = false;
+      document.getElementById('playIcon').className = 'bi bi-play-fill';
+      gamification.onPause();
+      sessionStartTime_g = true;
+    }
+
+    function stop() {
+      gamification.endSession();
+      sessionStartTime_g = false;
+      if (isPlayingLick) stopLickDemo();
+      Tone.Transport.stop();
+      Tone.Transport.position = 0;
+      isPlaying = false;
+      currentMeasure = -1;
+      chorusCount = 1;
+      document.getElementById('chorusNum').textContent = '1';
+      document.getElementById('playIcon').className = 'bi bi-play-fill';
+      updateHighlight();
+      if (currentMode === 'licks') renderNotation();
+    }
+
+    // =========================================================================
+    // UI
+    // =========================================================================
+
+    function updateSlideToggleVisibility() {
+      const show = currentMode === 'licks' && currentInstrument.id === 'bass-concert';
+      document.getElementById('slideToggleRow').style.display = show ? 'flex' : 'none';
+    }
+
+    function setupUI() {
+      document.getElementById('playBtn').addEventListener('click', () => {
+        if (isPlaying) pause(); else play();
+      });
+      document.getElementById('stopBtn').addEventListener('click', stop);
+
+      document.getElementById('loopBtn').addEventListener('click', () => {
+        isLooping = !isLooping;
+        document.getElementById('loopBtn').classList.toggle('active', isLooping);
+        Tone.Transport.loop = isLooping;
+      });
+
+      document.getElementById('muteBtn').addEventListener('click', () => {
+        isMuted = !isMuted;
+        document.getElementById('muteBtn').classList.toggle('active', isMuted);
+        document.getElementById('muteIcon').className = isMuted ? 'bi bi-volume-mute-fill' : 'bi bi-volume-up-fill';
+        if (masterVol) masterVol.volume.value = isMuted ? -Infinity : 0;
+      });
+
+      const tempoSlider = document.getElementById('tempoSlider');
+      const tempoBpm = document.getElementById('tempoBpm');
+      tempoSlider.addEventListener('input', () => {
+        const bpm = parseInt(tempoSlider.value);
+        tempoBpm.textContent = bpm + ' BPM';
+        Tone.Transport.bpm.value = bpm;
+      });
+
+      // Instrument selector
+      document.getElementById('instrumentSelect').addEventListener('change', e => {
+        currentInstrument = INSTRUMENTS[e.target.value] || INSTRUMENTS['bass-concert'];
+        if (isPlaying) {
+          // Don't reschedule audio — it stays concert pitch. Just re-render notation.
+        }
+        updateSlideToggleVisibility();
+        renderNotation();
+      });
+
+      // Hear Lick button
+      document.getElementById('hearLickBtn').addEventListener('click', playLickDemo);
+
+      // Slide position toggle
+      document.getElementById('slideToggle').addEventListener('click', () => {
+        showSlidePositions = !showSlidePositions;
+        document.getElementById('slideToggle').classList.toggle('active', showSlidePositions);
+        renderNotation();
+      });
+      document.getElementById('slideToggle').classList.add('active'); // starts on
+
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentMode = btn.dataset.mode;
+          document.getElementById('noteLegend').style.display = currentMode === 'tones' ? 'flex' : 'none';
+          document.getElementById('levelBar').style.display = currentMode === 'licks' ? 'flex' : 'none';
+          document.getElementById('hearLickRow').style.display = currentMode === 'licks' ? 'flex' : 'none';
+          updateSlideToggleVisibility();
+          // Stop lick demo if switching away from licks mode
+          if (currentMode !== 'licks' && isPlayingLick) stopLickDemo();
+          gamification.trackModeUsed(currentMode);
+          renderNotation();
+        });
+      });
+
+      // Level selector
+      document.querySelectorAll('.level-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentLevel = btn.dataset.level;
+          renderNotation();
+          renderTips();
+        });
+      });
+
+      document.getElementById('progressionSelect').addEventListener('change', e => {
+        const prog = PROGRESSIONS[e.target.value];
+        if (prog) {
+          currentProgression = prog;
+          stop();
+          // Apply per-progression tempo range
+          if (prog.tempoRange) {
+            tempoSlider.min = prog.tempoRange[0];
+            tempoSlider.max = prog.tempoRange[1];
+          }
+          tempoSlider.value = prog.defaultTempo;
+          tempoBpm.textContent = prog.defaultTempo + ' BPM';
+          renderTips();
+          renderNotation();
+        }
+      });
+
+      document.getElementById('tipsToggle').addEventListener('click', () => {
+        const content = document.getElementById('tipsContent');
+        const chevron = document.getElementById('tipsChevron');
+        content.classList.toggle('show');
+        chevron.className = content.classList.contains('show') ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+      });
+
+      // Swing feel toggle
+      document.querySelectorAll('.swing-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.swing-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentSwing = parseInt(btn.dataset.swing);
+          Tone.Transport.swing = SWING_SETTINGS[currentSwing].value;
+          Tone.Transport.swingSubdivision = '8n';
+          // If playing, reschedule to apply swing
+          if (isPlaying) {
+            scheduleProgression();
+          }
+        });
+      });
+
+      // Mic toggle
+      document.getElementById('micBtn').addEventListener('click', () => {
+        if (micActive) stopMic(); else startMic();
+      });
+
+      // Ear Training
+      document.getElementById('earTrainBtn').addEventListener('click', openEarTraining);
+      document.getElementById('earClose').addEventListener('click', closeEarTraining);
+      document.getElementById('earPlayBtn').addEventListener('click', playEarQuiz);
+      document.querySelectorAll('.ear-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.ear-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          earQuizType = tab.dataset.quiz;
+          earScore = 0; earTotal = 0; earQuizStreak = 0;
+          document.getElementById('earScore').textContent = '0';
+          document.getElementById('earTotal').textContent = '0';
+          document.getElementById('earStreak').textContent = '';
+          generateEarQuiz();
+        });
+      });
+      // Close ear training on overlay background click
+      document.getElementById('earOverlay').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('earOverlay')) closeEarTraining();
+      });
+
+      // Share
+      document.getElementById('shareBtn').addEventListener('click', shareProgress);
+
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(renderNotation, 200);
+      });
+    }
+
+    function renderTips() {
+      const tips = currentProgression.tips;
+      const tipsArr = typeof tips === 'object' && !Array.isArray(tips)
+        ? (tips[currentLevel] || tips.beginner || [])
+        : (tips || []);
+      document.getElementById('tipsContent').innerHTML = tipsArr
+        .map(t => `<div class="tip-item">${t}</div>`).join('');
+    }
+
+    // =========================================================================
+    // INIT
+    // =========================================================================
+
+    function init() {
+      // Default to symbols mode in UI
+      document.querySelectorAll('.mode-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.mode === 'symbols');
+      });
+      // Ensure hear-lick row and slide toggle match mode state
+      document.getElementById('hearLickRow').style.display = currentMode === 'licks' ? 'flex' : 'none';
+      updateSlideToggleVisibility();
+
+      gamification.init();
+      setupUI();
+      renderTips();
+
+      requestAnimationFrame(() => {
+        try {
+          renderNotation();
+        } catch(e) {
+          console.error('Notation render error:', e);
+        }
+        document.getElementById('loading').classList.add('hidden');
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+  })();
+  </script>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./woodshed-sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
