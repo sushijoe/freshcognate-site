@@ -1124,6 +1124,10 @@
       <svg viewBox="0 0 40 40"><path d="M4 22h20M4 18h20M24 14c5 0 12 3 12 8s-7 8-12 8M10 16v-4M14 16v-5M18 16v-4" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span class="inst-btn-label">Trumpet</span>
     </button>
+    <button class="inst-btn" data-name="bari-sax" title="Baritone Saxophone">
+      <svg viewBox="0 0 40 40"><path d="M15 4c0 0 1 1 1 3v13c0 3 5 6 7 10 2 5-2 8-7 8s-7-2-6-6c1-3 4-4 6-4M16 7l4-2M16 12l4-2M16 17l4-1M16 22l4-1" stroke-width="2.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="inst-btn-label">Bari Sax</span>
+    </button>
     <button class="inst-btn" data-name="alto-sax" title="Alto Saxophone">
       <svg viewBox="0 0 40 40"><path d="M18 4c0 0 1 1 1 3v10c0 2 3 8 5 12 2 5-1 9-6 9s-7-3-6-7c1-3 4-5 6-5M19 7l3-2M19 11l3-2M19 15l3-1" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span class="inst-btn-label">Alto Sax</span>
@@ -1132,13 +1136,13 @@
       <svg viewBox="0 0 40 40"><path d="M16 4c0 0 1 1 1 3v12c0 2 4 7 6 11 2 5-1 8-6 8s-7-2-6-6c1-3 4-5 6-5M17 7l3-2M17 11l3-2M17 15l3-1M17 19l3-1" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span class="inst-btn-label">Tenor Sax</span>
     </button>
-    <button class="inst-btn" data-name="bari-sax" title="Baritone Saxophone">
-      <svg viewBox="0 0 40 40"><path d="M15 4c0 0 1 1 1 3v13c0 3 5 6 7 10 2 5-2 8-7 8s-7-2-6-6c1-3 4-4 6-4M16 7l4-2M16 12l4-2M16 17l4-1M16 22l4-1" stroke-width="2.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="inst-btn-label">Bari Sax</span>
-    </button>
     <button class="inst-btn" data-name="clarinet" title="Clarinet">
       <svg viewBox="0 0 40 40"><path d="M20 4v26c0 2-1 4-3 5s-5 0-5-3 3-4 5-4h3M18 8h4M18 13h4M18 18h4M18 23h4" stroke-width="2.2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span class="inst-btn-label">Clarinet</span>
+    </button>
+    <button class="inst-btn" data-name="piano" title="Piano / Guitar / Flute">
+      <svg viewBox="0 0 40 40"><path d="M8 12h24v18H8zM8 12h24M14 12v11M20 12v11M26 12v11M12 12v7M17 12v7M23 12v7M29 12v7" stroke-width="1.8" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="inst-btn-label">Piano</span>
     </button>
   </div>
 
@@ -2518,10 +2522,11 @@
       { name: 'trombone',  label: 'Trombone',  transposition: 'bass-concert' },
       { name: 'horn',      label: 'Horn',      transposition: 'treble-f' },
       { name: 'trumpet',   label: 'Trumpet',   transposition: 'treble-bb' },
+      { name: 'bari-sax',  label: 'Bari Sax',  transposition: 'treble-eb' },
       { name: 'alto-sax',  label: 'Alto Sax',  transposition: 'treble-eb' },
       { name: 'tenor-sax', label: 'Tenor Sax', transposition: 'treble-bb' },
-      { name: 'bari-sax',  label: 'Bari Sax',  transposition: 'treble-eb' },
-      { name: 'clarinet',  label: 'Clarinet',  transposition: 'treble-bb' }
+      { name: 'clarinet',  label: 'Clarinet',  transposition: 'treble-bb' },
+      { name: 'piano',     label: 'Piano',     transposition: 'treble-concert' }
     ];
 
     let currentInstrument = INSTRUMENTS['bass-concert'];
