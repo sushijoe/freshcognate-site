@@ -1902,9 +1902,23 @@
       // captures the Closer Walk head. Up-tempo section (♩=200) and
       // IFA/LLL/Amen come after. Using 60 BPM default for the Dirge feel;
       // user can bump to 200 for the uptempo sections.
-      // gospel-medley: now loaded from band's MusicXML via BAND_TUNES_CORE
-      // (see woodshed-tunes-core.js). The old inline transcription is
-      // superseded by per-instrument parts with triplets + correct chords.
+      // GOSPEL MEDLEY — Closer Walk (dirge) -> I'll Fly Away (uptempo) -> Lord
+      // Lord Lord / Amen. Default to the SOLO SECTION progression, which is
+      // I'll Fly Away's 16-bar form in Bb. This is what soloists blow over.
+      // Closer Walk dirge is sung as an intro; the uptempo form opens the
+      // practice cycle. ♩=200 for soloing feel.
+      mkProg({id:'gospel-medley', t:'Gospel Medley (Closer Walk / I\'ll Fly Away / Lord Lord Lord)', cp:'Traditional, arr. Good Trouble', k:'Bb', bpm:200, sec:'core',
+        m:[
+          // I'll Fly Away — solo section (16 bars in Bb)
+          'Bb','Bb','F7','F7',
+          'Bb','Bb','Bb7','Bb7',
+          'Eb','Eb','Bb','Bb',
+          'F7','F7','Bb','Bb'
+        ],
+        tb:['Three gospel standards: Closer Walk (dirge) -> I\'ll Fly Away (uptempo) -> Lord Lord Lord -> Amen.','Solo section is I\'ll Fly Away\'s 16-bar form in Bb: I-V7-I-I7-IV-I-V7-I.','Bb major / Bb blues scale work throughout.'],
+        ti:['The Bb7 in bar 7 is V7 of IV (Eb) — lean into the b7 (Ab).','Gospel lick: bluesy descending riffs from Bb down through the blues scale.','The IV (Eb) on bars 9-10 is the "lift" — target G (3rd of Eb) on beat 1.'],
+        ta:['Use the Bb mixolydian on the Bb7 bars for a cleaner gospel-jazz feel.','Amen cadence (outro): Eb -> Bb or Ab7 -> Fm7 -> F7 -> Bb | Eb -> Bb.','Quote other hymns: Amazing Grace, When The Saints — the tradition loves references.']
+      }),
       // Verified against band's 9/11/24 tuba score — 4-flat key signature,
       // Bb7#9 center, ♩=95. Form: Tuba vamp, Follow the leader, Solos over
       // [1]. Section [1] is Bb7#9 (hip bluesy dominant). Section [2] is
@@ -2671,51 +2685,35 @@
     ].forEach(registerTune);
 
     // ======================================================================
-    // BAND REPERTOIRE FROM MUSICXML — authoritative per-instrument parts
-    // extracted from the band's actual charts via /tmp/band-scores/
-    // xml_to_parts.py pipeline. These OVERRIDE any earlier mkProg() definitions
-    // for the same id, because they carry real per-instrument data instead of
-    // hand-transcribed melodies.
+    // XML-DERIVED PER-INSTRUMENT PARTS — additive overlay only.
+    //
+    // The app's chord progressions come from the hand-crafted mkProg
+    // definitions above (they carry the band's actual solo-section chord
+    // changes — e.g. Saints' Bbm→Eb→Gb7 passage, Feel Like Funkin's I7-IV7
+    // vamp, NOM's Bb7#9 center). Those are the star feature for soloing
+    // practice and must not be overwritten.
+    //
+    // BAND_TUNES_CORE (from woodshed-tunes-core.js) carries authoritative
+    // per-instrument note data extracted from the band's MusicXML. We merge
+    // those notes INTO the existing tune measures, matching by index, WITHOUT
+    // touching the chord progression, tempo, key, or layout.
     // ======================================================================
-    function registerBandTune(tune) {
-      const chordSet = new Set(tune.measures.map(function(m){return m.chord;}));
-      const V = {}, B = {};
-      chordSet.forEach(function(c){
-        V[c] = VOICINGS[c] || VOICINGS['Bb7'];
-        B[c] = BASS_NOTES[c] || BASS_NOTES['Bb7'];
-      });
-      const tempo = tune.defaultTempo || 120;
-      const enriched = Object.assign({}, tune, {
-        tempoRange: [Math.max(40, tempo - 40), Math.max(260, tempo + 60)],
-        layout: { measuresPerLine: 4, clef: 'bass' },
-        audio: { type: 'synth', voicings: V, bassNotes: B },
-        tips: tune.tips || {
-          beginner: [
-            'Play the root of each chord on beat 1.',
-            'Use the ' + (tune.key || 'Bb') + ' major/blues scale for solos.',
-            'Lock with the tuba for groove.'
-          ],
-          intermediate: [
-            'Target the 3rd and b7 of each chord on strong beats.',
-            'Call-and-response with 2-bar phrases.',
-            'Accent the "and" of beats for second-line bounce.'
-          ],
-          advanced: [
-            'Paraphrase the melody with rhythmic displacement.',
-            'Chromatic approach tones and enclosures.',
-            'Double-time feel passages for contrast.'
-          ]
-        },
-        dataSource: 'musicxml',
-      });
-      // Delete the old version before re-registering so console doesn't see both
-      delete PROGRESSIONS[enriched.id];
-      registerTune(enriched);
+    function mergeBandPartsIntoExistingTune(xmlTune) {
+      const existing = PROGRESSIONS[xmlTune.id];
+      if (!existing) return; // skip tunes not hand-crafted
+      const n = Math.min(existing.measures.length, xmlTune.measures.length);
+      for (let i = 0; i < n; i++) {
+        const xmlM = xmlTune.measures[i];
+        if (!xmlM.parts) continue;
+        const existingM = existing.measures[i];
+        existingM.parts = Object.assign({}, existingM.parts || {}, xmlM.parts);
+      }
+      existing.dataSources = (existing.dataSources || []).concat(['musicxml-parts']);
     }
 
     if (window.BAND_TUNES_CORE) {
-      window.BAND_TUNES_CORE.forEach(registerBandTune);
-      console.log('[Woodshed] Registered ' + window.BAND_TUNES_CORE.length + ' tunes from MusicXML source');
+      window.BAND_TUNES_CORE.forEach(mergeBandPartsIntoExistingTune);
+      console.log('[Woodshed] Merged MusicXML parts into ' + window.BAND_TUNES_CORE.length + ' existing tunes');
     }
 
     // ======================================================================
