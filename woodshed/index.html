@@ -2129,11 +2129,24 @@
         ti:['The Bb7 (bar 6) sets up the IV (Eb). Blue 3rd (Db) works here.','Traditional parade phrasing — short, punchy, repeated figures.','Trade lead with the section.'],
         ta:['Quote "Mardi Gras Mambo" or "Iko Iko" riffs.','Build to a shout chorus in high register.','Listen to Professor Longhair and Wild Tchoupitoulas.']
       }),
-      mkProg({id:'mercy-mercy-mercy', t:'Mercy, Mercy, Mercy', cp:'Joe Zawinul / Cannonball Adderley', k:'Bb', bpm:100, sec:'active',
-        m:['Bb7','Ab7','Bb7','Ab7','Bb7','Ab7','Bb7','F7','Bb7','Ab7','Bb7','Ab7','Eb7','F7','Bb7','F7'],
-        tb:['Cannonball Adderley hit. Gospel-jazz crossover.','Bb7 → Ab7 is the classic "soul" move.','Bb blues scale covers most of it.'],
-        ti:['Target Ab (b7 of Bb7) and Gb (b7 of Ab7) for that soul sound.','Sanctified gospel phrasing with bends and slides.','Grace notes and blue inflections everywhere.'],
-        ta:['Zawinul\'s original voicings are the sound — listen.','Double-time bebop lines over the bridge for contrast.','Build slowly — start with melody, end with wailing.']
+      // Verified against Rebirth arrangement (trans. Jesse Metzler, 3/12/17)
+      // Bb Trumpet PDF. Concert Bb, 4/4. Form: A (C7-F7 = Bb7-Eb7 concert)
+      // → B (C-Eb = Bb-Db chromatic shift) → C (C-F-C-G = Bb-Eb-Bb-F) → D
+      // (Dm7-Em7-Am7 = Cm7-Dm7-Gm7 turnaround). Head 2x, solos over AB.
+      mkProg({id:'mercy-mercy-mercy', t:'Mercy, Mercy, Mercy', cp:'Joe Zawinul, arr. Rebirth', k:'Bb', bpm:100, sec:'active',
+        m:[
+          {c:'Bb7', ml:[{keys:['F/4'],duration:'4'},{keys:['Ab/4'],duration:'4'},{keys:['F/4'],duration:'2'}]},
+          {c:'Eb7', ml:[{keys:['Eb/4'],duration:'4'},{keys:['Gb/4'],duration:'4'},{keys:['Eb/4'],duration:'2'}]},
+          {c:'Bb7', ml:[{keys:['F/4'],duration:'4'},{keys:['Ab/4'],duration:'4'},{keys:['F/4'],duration:'2'}]},
+          {c:'Eb7', ml:[{keys:['Eb/4'],duration:'4'},{keys:['Gb/4'],duration:'4'},{keys:['Eb/4'],duration:'2'}]},
+          {c:'Bb',  ml:[{keys:['Bb/4'],duration:'4'},{keys:['D/5'],duration:'4'},{keys:['F/5'],duration:'2'}]},
+          {c:'Db',  ml:[{keys:['Db/5'],duration:'4'},{keys:['F/5'],duration:'4'},{keys:['Ab/5'],duration:'2'}]},
+          {c:'Bb',  ml:[{keys:['Bb/4'],duration:'4'},{keys:['D/5'],duration:'4'},{keys:['F/5'],duration:'2'}]},
+          {c:'Db',  ml:[{keys:['Db/5'],duration:'4'},{keys:['F/5'],duration:'4'},{keys:['Ab/5'],duration:'2'}]}
+        ],
+        tb:['Cannonball Adderley hit, Rebirth arrangement. Gospel-jazz crossover.','Section A is I7-IV7 (Bb7-Eb7). Section B shifts to Bb-Db modally.','Bb blues scale covers A. For B, try Bb mixolydian over Bb, Db lydian over Db.'],
+        ti:['Section C moves Bb-Eb-Bb-F (I-IV-I-V). Simple diatonic approach.','Section D is a ii-iii-vi turnaround (Cm7-Dm7-Gm7) — jazz language.','Sanctified gospel phrasing with bends and slides throughout.'],
+        ta:['The Bb-Db shift is chromatic mediant — target common tones (F is in both).','Zawinul\'s original voicings are the sound — listen.','Build slowly — Head 2x, solos over just AB section.']
       }),
       mkProg({id:'planet-gibbous', t:'Planet Gibbous', cp:'Good Trouble', k:'Bbm', bpm:95, sec:'active',
         m:['Bbm7','Bbm7','Ebm7','Ebm7','Bbm7','F7','Bbm7','Bbm7'],
