@@ -278,6 +278,39 @@
       color: var(--accent);
     }
 
+    /* Form + tempo provenance badges — show at top of tips */
+    .tune-meta-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 0 0 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 8px;
+    }
+    .tune-meta-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 500;
+      background: rgba(255,255,255,0.05);
+      color: var(--text-secondary);
+      border: 1px solid rgba(255,255,255,0.08);
+      letter-spacing: 0.2px;
+    }
+    .tune-meta-badge.tempo-source.tempo-xml,
+    .tune-meta-badge.tempo-source.tempo-pdf,
+    .tune-meta-badge.tempo-source.tempo-recording {
+      background: rgba(50,200,120,0.10);
+      color: #7fd9a6;
+      border-color: rgba(50,200,120,0.25);
+    }
+    .tune-meta-badge.tempo-source.tempo-estimate {
+      background: rgba(255,180,60,0.08);
+      color: #d9a86a;
+      border-color: rgba(255,180,60,0.22);
+    }
+
     /* Chorus counter */
     .chorus-counter {
       text-align: center;
@@ -1665,7 +1698,15 @@
 
     // Compact song builder. def = { id, t: title, cp: composer, k: key,
     // bpm, sec: bookSection, m: [chord strings OR {c:chord, ml:melody}],
-    // cl: clef ('bass'|'treble'), mpl: measuresPerLine, tb/ti/ta: tips }
+    // cl: clef ('bass'|'treble'), mpl: measuresPerLine,
+    // tb/ti/ta: tips,
+    // form: 'head' | 'solo-form' | 'outro-turnaround' | 'vamp' | 'bridge'
+    //        (describes what the m: progression represents; shown to the user
+    //         so they know what section they're looping over)
+    // tempoSource: 'xml' | 'pdf' | 'recording' | 'estimate'
+    //              (provenance of the default tempo; 'xml'/'pdf' = read from
+    //               the band's chart, 'recording' = verified against
+    //               recording, 'estimate' = best guess — may need correction)
     function mkProg(def) {
       const tempo = def.bpm || 110;
       const chordSet = new Set(def.m.map(mm => typeof mm === 'string' ? mm : mm.c));
@@ -1683,6 +1724,8 @@
         timeSignature: '4/4',
         defaultTempo: tempo,
         tempoRange: [Math.max(60, tempo - 30), Math.min(200, tempo + 40)],
+        form: def.form || 'solo-form',     // NEW — default: progression IS the solo form
+        tempoSource: def.tempoSource || 'estimate',
         measures: def.m.map(mm => {
           if (typeof mm === 'string') return { chord: mm, beats: 4 };
           const out = { chord: mm.c, beats: 4 };
@@ -1825,6 +1868,7 @@
       // transposed to concert Bb. Chord progression matches: Bb-F7 turnarounds
       // with the chromatic Bbm → Eb → Gb7 passage in bars 11-13.
       mkProg({id:'saints', t:'Saints Go Marching In / Mama Don\'t Allow', cp:'Traditional', k:'Bb', bpm:200, sec:'core',
+        form:'head', tempoSource:'xml',
         m:[
           {c:'Bb',  ml:[{keys:['d/4'],duration:'8r'},{keys:['Bb/4'],duration:'8'},{keys:['Bb/4'],duration:'4'},{keys:['D/5'],duration:'4'},{keys:['Eb/5'],duration:'4'}]},
           {c:'Bb',  ml:[{keys:['F/5'],duration:'w'}]},
@@ -1854,6 +1898,7 @@
       // mostly rests during the tuba groove; stab on Bb held note in
       // section 2. Melody captures the recurring bar-5 stab.
       mkProg({id:'feel-like-funkin', t:'Feel Like Funkin\' It Up', cp:'Rebirth Brass Band', k:'Eb', bpm:100, sec:'core',
+        form:'solo-form', tempoSource:'xml',
         m:[
           {c:'Eb7', ml:[{keys:['d/4'],duration:'2r'},{keys:['Bb/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
           {c:'Eb7', ml:[{keys:['Bb/4'],duration:'w'}]},
@@ -1879,6 +1924,12 @@
       // Bb | F7/A-Gm | F-Eb-Bb/F | Cm7-F7 | Bb. Bar 1 descending bass
       // (Bb-A-G-F) underpins the trumpet line.
       mkProg({id:'later-than-you-think', t:'It\'s Later Than You Think', cp:'Kermit Ruffins & Rebirth', k:'Bb', bpm:90, sec:'core',
+        // NOTE: current progression = OUTRO TURNAROUND (Bb-F7-Gm-F-Eb-Bb-Cm7-F7).
+        // The actual "Solos (partner)" section in the band's chart cycles a
+        // different form — likely based on sections 1 and 2 of the head. Need
+        // the band's solo-section markup to nail that down. For now, the outro
+        // turnaround is still a playable 8-bar loop with rich changes.
+        form:'outro-turnaround', tempoSource:'xml',
         m:[
           {c:'Bb',  ml:[{keys:['F/4'],duration:'2'},{keys:['Bb/4'],duration:'2'}]},
           {c:'F7',  ml:[{keys:['Eb/4'],duration:'2'},{keys:['A/4'],duration:'2'}]},
@@ -1908,6 +1959,7 @@
       // Closer Walk dirge is sung as an intro; the uptempo form opens the
       // practice cycle. ♩=200 for soloing feel.
       mkProg({id:'gospel-medley', t:'Gospel Medley (Closer Walk / I\'ll Fly Away / Lord Lord Lord)', cp:'Traditional, arr. Good Trouble', k:'Bb', bpm:200, sec:'core',
+        form:'solo-form', tempoSource:'recording',
         m:[
           // I'll Fly Away — solo section (16 bars in Bb)
           'Bb','Bb','F7','F7',
@@ -1931,6 +1983,7 @@
       // Simplified to chord-tone arpeggios on each chord — captures the
       // harmonic motion without the ornamental 16ths.
       mkProg({id:'new-orleans-music', t:'New Orleans Music', cp:'Rebirth Brass Band', k:'Bb', bpm:95, sec:'core',
+        form:'solo-form', tempoSource:'xml',
         m:[
           {c:'Bb7', ml:[{keys:['Bb/4'],duration:'4'},{keys:['Db/5'],duration:'4'},{keys:['F/5'],duration:'2'}]},
           {c:'Bb7', ml:[{keys:['F/5'],duration:'4'},{keys:['Db/5'],duration:'4'},{keys:['Bb/4'],duration:'2'}]},
@@ -1952,6 +2005,7 @@
       // Verified via MusicXML — F major, ♩=120. Trumpet melody from
       // "African Mkt A" section (bars 9-16). Simple I-V alternation.
       mkProg({id:'african-marketplace', t:'African Marketplace / Homecoming', cp:'Abdullah Ibrahim', k:'F', bpm:120, sec:'core',
+        form:'solo-form', tempoSource:'xml',
         m:[
           {c:'F', ml:[{keys:['A/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['A/4'],duration:'4'}]},
           {c:'F', ml:[{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['F/4'],duration:'4'}]},
@@ -1975,6 +2029,11 @@
       // vamp. Melody sourced from the TROMBONE part (trumpet was busy
       // 16ths). Shows the Db-centric riff with G/Bb/Eb chord tones.
       mkProg({id:'thousand-island', t:'Thousand Island', cp:'Rebirth Brass Band', k:'Eb', bpm:100, sec:'core',
+        // Verified as ONE-CHORD Eb7 vamp via tuba XML analysis:
+        // tuba plays Eb-G-Bb-C (Eb chord outline) across m1-4, rests through
+        // the middle, returns to Eb in m18-22 and m29-35. No bridge with
+        // different chords. Soloists blow over static Eb mixolydian.
+        form:'vamp', tempoSource:'xml',
         m:[
           {c:'Eb7', ml:[{keys:['Db/4'],duration:'w'}]},
           {c:'Eb7', ml:[{keys:['Db/4'],duration:'2'},{keys:['Db/4'],duration:'8'},{keys:['Db/4'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['Ab/3'],duration:'8'}]},
@@ -2001,6 +2060,11 @@
       // octave-jump pattern with a Gb/Db parallel move (phrygian b2).
       // Raised up an octave so it reads across instruments.
       mkProg({id:'montserrat-serrat', t:'Montserrat Serrat', cp:'S. Isler', k:'Fm', bpm:200, sec:'core',
+        // Verified as ONE-CHORD Fm7 modal vamp via tuba XML analysis:
+        // tuba roots on F throughout (F-Eb-F pattern), with C as 5th passing
+        // tone. No bridge with different chords. The band's chart explicitly
+        // marks "Modal Scale for solos" — soloists use F minor modes.
+        form:'vamp', tempoSource:'xml',
         m:[
           {c:'Fm7', ml:[{keys:['F/3'],duration:'4'},{keys:['F/3'],duration:'8'},{keys:['C/4'],duration:'8'},{keys:['C/4'],duration:'4'},{keys:['F/4'],duration:'4'}]},
           {c:'Fm7', ml:[{keys:['Gb/4'],duration:'4'},{keys:['Gb/4'],duration:'8'},{keys:['Db/4'],duration:'8'},{keys:['Db/4'],duration:'4'},{keys:['Gb/3'],duration:'4'}]},
@@ -2035,6 +2099,12 @@
       // Ab), ♩=175. Melody sourced from the HORN part (trumpet + alto
       // were mostly rests). Shows the dorian 7-6 oscillation (Eb-D).
       mkProg({id:'you-move-ya-lose', t:'You Move You Lose', cp:'Rebirth Brass Band', k:'Fm', bpm:175, sec:'core',
+        // Verified as Fm7 vamp via tuba XML analysis: tuba plays a chromatic
+        // 4-bar ASCENDING WALKING BASS pattern (F-G-Ab-A-Bb-B-C-E) that
+        // repeats as a loop. Bars 21-28 have a short B-section (F-Ab
+        // alternation) then returns. Soloists blow over the Fm7 chromatic
+        // walk — that's the character of the tune.
+        form:'vamp', tempoSource:'xml',
         m:[
           {c:'Fm7', ml:[{keys:['d/4'],duration:'8r'},{keys:['Eb/4'],duration:'8'},{keys:['D/4'],duration:'8'},{keys:['d/4'],duration:'8r'},{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'}]},
           {c:'Fm7', ml:[{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'}]},
@@ -2063,6 +2133,7 @@
       // slash notation (which is the proper "part not yet available"
       // state, not wrong data).
       mkProg({id:'do-whatcha-wanna', t:'Do Whatcha Wanna', cp:'Rebirth Brass Band', k:'Bb', bpm:160, sec:'active',
+        form:'solo-form', tempoSource:'pdf',
         m:[
           {c:'Bb7', parts:{
             tuba:     [{keys:['Bb/2'],duration:'4d'},{keys:['F/3'],duration:'8'},{keys:['Bb/3'],duration:'4d'},{keys:['F/3'],duration:'8'}],
@@ -2139,6 +2210,7 @@
       // Melody extracted from band's 2/20/2026 MusicXML (trumpet → concert).
       // 16-bar Section 1 head with full circle-of-fifths + Gbdim passing.
       mkProg({id:'bogalusa-strut', t:'Bogalusa Strut', cp:'Sam Morgan', k:'C', bpm:180, sec:'active',
+        form:'head', tempoSource:'xml',
         m:[
           {c:'C7',    ml:[{keys:['C/5'],duration:'4'},{keys:['B/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['d/4'],duration:'4r'}]},
           {c:'F',     ml:[{keys:['A/4'],duration:'8'},{keys:['Ab/4'],duration:'8'},{keys:['A/4'],duration:'8'},{keys:['C/5'],duration:'8'},{keys:['C/5'],duration:'2'}]},
@@ -6522,8 +6594,42 @@
       const tipsArr = typeof tips === 'object' && !Array.isArray(tips)
         ? (tips[currentLevel] || tips.beginner || [])
         : (tips || []);
-      document.getElementById('tipsContent').innerHTML = tipsArr
+
+      // Form + tempo provenance badges — tells the musician what they're
+      // looping over (solo form vs. head vs. outro) and how trustworthy the
+      // tempo is (read from chart / recording / estimate).
+      const FORM_LABELS = {
+        'solo-form':       'Solo form',
+        'head':            'Head (solos cycle the same form)',
+        'vamp':            'One-chord vamp',
+        'outro-turnaround':'Outro turnaround',
+        'bridge':          'Bridge',
+      };
+      const TEMPO_LABELS = {
+        'xml':       'from band\'s chart',
+        'pdf':       'from score PDF',
+        'recording': 'verified vs recording',
+        'estimate':  'estimate — may need tuning',
+      };
+      const formLabel = FORM_LABELS[currentProgression.form] || currentProgression.form || 'Solo form';
+      const tempoLabel = TOTAL_TEMPO_LABEL(currentProgression);
+      const badges = `<div class="tune-meta-badges">
+        <span class="tune-meta-badge">${formLabel}</span>
+        <span class="tune-meta-badge tempo-source tempo-${currentProgression.tempoSource || 'estimate'}">${tempoLabel}</span>
+      </div>`;
+
+      document.getElementById('tipsContent').innerHTML = badges + tipsArr
         .map(t => `<div class="tip-item">${t}</div>`).join('');
+    }
+
+    function TOTAL_TEMPO_LABEL(prog) {
+      const TEMPO_LABELS = {
+        'xml':       '♩ verified',
+        'pdf':       '♩ from PDF',
+        'recording': '♩ verified',
+        'estimate':  '♩ estimate',
+      };
+      return TEMPO_LABELS[prog.tempoSource || 'estimate'];
     }
 
     // =========================================================================
