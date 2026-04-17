@@ -1158,26 +1158,7 @@
       </button>
     </div>
     <select class="progression-select" id="progressionSelect">
-      <optgroup label="NOLA Tunes">
-        <option value="do-whatcha-wanna">Do Whatcha Wanna</option>
-        <option value="saints">When the Saints</option>
-        <option value="feel-like-funkin">Feel Like Funkin' It Up</option>
-        <option value="fly-away">I'll Fly Away</option>
-        <option value="mardi-gras">Mardi Gras in New Orleans</option>
-        <option value="its-later">It's Later Than You Think</option>
-      </optgroup>
-      <optgroup label="NOLA Grooves">
-        <option value="nola-second-line">Second Line Vamp (Bb)</option>
-        <option value="nola-funk">NOLA Funk Vamp (Eb)</option>
-        <option value="nola-traditional">Trad Vamp (Bb)</option>
-      </optgroup>
-      <optgroup label="Practice Fundamentals">
-        <option value="bb-blues">12-Bar Bb Blues</option>
-        <option value="f-blues">12-Bar F Blues</option>
-        <option value="eb-blues">12-Bar Eb Blues</option>
-        <option value="c-minor-blues">Minor Blues in C</option>
-        <option value="ii-v-i-bb">ii-V-I in Bb</option>
-      </optgroup>
+      <!-- Options populated dynamically from PROGRESSIONS at init -->
     </select>
   </header>
 
@@ -1372,358 +1353,635 @@
     // DATA MODEL
     // =========================================================================
 
-    const PROGRESSIONS = {
-      // ====================================================================
-      // NOLA TUNES — the heart of the app. Tunes the band actually plays.
-      // ====================================================================
+    // Shared chord-voicing library. All songs pull backing track voicings
+    // from here so we don't duplicate voicing arrays across 70+ tunes.
+    // Format: [4-note voicing for comping synth]
+    const VOICINGS = {
+      // Dominant 7ths
+      'Bb7':  ['Bb3', 'D4', 'F4', 'Ab4'],
+      'Eb7':  ['Bb3', 'Db4', 'Eb4', 'G4'],
+      'F7':   ['A3', 'C4', 'Eb4', 'F4'],
+      'C7':   ['Bb3', 'C4', 'E4', 'G4'],
+      'G7':   ['G3', 'B3', 'D4', 'F4'],
+      'D7':   ['F#3', 'A3', 'C4', 'D4'],
+      'A7':   ['A3', 'C#4', 'E4', 'G4'],
+      'E7':   ['E3', 'G#3', 'B3', 'D4'],
+      'B7':   ['B3', 'D#4', 'F#4', 'A4'],
+      'Ab7':  ['Gb3', 'Ab3', 'C4', 'Eb4'],
+      'Db7':  ['Db3', 'F3', 'Ab3', 'B3'],
+      'F#7':  ['F#3', 'A#3', 'C#4', 'E4'],
+      // Major 7ths
+      'BbMaj7': ['A3', 'Bb3', 'D4', 'F4'],
+      'EbMaj7': ['D3', 'Eb3', 'G3', 'Bb3'],
+      'FMaj7':  ['E3', 'F3', 'A3', 'C4'],
+      'CMaj7':  ['B3', 'C4', 'E4', 'G4'],
+      'GMaj7':  ['F#3', 'G3', 'B3', 'D4'],
+      'DMaj7':  ['C#3', 'D3', 'F#3', 'A3'],
+      'AbMaj7': ['G3', 'Ab3', 'C4', 'Eb4'],
+      // Minor 7ths
+      'Cm7':   ['C3', 'Eb3', 'G3', 'Bb3'],
+      'Dm7':   ['D3', 'F3', 'A3', 'C4'],
+      'Em7':   ['E3', 'G3', 'B3', 'D4'],
+      'Fm7':   ['F3', 'Ab3', 'C4', 'Eb4'],
+      'Gm7':   ['G3', 'Bb3', 'D4', 'F4'],
+      'Am7':   ['A3', 'C4', 'E4', 'G4'],
+      'Bm7':   ['B3', 'D4', 'F#4', 'A4'],
+      'Bbm7':  ['Bb3', 'Db4', 'F4', 'Ab4'],
+      'Ebm7':  ['Eb3', 'Gb3', 'Bb3', 'Db4'],
+      'F#m7':  ['F#3', 'A3', 'C#4', 'E4'],
+      // Aliases (major/minor triads map to m7/Maj7 for backing)
+      'Bb':  ['A3', 'Bb3', 'D4', 'F4'],
+      'Eb':  ['D3', 'Eb3', 'G3', 'Bb3'],
+      'F':   ['E3', 'F3', 'A3', 'C4'],
+      'C':   ['B3', 'C4', 'E4', 'G4'],
+      'G':   ['F#3', 'G3', 'B3', 'D4'],
+      'D':   ['C#3', 'D3', 'F#3', 'A3'],
+      'Ab':  ['G3', 'Ab3', 'C4', 'Eb4'],
+      'Cm':  ['C3', 'Eb3', 'G3', 'Bb3'],
+      'Dm':  ['D3', 'F3', 'A3', 'C4'],
+      'Em':  ['E3', 'G3', 'B3', 'D4'],
+      'Fm':  ['F3', 'Ab3', 'C4', 'Eb4'],
+      'Gm':  ['G3', 'Bb3', 'D4', 'F4'],
+      'Am':  ['A3', 'C4', 'E4', 'G4'],
+      'Bbm': ['Bb3', 'Db4', 'F4', 'Ab4']
+    };
 
-      'do-whatcha-wanna': {
-        id: 'do-whatcha-wanna',
-        title: 'Do Whatcha Wanna',
-        composer: 'Rebirth Brass Band',
-        key: 'F',
+    // Bass patterns: root-3-5-3 shuffle by default. Pulled per-chord.
+    const BASS_NOTES = {
+      'Bb7':  ['Bb2', 'D3', 'F3', 'D3'],
+      'Eb7':  ['Eb2', 'G2', 'Bb2', 'G2'],
+      'F7':   ['F2', 'A2', 'C3', 'A2'],
+      'C7':   ['C2', 'E2', 'G2', 'E2'],
+      'G7':   ['G2', 'B2', 'D3', 'B2'],
+      'D7':   ['D2', 'F#2', 'A2', 'F#2'],
+      'A7':   ['A2', 'C#3', 'E3', 'C#3'],
+      'E7':   ['E2', 'G#2', 'B2', 'G#2'],
+      'B7':   ['B2', 'D#3', 'F#3', 'D#3'],
+      'Ab7':  ['Ab2', 'C3', 'Eb3', 'C3'],
+      'Db7':  ['Db2', 'F2', 'Ab2', 'F2'],
+      'F#7':  ['F#2', 'A#2', 'C#3', 'A#2'],
+      'BbMaj7':['Bb2', 'D3', 'F3', 'D3'],
+      'EbMaj7':['Eb2', 'G2', 'Bb2', 'G2'],
+      'FMaj7': ['F2', 'A2', 'C3', 'A2'],
+      'CMaj7': ['C2', 'E2', 'G2', 'E2'],
+      'GMaj7': ['G2', 'B2', 'D3', 'B2'],
+      'DMaj7': ['D2', 'F#2', 'A2', 'F#2'],
+      'AbMaj7':['Ab2', 'C3', 'Eb3', 'C3'],
+      'Cm7':   ['C2', 'Eb2', 'G2', 'Eb2'],
+      'Dm7':   ['D2', 'F2', 'A2', 'F2'],
+      'Em7':   ['E2', 'G2', 'B2', 'G2'],
+      'Fm7':   ['F2', 'Ab2', 'C3', 'Ab2'],
+      'Gm7':   ['G2', 'Bb2', 'D3', 'Bb2'],
+      'Am7':   ['A2', 'C3', 'E3', 'C3'],
+      'Bm7':   ['B2', 'D3', 'F#3', 'D3'],
+      'Bbm7':  ['Bb2', 'Db3', 'F3', 'Db3'],
+      'Ebm7':  ['Eb2', 'Gb2', 'Bb2', 'Gb2'],
+      'F#m7':  ['F#2', 'A2', 'C#3', 'A2'],
+      // Triad aliases mirror the 7ths
+      'Bb':  ['Bb2', 'D3', 'F3', 'D3'],
+      'Eb':  ['Eb2', 'G2', 'Bb2', 'G2'],
+      'F':   ['F2', 'A2', 'C3', 'A2'],
+      'C':   ['C2', 'E2', 'G2', 'E2'],
+      'G':   ['G2', 'B2', 'D3', 'B2'],
+      'D':   ['D2', 'F#2', 'A2', 'F#2'],
+      'Ab':  ['Ab2', 'C3', 'Eb3', 'C3'],
+      'Cm':  ['C2', 'Eb2', 'G2', 'Eb2'],
+      'Dm':  ['D2', 'F2', 'A2', 'F2'],
+      'Em':  ['E2', 'G2', 'B2', 'G2'],
+      'Fm':  ['F2', 'Ab2', 'C3', 'Ab2'],
+      'Gm':  ['G2', 'Bb2', 'D3', 'Bb2'],
+      'Am':  ['A2', 'C3', 'E3', 'C3'],
+      'Bbm': ['Bb2', 'Db3', 'F3', 'Db3']
+    };
+
+    // Compact song builder. def = { id, t: title, cp: composer, k: key,
+    // bpm, sec: bookSection, m: [chord strings OR {c:chord, ml:melody}],
+    // cl: clef ('bass'|'treble'), mpl: measuresPerLine, tb/ti/ta: tips }
+    function mkProg(def) {
+      const tempo = def.bpm || 110;
+      const chordSet = new Set(def.m.map(mm => typeof mm === 'string' ? mm : mm.c));
+      const V = {}, B = {};
+      chordSet.forEach(c => {
+        V[c] = VOICINGS[c] || VOICINGS['Bb7'];
+        B[c] = BASS_NOTES[c] || BASS_NOTES['Bb7'];
+      });
+      return {
+        id: def.id,
+        title: def.t,
+        composer: def.cp || '',
+        key: def.k,
+        bookSection: def.sec || 'core',
         timeSignature: '4/4',
-        defaultTempo: 95,
-        tempoRange: [70, 130],
-        measures: [
-          { chord: 'F7',  beats: 4, melody: [{keys:['F/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['Eb/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['C/4'],duration:'2'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['F/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['Eb/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['C/4'],duration:'4'},{keys:['A/3'],duration:'4'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['Ab/3'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['F/3'],duration:'2'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['Ab/3'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['F/3'],duration:'4'},{keys:['D/3'],duration:'4'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['F/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['Eb/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['C/4'],duration:'2'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['F/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['Eb/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['A/3'],duration:'4'},{keys:['F/3'],duration:'4'}] },
-          { chord: 'C7',  beats: 4, melody: [{keys:['C/4'],duration:'4'},{keys:['Bb/3'],duration:'4'},{keys:['G/3'],duration:'4'},{keys:['E/3'],duration:'4'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['F/3'],duration:'4'},{keys:['A/3'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['F/4'],duration:'4'}] }
-        ],
-        layout: { measuresPerLine: 4, clef: 'bass' },
-        audio: {
-          type: 'synth',
-          voicings: {
-            'F7':  ['A3', 'C4', 'Eb4', 'F4'],
-            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4'],
-            'C7':  ['Bb3', 'C4', 'E4', 'G4']
-          },
-          bassNotes: {
-            'F7':  ['F2', 'A2', 'C3', 'Eb3'],
-            'Bb7': ['Bb2', 'D3', 'F3', 'Ab3'],
-            'C7':  ['C2', 'E2', 'G2', 'Bb2']
-          }
-        },
+        defaultTempo: tempo,
+        tempoRange: [Math.max(60, tempo - 30), Math.min(200, tempo + 40)],
+        measures: def.m.map(mm => {
+          if (typeof mm === 'string') return { chord: mm, beats: 4 };
+          const out = { chord: mm.c, beats: 4 };
+          if (mm.ml) out.melody = mm.ml;
+          return out;
+        }),
+        layout: { measuresPerLine: def.mpl || 4, clef: def.cl || 'bass' },
+        audio: { type: 'synth', voicings: V, bassNotes: B },
         tips: {
-          beginner: [
-            'Rebirth Brass Band signature tune. This vamp is F7 → Bb7 (I7–IV7) — two chords, infinite groove.',
-            'The hook is a 2-bar rhythmic riff on F. Internalize it, then improvise around it.',
-            'Use the F blues scale (F, Ab, Bb, B, C, Eb) over the whole tune.',
-            'Leave space — NOLA funk breathes. Play 2 notes, rest, then 2 more.',
-            'Listen to Phil Frazier (sousaphone) anchoring the groove. Feel that pocket.'
+          beginner: def.tb || [
+            'Learn the melody first — that IS the gig.',
+            'Play the root of each chord on beat 1. Feel the changes.',
+            'Use the ' + def.k + ' blues scale for your first solo attempts.'
           ],
-          intermediate: [
-            'The 3rd (A) and b7 (Eb) of F7 are guide tones. Target them on strong beats.',
-            'Call-and-response: play a 2-bar phrase on F7, answer it on Bb7.',
-            'Syncopate: accent the "and" of 2 and "and" of 4 to lock with the second line drum feel.',
-            'Chromatic approach from Eb up to F gives classic brass band grit.',
-            'Minor third bends (Ab to A) are the sound of NOLA funk — work them in.'
+          intermediate: def.ti || [
+            'Target the 3rd and b7 of each chord on strong beats.',
+            'Call-and-response: 2-bar phrase, 2-bar answer.',
+            'Accent the "and" of beats for second line bounce.'
           ],
-          advanced: [
-            'Over C7 in bar 7, use Gb (tritone) for tension, resolve to F on the downbeat.',
-            'Quote "When the Saints" or "Iko Iko" — NOLA tradition is layering familiar melodies.',
-            'Octave displacement: low unison into high octave jump, Rebirth-style.',
-            'Mixolydian with b3 added (F G Ab A Bb C D Eb) is the full NOLA dominant sound.',
-            'Listen to Dirty Dozen and Soul Rebels versions for trumpet/trombone trade ideas.'
+          advanced: def.ta || [
+            'Paraphrase the melody with rhythmic displacement.',
+            'Chromatic approach tones and double enclosures.',
+            'Build three choruses: melody, paraphrase, shout chorus.'
           ]
         }
-      },
+      };
+    }
 
-      'saints': {
-        id: 'saints',
-        title: 'When the Saints Go Marching In',
-        composer: 'Traditional',
-        key: 'Bb',
-        timeSignature: '4/4',
-        defaultTempo: 110,
-        tempoRange: [70, 180],
-        measures: [
-          { chord: 'Bb7', beats: 4, melody: [{keys:['d/4'],duration:'2r'},{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'2'},{keys:['d/4'],duration:'4r'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['d/4'],duration:'4r'},{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/4'],duration:'2'},{keys:['d/4'],duration:'2r'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/4'],duration:'2'},{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'4'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['A/3'],duration:'4'}] },
-          { chord: 'Eb7', beats: 4, melody: [{keys:['Bb/3'],duration:'2'},{keys:['d/4'],duration:'2r'}] },
-          { chord: 'Eb7', beats: 4, melody: [{keys:['G/3'],duration:'4'},{keys:['G/3'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['Eb/4'],duration:'4'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['d/4'],duration:'2r'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['d/4'],duration:'4r'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'w'}] }
-        ],
-        layout: { measuresPerLine: 4, clef: 'bass' },
-        audio: {
-          type: 'synth',
-          voicings: {
-            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4'],
-            'Eb7': ['Bb3', 'Db4', 'Eb4', 'G4'],
-            'F7':  ['A3', 'C4', 'Eb4', 'F4']
-          },
-          bassNotes: {
-            'Bb7': ['Bb2', 'D3', 'F3', 'D3'],
-            'Eb7': ['Eb2', 'G2', 'Bb2', 'G2'],
-            'F7':  ['F2', 'A2', 'C3', 'A2']
-          }
-        },
-        tips: {
-          beginner: [
-            'The most iconic NOLA tune. Start by playing just the melody clean — that IS the gig.',
-            'Traditional form: I (Bb) - V (F7) - I - I - IV (Eb) - I - V - I. Standard hymn changes.',
-            'Play it like a dirge on the way to the cemetery, uptempo on the way back. Both are right.',
-            'The pickup "Oh when the" (D-Eb-F) leads into "saints" on Bb — feel that resolution.',
-            'Brass bands often trade solos 4 bars at a time. Listen before you jump in.'
-          ],
-          intermediate: [
-            'Paraphrase the melody — embellish it with grace notes, approach tones, and rhythmic variation.',
-            'The Bb major pentatonic (Bb, C, D, F, G) sounds pure and hymn-like over the whole tune.',
-            'On the Eb (bar 8), strong the 3rd of Eb (G) — it\'s the brightest note in the tune.',
-            'Tailgate trombone style: glide smears into target notes. Use slow slide moves.',
-            'Listen to Preservation Hall Jazz Band and Treme Brass Band for the traditional feel.'
-          ],
-          advanced: [
-            'Play the melody "out" — displace rhythms, change octaves, add chromatic passing tones.',
-            'The Bb blues scale works on any bar — lean into the blue 3rd (Db) for grit.',
-            'Quote other hymns: "I\'ll Fly Away", "Just a Closer Walk" — they share the DNA.',
-            'For the "shout chorus" (last time through), play high and loud in the upper register.',
-            'Louis Armstrong\'s version is the Rosetta Stone. Study his melodic paraphrase.'
-          ]
-        }
-      },
+    // Build the full progression map from compact definitions.
+    const PROGRESSIONS = {};
 
-      'feel-like-funkin': {
-        id: 'feel-like-funkin',
-        title: 'Feel Like Funkin\' It Up',
-        composer: 'Rebirth Brass Band',
-        key: 'Bb',
-        timeSignature: '4/4',
-        defaultTempo: 100,
-        tempoRange: [80, 140],
-        measures: [
-          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'8'},{keys:['d/4'],duration:'8r'},{keys:['Db/4'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['Ab/3'],duration:'4'},{keys:['F/3'],duration:'4'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'8'},{keys:['d/4'],duration:'8r'},{keys:['Db/4'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['F/3'],duration:'4'},{keys:['D/3'],duration:'4'}] },
-          { chord: 'Eb7', beats: 4, melody: [{keys:['Eb/4'],duration:'8'},{keys:['d/4'],duration:'8r'},{keys:['Gb/4'],duration:'8'},{keys:['Eb/4'],duration:'8'},{keys:['Db/4'],duration:'4'},{keys:['Bb/3'],duration:'4'}] },
-          { chord: 'Eb7', beats: 4, melody: [{keys:['Eb/4'],duration:'8'},{keys:['d/4'],duration:'8r'},{keys:['Gb/4'],duration:'8'},{keys:['Eb/4'],duration:'8'},{keys:['Bb/3'],duration:'4'},{keys:['G/3'],duration:'4'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'8'},{keys:['d/4'],duration:'8r'},{keys:['Db/4'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['Ab/3'],duration:'4'},{keys:['F/3'],duration:'4'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['F/3'],duration:'8'},{keys:['d/4'],duration:'8r'},{keys:['Ab/3'],duration:'8'},{keys:['F/3'],duration:'8'},{keys:['Eb/3'],duration:'4'},{keys:['C/3'],duration:'4'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'4'},{keys:['Db/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['A/3'],duration:'4'},{keys:['F/3'],duration:'4'}] }
-        ],
-        layout: { measuresPerLine: 4, clef: 'bass' },
-        audio: {
-          type: 'synth',
-          voicings: {
-            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4'],
-            'Eb7': ['Bb3', 'Db4', 'Eb4', 'G4'],
-            'F7':  ['A3', 'C4', 'Eb4', 'F4']
-          },
-          bassNotes: {
-            'Bb7': ['Bb2', 'D3', 'F3', 'Ab3'],
-            'Eb7': ['Eb2', 'G2', 'Bb2', 'G2'],
-            'F7':  ['F2', 'A2', 'C3', 'Eb3']
-          }
-        },
-        tips: {
-          beginner: [
-            'Rebirth Brass Band anthem. Funky minor-pentatonic hook over a driving I7-IV7-V7 groove.',
-            'Bb minor pentatonic (Bb, Db, Eb, F, Ab) is home base. Use the blue note E for grit.',
-            'Keep it in the pocket — every note serves the groove, nothing flashy.',
-            'The hook is percussive: short, punchy notes with space between.',
-            'Play loud and proud. This is party music.'
-          ],
-          intermediate: [
-            'Second line drum pattern drives this. Lock into the "and of 2" snare accent.',
-            'Over Eb7 (bar 3-4), try the Db blues lick — it walks up from Bb to Eb naturally.',
-            'Use ghost notes — almost-unvoiced pitches that add rhythm without melody.',
-            'The F7 in bar 6 is the climax — build intensity into it, release on the Bb turnaround.',
-            'Trade 4 bars with another horn player if available. Call and response is core NOLA.'
-          ],
-          advanced: [
-            'Polyrhythmic feel: play in 3 against the 4 — dotted 8th note patterns create tension.',
-            'Chromatic lead-ins: approach each chord tone from a half step above or below.',
-            'Build to a "shout chorus": high register, unison lines with the section.',
-            'Quote "Hey Pocky Way" or other NOLA standards — the tradition loves musical references.',
-            'Listen to the trombone solos on Rebirth recordings for slide-heavy NOLA phrasing.'
-          ]
-        }
-      },
+    // ======================================================================
+    // GOOD TROUBLE BRASS BAND REPERTOIRE
+    // Sections: core (Core Standards, the 10 must-know) / active (rehearsal
+    // focus) / developing (in the works) / dusty (warmup) / vault (retired)
+    // ======================================================================
 
-      'fly-away': {
-        id: 'fly-away',
-        title: 'I\'ll Fly Away',
-        composer: 'Albert E. Brumley (trad.)',
-        key: 'Bb',
-        timeSignature: '4/4',
-        defaultTempo: 120,
-        tempoRange: [80, 180],
-        measures: [
-          { chord: 'Bb7', beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'4'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['G/4'],duration:'2'},{keys:['F/4'],duration:'2'}] },
-          { chord: 'Eb7', beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['G/4'],duration:'4'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['F/4'],duration:'2'},{keys:['d/4'],duration:'2r'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'4'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['G/4'],duration:'2'},{keys:['A/4'],duration:'2'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['F/4'],duration:'4'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'w'}] }
+    [
+      // ---------- CORE STANDARDS (the 10) ----------
+      mkProg({id:'saints', t:'Saints Go Marching In / Mama Don\'t Allow', cp:'Traditional', k:'Bb', bpm:110, sec:'core',
+        m:[
+          {c:'Bb7', ml:[{keys:['d/4'],duration:'2r'},{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'}]},
+          {c:'Bb7', ml:[{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'2'},{keys:['d/4'],duration:'4r'}]},
+          {c:'F7',  ml:[{keys:['d/4'],duration:'4r'},{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'}]},
+          {c:'Bb7', ml:[{keys:['Bb/4'],duration:'2'},{keys:['d/4'],duration:'2r'}]},
+          {c:'Bb7', ml:[{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
+          {c:'Bb7', ml:[{keys:['Bb/4'],duration:'2'},{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'4'}]},
+          {c:'Bb7', ml:[{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['A/3'],duration:'4'}]},
+          {c:'Eb7', ml:[{keys:['Bb/3'],duration:'2'},{keys:['d/4'],duration:'2r'}]},
+          {c:'Eb7', ml:[{keys:['G/3'],duration:'4'},{keys:['G/3'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['Eb/4'],duration:'4'}]},
+          {c:'Bb7', ml:[{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['d/4'],duration:'2r'}]},
+          {c:'F7',  ml:[{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['d/4'],duration:'4r'}]},
+          {c:'Bb7', ml:[{keys:['Bb/3'],duration:'w'}]}
         ],
-        layout: { measuresPerLine: 4, clef: 'bass' },
-        audio: {
-          type: 'synth',
-          voicings: {
-            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4'],
-            'Eb7': ['Bb3', 'Db4', 'Eb4', 'G4'],
-            'F7':  ['A3', 'C4', 'Eb4', 'F4']
-          },
-          bassNotes: {
-            'Bb7': ['Bb2', 'D3', 'F3', 'D3'],
-            'Eb7': ['Eb2', 'G2', 'Bb2', 'G2'],
-            'F7':  ['F2', 'A2', 'C3', 'A2']
-          }
-        },
-        tips: {
-          beginner: [
-            'Gospel staple embraced by brass bands. Usually played with joy and lift.',
-            'Simple I-IV-V changes. Bb major pentatonic gets you through the whole tune.',
-            'Lean into the major 3rd (D) — this is happy, bright music.',
-            'Clap on 2 and 4 while you play. Feel the church rhythm.',
-            'Many NOLA funerals end with this tune on the way back. Celebrate with every note.'
-          ],
-          intermediate: [
-            'Add grace notes above the melody — gospel singers do this naturally.',
-            'Trade the lead: play straight melody once, then paraphrase with eighth notes the second time.',
-            'The 6th (G) over Bb gives a sweet gospel sound. Use it freely.',
-            'When the form restarts, try playing an octave higher for lift and excitement.',
-            'Listen to Rebirth, Dirty Dozen, and Preservation Hall\'s takes.'
-          ],
-          advanced: [
-            'Reharmonize mentally: the V-of-V (C7) can sub for the F7 in bar 6 for a jazzier sound.',
-            'Gospel lick: blues-scale descending riff (Bb-Ab-G-F-Eb-D-Bb) fits any measure.',
-            'Build three choruses: melody, paraphrase, wail. The arc teaches solo architecture.',
-            'Quote "Amazing Grace" or "Just a Closer Walk" — sister gospel tunes that share DNA.',
-            'End on a long held note with vibrato — classic gospel brass ending.'
-          ]
-        }
-      },
+        tb:['The most iconic NOLA tune. Start by playing just the melody clean.','Form: I - V7 - I - IV - I - V - I. Classic hymn changes.','Dirge on the way to the cemetery, uptempo on the way back.'],
+        ti:['Paraphrase the melody with grace notes and approach tones.','Bb major pentatonic sounds pure and hymn-like.','Tailgate trombone: glide smears into target notes.'],
+        ta:['Play the melody "out" — displaced rhythms, octave shifts.','Bb blues scale works on any bar — lean into Db for grit.','Louis Armstrong\'s version is the Rosetta Stone.']
+      }),
+      mkProg({id:'feel-like-funkin', t:'Feel Like Funkin\' It Up', cp:'Rebirth Brass Band', k:'Eb', bpm:100, sec:'core',
+        m:['Eb7','Eb7','Ab7','Eb7','Eb7','Ab7','Bb7','Eb7'],
+        tb:['Rebirth anthem. I7 - IV7 - V7 funk groove.','Eb minor pentatonic (Eb, Gb, Ab, Bb, Db) is home.','Keep it in the pocket — short, punchy phrases with space.'],
+        ti:['Second line snare on the "and" of 2 is the key to the feel.','Major 3rd (G) over Eb7 gives the sweet/sour NOLA blues sound.','Trade 4 bars with another horn if you can.'],
+        ta:['Chromatic approaches into the 3rd of each chord.','Build to the Bb7 (bar 7) — then release on the Eb turnaround.','Quote Rebirth phrases or "Iko Iko" — tradition loves references.']
+      }),
+      mkProg({id:'later-than-you-think', t:'Later Than You Think (Enjoy Yourself)', cp:'Carr/Magidson, arr. Rebirth', k:'Bb', bpm:120, sec:'core',
+        m:['Bb7','Bb7','F7','F7','F7','F7','Bb7','Bb7','Eb7','Eb7','Bb7','Bb7','F7','F7','Bb7','Bb7'],
+        tb:['Swing standard, brass-band-fied. Play the melody like you\'re singing it.','I-V changes. Bb major scale works throughout.','The tune is philosophical but happy — keep it light.'],
+        ti:['Second line OR medium swing feel both work. Try both.','Guide tones on F7: A (3rd) and Eb (b7).','Trade 4s — this tune loves conversational phrasing.'],
+        ta:['Three-chorus arc: melody, paraphrase, double-time.','Bb bebop dominant adds chromatic motion everywhere.','Quote other NOLA party tunes for wink-wink moments.']
+      }),
+      mkProg({id:'gospel-medley', t:'Gospel Medley (Closer Walk / I\'ll Fly Away / Lord Lord Lord)', cp:'Traditional', k:'Bb', bpm:100, sec:'core',
+        m:['Bb7','Bb7','Eb7','Eb7','Bb7','F7','Bb7','Bb7','Bb7','Bb7','Eb7','Bb7','Bb7','F7','Bb7','Bb7'],
+        tb:['Three gospel standards stitched together. Start reverent, build to joy.','Just a Closer Walk → I\'ll Fly Away → Lord Lord Lord.','Bb major pentatonic sounds like church.'],
+        ti:['Add grace notes above the melody — gospel singers do this naturally.','The 6th (G) over Bb is sweet gospel flavor.','Each tune is a lift — go up an octave when the next one starts.'],
+        ta:['Gospel lick library: bluesy descending riffs from Bb down.','Build three choruses: melody, paraphrase, wail with vibrato.','Quote Amazing Grace or Just a Closer Walk across the medley.']
+      }),
+      mkProg({id:'new-orleans-music', t:'New Orleans Music', cp:'Rebirth Brass Band', k:'Bb', bpm:100, sec:'core',
+        m:['Bb7','Bb7','Eb7','Eb7','Bb7','F7','Bb7','Bb7'],
+        tb:['Rebirth\'s love letter to the city. Celebratory 8-bar vamp in Bb.','Bb major pentatonic + blue 3rd (Db).','Play with joy and swagger — this is a party anthem.'],
+        ti:['Repeated rhythmic hooks work better than long lines.','Use octave jumps for excitement.','Call-and-response with the melody of the tune.'],
+        ta:['Trombone glisses into each chord change.','Quote "New Orleans" melodies from other tunes — meta and fun.','High-register wails on the F7 (bar 6) before resolving.']
+      }),
+      mkProg({id:'african-marketplace', t:'African Marketplace / Homecoming', cp:'Abdullah Ibrahim', k:'F', bpm:95, sec:'core',
+        m:['Fm7','Fm7','Bbm7','Bbm7','Eb7','Eb7','Ab','Ab','Dbm7','Dbm7','Gm7','C7','Fm7','Fm7','C7','Fm7'],
+        tb:['Abdullah Ibrahim\'s modal township jazz masterpiece.','F dorian mode (F G Ab Bb C D Eb F) is the primary color.','Let the groove breathe — lots of space between phrases.'],
+        ti:['The ii-V into Eb major (bars 5) is the harmonic lift.','Ab major section (bars 7-8) is the "homecoming" feeling.','Abdullah Ibrahim solos are sparse — leave tons of space.'],
+        ta:['Use the Ebmaj7 arpeggio over Fm7 for a modal sound.','Bbm7 → Eb7 → Ab is a ii-V-I in Ab — play Ab melodies there.','Listen to Abdullah\'s piano solos for pacing and texture.']
+      }),
+      mkProg({id:'thousand-island', t:'Thousand Island', cp:'Rebirth Brass Band', k:'Eb', bpm:105, sec:'core',
+        m:['Eb7','Eb7','Ab7','Ab7','Eb7','Eb7','Bb7','Eb7'],
+        tb:['Rebirth groove in Eb. 8-bar I-IV-V vamp.','Eb blues scale covers the whole thing.','Percussive, rhythmic phrasing — not legato.'],
+        ti:['Lean into the blue 3rd (Gb) for that Rebirth sound.','The "and of 2" snare hit — land your phrases around it.','Short 2-bar phrases with space in between.'],
+        ta:['Polyrhythmic 3-against-4 dotted-8th patterns.','Build intensity through each chorus — don\'t peak early.','Octave-jump answers from one phrase to the next.']
+      }),
+      mkProg({id:'montserrat-serrat', t:'Montserrat Serrat', cp:'Silvio Rodriguez / S. Isler arr', k:'F', bpm:100, sec:'core',
+        m:['Dm','Dm','Am','Am','F','F','C','A7','Dm','Dm','Am','Am','Bb','C7','F','F'],
+        tb:['Latin ballad in F (relative Dm). Beautiful melodic tune.','F major and D minor are cousins — move freely between.','Let it breathe — not every bar needs notes.'],
+        ti:['The A7 into Dm (bar 8) is the emotional peak. Lean into the F# (3rd of A7).','Target the 3rd of each chord for singing melody lines.','Slow vibrato on held notes — vocal inspired.'],
+        ta:['Dm harmonic minor over A7 (the V7 of Dm) sounds classical/flamenco.','Chromatic motion C-Bb-A into the final F — classic Latin cadence.','Listen to Silvio Rodriguez vocals for phrasing.']
+      }),
+      mkProg({id:'never-gonna-let-you-go', t:'Never Gonna Let You Go', cp:'24:43', k:'Gm', bpm:100, sec:'core',
+        m:['Gm7','Gm7','Cm7','Cm7','Gm7','Gm7','D7','Gm7'],
+        tb:['Minor-key funk in Gm. Moody and driving.','Gm pentatonic (G Bb C D F) is the core vocabulary.','Keep phrases short and percussive.'],
+        ti:['Over D7 (bar 7), use G harmonic minor (G A Bb C D Eb F#) for the V7 tension.','Target the 3rd of each chord: Bb on Gm, Eb on Cm, F# on D7.','Ghost notes add funk-rhythm without changing the pitch.'],
+        ta:['Chromatic walk-up from Gm to Cm: G Ab A Bb → C.','D7alt (D Eb F F# G# B) for outside tension into Gm.','Build intensity with double-time over the D7 turnaround.']
+      }),
+      mkProg({id:'you-move-ya-lose', t:'You Move Ya Lose', cp:'Rebirth Brass Band', k:'Fm', bpm:105, sec:'core',
+        m:['Fm7','Fm7','Bbm7','Bbm7','Fm7','Fm7','C7','Fm7'],
+        tb:['Minor-key Rebirth funk. Fm7 (i) to Bbm7 (iv) — classic minor blues feel.','Fm pentatonic (F Ab Bb C Eb) is home.','Play like a chant — repeated rhythmic figures.'],
+        ti:['C7 (V7 of Fm) brings the tension — use Db (b9) and Ab (b13) for color.','Walking bass line works: F Ab C Eb on Fm measures.','Quote "Feel Like Funkin\'" riffs — same family.'],
+        ta:['F harmonic minor scale over the C7 for flamenco-jazz tension.','Polytonal: play in Ab major (relative major) over Fm for brightness.','Double-time the last chorus before the head comes back.']
+      }),
 
-      'mardi-gras': {
-        id: 'mardi-gras',
-        title: 'Mardi Gras in New Orleans',
-        composer: 'Professor Longhair',
-        key: 'F',
-        timeSignature: '4/4',
-        defaultTempo: 95,
-        tempoRange: [80, 130],
-        measures: [
-          { chord: 'F7',  beats: 4, melody: [{keys:['C/4'],duration:'4'},{keys:['A/3'],duration:'8'},{keys:['C/4'],duration:'8'},{keys:['F/4'],duration:'4'},{keys:['A/3'],duration:'4'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['C/4'],duration:'4'},{keys:['A/3'],duration:'8'},{keys:['C/4'],duration:'8'},{keys:['F/4'],duration:'2'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['A/3'],duration:'4'},{keys:['G/3'],duration:'4'},{keys:['F/3'],duration:'4'},{keys:['C/4'],duration:'4'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['F/4'],duration:'2'},{keys:['d/4'],duration:'2r'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['Bb/4'],duration:'2'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['D/4'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['Bb/3'],duration:'4'},{keys:['F/3'],duration:'4'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['C/4'],duration:'4'},{keys:['A/3'],duration:'8'},{keys:['C/4'],duration:'8'},{keys:['F/4'],duration:'2'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['A/3'],duration:'2'},{keys:['F/3'],duration:'2'}] },
-          { chord: 'C7',  beats: 4, melody: [{keys:['G/3'],duration:'4'},{keys:['E/3'],duration:'8'},{keys:['G/3'],duration:'8'},{keys:['C/4'],duration:'2'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['F/3'],duration:'4'},{keys:['D/3'],duration:'4'},{keys:['Bb/3'],duration:'2'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['C/4'],duration:'4'},{keys:['A/3'],duration:'4'},{keys:['F/3'],duration:'2'}] },
-          { chord: 'C7',  beats: 4, melody: [{keys:['G/3'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['E/3'],duration:'2'}] }
-        ],
-        layout: { measuresPerLine: 4, clef: 'bass' },
-        audio: {
-          type: 'synth',
-          voicings: {
-            'F7':  ['A3', 'C4', 'Eb4', 'F4'],
-            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4'],
-            'C7':  ['Bb3', 'C4', 'E4', 'G4']
-          },
-          bassNotes: {
-            'F7':  ['F2', 'A2', 'C3', 'A2'],
-            'Bb7': ['Bb2', 'D3', 'F3', 'D3'],
-            'C7':  ['C2', 'E2', 'G2', 'E2']
-          }
-        },
-        tips: {
-          beginner: [
-            'Professor Longhair\'s anthem. 12-bar blues in F with Fess\'s iconic triplet feel.',
-            'Use the F blues scale (F, Ab, Bb, B, C, Eb). This IS the sound of NOLA blues.',
-            'Triplet subdivision is everything. Count "1-trip-let, 2-trip-let..." while you play.',
-            'Play short, percussive notes. The rhumba feel comes from rhythm, not legato.',
-            'Fess played piano with a left-hand rhumba bass. Feel that 3:2 pulse.'
-          ],
-          intermediate: [
-            'The "Caribbean" feel comes from the triplet 16th placement — not quite straight, not swung.',
-            'On bar 9 (C7), the 3rd (E) clashes beautifully with Eb from the F blues scale. Use both.',
-            'Call-and-response: 2-bar phrase, 2-bar answer. Classic Fess style.',
-            'Use the major 6th (D) over F7 for the bright, festive NOLA sound.',
-            'Listen to Dr. John, Art Neville, and Trombone Shorty for modern interpretations.'
-          ],
-          advanced: [
-            'Montuno-style comping from the piano inspires horn rhythmic phrasing. Lock with the clave.',
-            'Two-handed piano licks translate to octave jumps on horn — use the register.',
-            'Quote "Iko Iko" or "Mardi Gras Mambo" — they\'re cousins of this tune.',
-            'The blues scale + major 3rd (A) over F7 gives the full bebop-meets-Fess sound.',
-            'For the out chorus, double-time 16ths over the triplet bass for maximum excitement.'
-          ]
-        }
-      },
+      // ---------- ACTIVE REPERTOIRE ----------
+      mkProg({id:'do-whatcha-wanna', t:'Do Whatcha Wanna', cp:'Rebirth Brass Band', k:'Eb', bpm:95, sec:'active',
+        m:['Eb7','Eb7','Ab7','Ab7','Eb7','Eb7','Bb7','Eb7'],
+        tb:['Rebirth signature tune in Eb. I-IV-V vamp, infinite groove.','Eb blues scale (Eb Gb Ab A Bb Db) covers everything.','The hook is a 2-bar riff — internalize then improvise.'],
+        ti:['Major 3rd (G) + minor 3rd (Gb) together = classic NOLA bend.','Call-and-response: phrase on Eb7, answer on Ab7.','"And of 2" and "and of 4" for the second line pocket.'],
+        ta:['Over Bb7 (bar 7), use E natural (tritone) for tension → Eb.','Quote "Iko Iko" or other NOLA classics freely.','Phil Frazier\'s tuba lines inspire horn octave jumps.']
+      }),
+      mkProg({id:'ballad-of-kami-jean', t:'Ballad of Kami Jean', cp:'Mama Digdown\'s Brass Band', k:'Eb', bpm:85, sec:'active',
+        m:['Eb','Cm7','Fm7','Bb7','Eb','Cm7','Fm7','Bb7','Ab','Eb','Ab','Eb','Fm7','Bb7','Eb','Eb'],
+        tb:['Ballad — play the melody clean first. No need to rush.','I-vi-ii-V turnaround is standard jazz language.','Eb major scale + occasional blue 3rd (Gb).'],
+        ti:['Target the 3rd of each chord for a singing line.','Long tones with vibrato — this is a lyrical tune.','Space is your friend on ballads.'],
+        ta:['Substitutions: D7 for Bb7 (tritone sub) for color.','Double-time 16ths only sparingly — save for the climax.','Listen to Mama Digdown\'s for the phrasing.']
+      }),
+      mkProg({id:'bogalusa-strut', t:'Bogalusa Strut', cp:'Sam Morgan\'s Jazz Band', k:'C', bpm:120, sec:'active',
+        m:['C7','C7','F7','C7','C7','G7','F7','C7'],
+        tb:['Classic early NOLA jazz strut. 8-bar blues in C.','C blues scale (C Eb F F# G Bb) works throughout.','Play with that old-timey dixieland bounce.'],
+        ti:['The G7 (bar 6) is the V7 — lean into B natural (3rd).','Tailgate trombone glisses were invented for this.','Trade lead with another horn — group improv is the point.'],
+        ta:['Collective improv: play around the melody, not over it.','Chromatic turnarounds into the C7 restart.','Listen to Sam Morgan\'s recordings from 1927.']
+      }),
+      mkProg({id:'bourbon-street', t:'Bourbon Street Parade', cp:'Paul Barbarin', k:'Ab', bpm:115, sec:'active',
+        m:['Ab','Ab','Ab7','Db','Ab','Eb7','Ab','Ab','Ab','Ab','Ab7','Db','Ab','Eb7','Ab','Ab'],
+        tb:['NOLA parade classic. Ab is the traditional key.','Ab major scale + Ab blues scale both work.','Strut tempo — imagine marching down Bourbon Street.'],
+        ti:['On the Ab7 (bar 3), lean into Gb (b7) to set up the Db.','Parade-style octave jumps and stabs.','Let the trombone smears speak — that\'s the sound.'],
+        ta:['Db major section (bar 4) — switch to Db major pentatonic.','Chromatic approaches from below on strong beats.','Listen to Preservation Hall and Paul Barbarin recordings.']
+      }),
+      mkProg({id:'bye-and-bye', t:'Bye and Bye', cp:'Traditional', k:'F', bpm:110, sec:'active',
+        m:['F','F','C7','F','F','C7','F','F'],
+        tb:['Gospel/traditional. Simple I-V changes in F.','F major pentatonic is enough for a whole chorus.','Hymn-like phrasing with dignity.'],
+        ti:['Add the 6th (D) for sweetness over F.','Call-and-response with the congregation in mind.','Long tones over quick phrases.'],
+        ta:['Gospel turnarounds: F - A7 - Dm - G7 - C7 - F.','Vibrato on held notes for soul.','Quote Amazing Grace in the last chorus.']
+      }),
+      mkProg({id:'canaan-land', t:'(On My Way To) Canaan Land', cp:'Denise Gordon arr.', k:'Cm', bpm:100, sec:'active',
+        m:['Cm','Cm','Fm','Cm','Cm','G7','Cm','Cm'],
+        tb:['Gospel in C minor. Dark but hopeful.','C harmonic minor (C D Eb F G Ab B) is the main color.','Play like you\'re praying and dancing at once.'],
+        ti:['On G7 (bar 6), use the C harmonic minor for the B natural.','Target Eb (3rd) and G (5th) of Cm for grounding.','Let the phrases breathe — this is spiritual music.'],
+        ta:['Bebop minor over Cm: C D Eb F G Ab B — 8 notes.','Quote Amazing Grace or Just a Closer Walk — gospel family.','Build from whisper to shout over 3 choruses.']
+      }),
+      mkProg({id:'danza-del-guerrero', t:'Danza del Guerrero', cp:'Rim Bam Bum', k:'C', bpm:115, sec:'active',
+        m:['C','C','F','C','G7','F','C','C'],
+        tb:['Latin/NOLA fusion in C major.','C major scale + C blues for flavor.','Think Cuban timba meets second line.'],
+        ti:['Clave-based phrasing — 3-2 or 2-3.','Montuno-inspired repeated figures.','Target the 3rd of each chord for brightness.'],
+        ta:['Mixed scales: C lydian for a floating feel.','Polyrhythmic 3 against 2 patterns.','Listen to Rim Bam Bum for the groove.']
+      }),
+      mkProg({id:'dumpster-bump', t:'Dumpster Bump', cp:'Good Trouble', k:'Bbm', bpm:105, sec:'active',
+        m:['Bbm7','Bbm7','Ebm7','Ebm7','Bbm7','F7','Bbm7','Bbm7'],
+        tb:['Minor funk groove in Bb minor.','Bb minor pentatonic (Bb Db Eb F Ab) is home.','Gritty and rhythmic — not pretty.'],
+        ti:['F7 (V7) is the tension — use Gb (b9) and C# (b13).','Ghost notes and percussive attacks.','Repeat 2-bar riffs to lock the groove.'],
+        ta:['Bb harmonic minor over F7 for the B natural.','Chromatic walks from Bbm down to Ebm.','Octave jumps on the "and of 4" for pop.']
+      }),
+      mkProg({id:'love-of-money', t:'For the Love of Money', cp:'O\'Jay\'s', k:'Bbm', bpm:90, sec:'active',
+        m:['Bbm7','Bbm7','Bbm7','Bbm7','Ebm7','Ebm7','Bbm7','F7'],
+        tb:['Classic soul-funk in Bb minor. That iconic bass line.','Bb dorian (Bb C Db Eb F G Ab) is key.','The "money, money, money" chant — respect the melody.'],
+        ti:['Wah-wah-style phrasing with ghost notes.','F7 brings it home — lean into Ab (b3 of F alt).','Stay in the pocket — don\'t overplay.'],
+        ta:['Bb dorian + blue note (E natural) for outside color.','Build over 3 choruses — start sparse, end screaming.','Listen to the original for the horn arrangement.']
+      }),
+      mkProg({id:'grazin-in-the-grass', t:'Grazin\' in the Grass', cp:'Hugh Masekela', k:'F', bpm:110, sec:'active',
+        m:['F','Eb','F','Eb','F','Eb','F','F'],
+        tb:['Hugh Masekela\'s 1968 hit. Simple I-bVII vamp in F.','F mixolydian (F G A Bb C D Eb) fits the dominant sound.','Funky, joyful, repetitive.'],
+        ti:['Eb is the bVII — gives a modal, open quality.','Target F (root) and A (3rd) for the bright melody.','Pentatonic riffs work great here.'],
+        ta:['Blue notes (Ab and B natural) for grit.','Trumpet-style octave calls.','Listen to Masekela\'s trumpet solos for the language.']
+      }),
+      mkProg({id:'gross', t:'Gross', cp:'Balkan Beat Box', k:'Bbm', bpm:130, sec:'active',
+        m:['Bbm','Bbm','Ebm','Bbm','Bbm','F7','Bbm','Bbm'],
+        tb:['Balkan-NOLA fusion. Modal minor with Eastern European flavor.','Bb Phrygian dominant (Bb B D Eb F Gb Ab) is the Balkan color.','Drone-based — pedal on Bb.'],
+        ti:['The major 3rd (D) over Bb gives the Phrygian dominant sound.','F7 → Bbm resolution — classic Balkan cadence.','Rapid ornaments and trills add authenticity.'],
+        ta:['Odd-meter feels — try 9/8 phrases across the 4/4.','Microtonal bends toward A/B natural.','Listen to Balkan Beat Box and Goran Bregović.']
+      }),
+      mkProg({id:'groovulation', t:'Groovulation', cp:'YoungBloods Brass Band', k:'Bb', bpm:100, sec:'active',
+        m:['Bb7','Bb7','Eb7','Eb7','Bb7','F7','Bb7','Bb7'],
+        tb:['YoungBloods groove in Bb. Straight-ahead second line.','Bb blues scale + Bb major pentatonic both work.','Lock with the sousaphone root notes.'],
+        ti:['Target 3rd and b7 on strong beats.','Second line snare groove — play on top of the beat.','Repeat 1-bar rhythmic figures for hypnotic effect.'],
+        ta:['Chromatic walk-downs from Bb into F7.','Octave displacement — hook in low register, answer high.','Listen to YoungBloods for the horn arrangement.']
+      }),
+      mkProg({id:'hurricane-season', t:'Hurricane Season', cp:'Trombone Shorty', k:'Gm', bpm:95, sec:'active',
+        m:['Gm7','Gm7','Cm7','Cm7','Gm7','Gm7','D7','Gm7'],
+        tb:['Trombone Shorty\'s minor-key hit. Heavy groove.','Gm pentatonic + Gm blues scale.','Trombone-forward — think bends and smears.'],
+        ti:['Over D7, use Eb (b9) and Bb (b13) for altered sound.','Heavy vibrato on long tones — Shorty-style.','Play loud — this is power music.'],
+        ta:['Hemiola: 3-against-4 rhythmic figures.','Diminished runs from D7 resolving to Gm.','Watch Shorty Live for the phrasing and energy.']
+      }),
+      mkProg({id:'la-misma-cancion', t:'La Misma Cancion', cp:'Traditional Latin', k:'C', bpm:115, sec:'active',
+        m:['C','C','G7','G7','C','C','G7','C'],
+        tb:['Latin standard in C. Simple I-V changes.','C major scale + C major pentatonic.','Think salsa or cumbia feel.'],
+        ti:['Guide tones on G7: B (3rd) and F (b7).','Clave-based rhythmic phrasing.','Target arpeggio notes on strong beats.'],
+        ta:['Add b9 (Ab) over G7 for Latin jazz color.','Mix major and Mixolydian scales freely.','Listen to Cuban montuno for rhythmic vocabulary.']
+      }),
+      mkProg({id:'lovely-day', t:'Lovely Day', cp:'Bill Withers / Soul Rebels', k:'Eb', bpm:105, sec:'active',
+        m:['Eb','Eb','Ab','Ab','Eb','Bb7','Eb','Eb'],
+        tb:['Bill Withers classic, brass-banded by Soul Rebels.','Eb major scale is the primary color.','Joyful, uplifting — play with smile.'],
+        ti:['Add 6th (C) and major 7th (D) over Eb for sweet pop sound.','Ab major section (bar 3-4) — lift the energy.','Soul Rebels-style horn section stabs.'],
+        ta:['That held high note — vibrato and bend up slightly.','Gospel turnarounds in the last chorus.','Listen to Soul Rebels\' version for the arrangement.']
+      }),
+      mkProg({id:'mardi-gras', t:'Mardi Gras', cp:'Traditional NOLA', k:'Bb', bpm:110, sec:'active',
+        m:['Bb','Bb','F7','Bb','Bb','Bb7','Eb','Eb','Bb','F7','Bb','Bb'],
+        tb:['NOLA Mardi Gras parade tune in Bb. Traditional form.','Bb major scale with occasional blue notes.','Play festive — it\'s carnival time.'],
+        ti:['The Bb7 (bar 6) sets up the IV (Eb). Blue 3rd (Db) works here.','Traditional parade phrasing — short, punchy, repeated figures.','Trade lead with the section.'],
+        ta:['Quote "Mardi Gras Mambo" or "Iko Iko" riffs.','Build to a shout chorus in high register.','Listen to Professor Longhair and Wild Tchoupitoulas.']
+      }),
+      mkProg({id:'mercy-mercy-mercy', t:'Mercy, Mercy, Mercy', cp:'Joe Zawinul / Cannonball Adderley', k:'Bb', bpm:100, sec:'active',
+        m:['Bb7','Ab7','Bb7','Ab7','Bb7','Ab7','Bb7','F7','Bb7','Ab7','Bb7','Ab7','Eb7','F7','Bb7','F7'],
+        tb:['Cannonball Adderley hit. Gospel-jazz crossover.','Bb7 → Ab7 is the classic "soul" move.','Bb blues scale covers most of it.'],
+        ti:['Target Ab (b7 of Bb7) and Gb (b7 of Ab7) for that soul sound.','Sanctified gospel phrasing with bends and slides.','Grace notes and blue inflections everywhere.'],
+        ta:['Zawinul\'s original voicings are the sound — listen.','Double-time bebop lines over the bridge for contrast.','Build slowly — start with melody, end with wailing.']
+      }),
+      mkProg({id:'planet-gibbous', t:'Planet Gibbous', cp:'Good Trouble', k:'Bbm', bpm:95, sec:'active',
+        m:['Bbm7','Bbm7','Ebm7','Ebm7','Bbm7','F7','Bbm7','Bbm7'],
+        tb:['Original minor-key vamp. Moody and modal.','Bb dorian scale for the main sound.','Play it dark and spacey.'],
+        ti:['Over F7 (V of Bbm), try the altered scale for tension.','Long phrases that weave through the changes.','Ghost notes and ambient textures.'],
+        ta:['Outside playing over Bbm — try Emaj7 arpeggio for tension.','Bitonal: Cmaj over Bbm for dissonance.','Modal interchange — borrow from Bb harmonic minor.']
+      }),
+      mkProg({id:'riverside', t:'Riverside', cp:'Good Trouble', k:'Bb', bpm:110, sec:'active',
+        m:['Bb7','Bb7','Eb7','Bb7','Bb7','F7','Bb7','Bb7'],
+        tb:['Original Bb blues-based tune. Straight-ahead second line.','Bb blues scale and major pentatonic.','Bounce second line feel.'],
+        ti:['Standard second line phrasing — short, rhythmic.','Call-and-response in 2-bar chunks.','Target the 3rd and b7 of each chord.'],
+        ta:['Chromatic lead-ins to target notes on strong beats.','Displaced rhythms — start on the "and of 4".','Building intensity over 3 choruses.']
+      }),
+      mkProg({id:'she-works-hard', t:'She Works Hard For the Money', cp:'Donna Summer', k:'Gm', bpm:115, sec:'active',
+        m:['Gm','Gm','Eb','Eb','Gm','Gm','D7','Gm'],
+        tb:['Disco classic in Gm. That iconic bass line.','Gm pentatonic + Gm natural minor.','Dancey but driving.'],
+        ti:['On D7, use Eb (b9) for tension.','Eb section (bar 3-4) is the major moment — lean into it.','Disco-style staccato phrasing.'],
+        ta:['Harmonic minor on D7 for the B-C# motion.','80s soprano sax-inspired runs (think Kenny G\'s better days).','High-energy double-time over the V7.']
+      }),
+      mkProg({id:'sidewinder', t:'Sidewinder', cp:'Lee Morgan (arr. Skatalites)', k:'Eb', bpm:130, sec:'active',
+        m:['Eb7','Eb7','Ab7','Ab7','Eb7','Eb7','Bb7','Ab7','Eb7','Bb7','Eb7','Eb7','Ab7','Bb7','Eb7','Eb7'],
+        tb:['Lee Morgan\'s hit, reggae-fied by Skatalites.','Eb blues scale + Eb mixolydian.','Boogaloo feel — play into the groove.'],
+        ti:['Target Ab (b7 of Bb7) for smooth voice leading.','Morgan\'s signature rhythmic cells — short and cool.','Horace Silver-style comping idea translates to horn lines.'],
+        ta:['Bebop dominant scales over each chord.','Morgan quote: 5-6-b7-1 figure is his calling card.','Listen to the Blue Note original AND the Skatalites cover.']
+      }),
+      mkProg({id:'sweet-dreams', t:'Sweet Dreams', cp:'Eurythmics / Soul Rebels', k:'Cm', bpm:105, sec:'active',
+        m:['Cm','Cm','Bb','Bb','Cm','Cm','Bb','Bb','Ab','Ab','G7','G7','Cm','Cm','Bb','Bb'],
+        tb:['80s synth-pop made brass band by Soul Rebels.','C natural minor scale (C D Eb F G Ab Bb).','Dark, anthemic, relentless.'],
+        ti:['On G7 (V of Cm), use B natural (3rd of G7) + Ab (b13).','The Bb is bVII — classic minor-mode move.','Sustained tones over the vamp feel epic.'],
+        ta:['Modal mixture — Cm melodic minor for brightness.','Soul Rebels octave jumps — signature move.','Build three choruses from whisper to scream.']
+      }),
+      mkProg({id:'thats-a-plenty', t:'That\'s A Plenty', cp:'Lew Pollack / Trad Dixieland', k:'Dm', bpm:140, sec:'active',
+        m:['Dm','Dm','A7','Dm','Gm','Gm','Dm','A7','Dm','Dm','A7','Dm','Gm','A7','Dm','Dm'],
+        tb:['Classic dixieland strut. Minor-key traditional jazz.','D harmonic minor (D E F G A Bb C#) over the changes.','Fast, joyful, collective improv tune.'],
+        ti:['C# (3rd of A7) is the leading tone into D.','Trade 2s or 4s — this tune is conversational.','Arpeggio-heavy old-school phrasing.'],
+        ta:['Diminished runs from A7 into Dm.','Double-time the last chorus before the out-head.','Classic Dixieland recordings — listen to them all.']
+      }),
+      mkProg({id:'unclean-waters', t:'Unclean Waters', cp:'Good Trouble', k:'Dm', bpm:95, sec:'active',
+        m:['Dm7','Dm7','Gm7','Gm7','Dm7','A7','Dm7','Dm7'],
+        tb:['Original Dm groove. Modal and murky.','D dorian (D E F G A B C) is the primary mode.','Long phrases that breathe.'],
+        ti:['The A7 provides the harmonic minor moment — C# leading tone.','Modal playing — don\'t chase every chord, live in the mode.','Space and texture over flashy notes.'],
+        ta:['D phrygian dominant (D Eb F# G A Bb C) for Eastern color.','Outside playing — try Ebmaj7 arpeggio over Dm.','Pedal point improvisations on D.']
+      }),
+      mkProg({id:'which-side', t:'Which Side Are You On', cp:'Florence Reece', k:'Dm', bpm:105, sec:'active',
+        m:['Dm','Dm','Dm','A7','Dm','Dm','Gm','A7','Dm','Dm','Dm','A7','Dm','Gm','A7','Dm'],
+        tb:['Union anthem. Play with conviction and gravitas.','D natural minor scale — mournful and resolute.','Folk-protest phrasing — singable, simple.'],
+        ti:['The A7 (V) brings the tension — resolve strong to D.','Long tones with vibrato — this is a declaration.','Call-and-response with the imagined crowd.'],
+        ta:['Harmonic minor on the A7 for the C#.','Gradual build — start solemn, end defiant.','Listen to Pete Seeger and Natalie Merchant versions.']
+      }),
+      mkProg({id:'yo-no-se', t:'Yo No Se', cp:'Rob Espino Y Sus Amigos De Nueva Orleans', k:'F', bpm:105, sec:'active',
+        m:['F','F','Bb','Bb','F','C7','F','F'],
+        tb:['Latin-NOLA fusion in F.','F major scale + F mixolydian.','Clave feel with second line influence.'],
+        ti:['Target chord tones on clave hits (1, 2+, 4).','Cuban-style repeated rhythmic cells.','Guide tones on C7: E (3rd) and Bb (b7).'],
+        ta:['Mixolydian b2 (F Gb A Bb C D Eb) for exotic flavor.','Polyrhythms — 3 against 4 figures.','Listen to Rob Espino\'s band for the aesthetic.']
+      }),
 
-      'its-later': {
-        id: 'its-later',
-        title: 'It\'s Later Than You Think',
-        composer: 'Carr/Magidson',
-        key: 'Bb',
-        timeSignature: '4/4',
-        defaultTempo: 120,
-        tempoRange: [90, 160],
-        measures: [
-          { chord: 'Bb7', beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['C/4'],duration:'2'},{keys:['Bb/3'],duration:'2'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['F/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['C/4'],duration:'2'},{keys:['A/3'],duration:'2'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['A/3'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'4'}] },
-          { chord: 'F7',  beats: 4, melody: [{keys:['Eb/4'],duration:'2'},{keys:['C/4'],duration:'2'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['D/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['F/4'],duration:'4'}] },
-          { chord: 'Bb7', beats: 4, melody: [{keys:['Bb/3'],duration:'w'}] }
-        ],
-        layout: { measuresPerLine: 4, clef: 'bass' },
-        audio: {
-          type: 'synth',
-          voicings: {
-            'Bb7': ['Bb3', 'D4', 'F4', 'Ab4'],
-            'F7':  ['A3', 'C4', 'Eb4', 'F4']
-          },
-          bassNotes: {
-            'Bb7': ['Bb2', 'D3', 'F3', 'D3'],
-            'F7':  ['F2', 'A2', 'C3', 'A2']
-          }
-        },
-        tips: {
-          beginner: [
-            '"Enjoy Yourself (It\'s Later Than You Think)" — brass band swing standard.',
-            'Simple I-V changes in Bb. Bb major scale works throughout.',
-            'Play the melody first — it\'s singable and tells you the story.',
-            'The tune is philosophical but happy. Keep the feel light and bouncy.',
-            'Swing the eighth notes — this is NOLA second line meets early swing.'
-          ],
-          intermediate: [
-            'Second line groove works, but so does medium swing. Try both feels.',
-            'Guide tones on F7: A (3rd) and Eb (b7) — pivot between them.',
-            'Add chromatic approach notes to target chord tones on strong beats.',
-            'Trade 4s with another horn — this tune loves conversational phrasing.',
-            'Listen to Preservation Hall\'s version for the traditional brass band take.'
-          ],
-          advanced: [
-            'The form repeats — build three choruses: melody, paraphrase, double-time.',
-            'Bb bebop dominant (Bb C D Eb F G Ab A) adds chromatic motion over everything.',
-            'On the ii-V into Bb, try a Cm7-F7 bebop line approaching the 3rd of Bb.',
-            'Quote "Let the Good Times Roll" or other NOLA party tunes for wink-wink moments.',
-            'For the final chorus, high-register octave-up melody with section playing harmony.'
-          ]
-        }
-      },
+      // ---------- DEVELOPING ----------
+      mkProg({id:'atchafalaya', t:'Atchafalaya', cp:'Snarky Puppy', k:'Bb', bpm:100, sec:'developing',
+        m:['Bb','Bb','Eb','Eb','Bb','F7','Bb','Bb'],
+        tb:['Snarky Puppy groove in Bb.','Bb major scale + Bb mixolydian.','Modern jazz-fusion feel.']
+      }),
+      mkProg({id:'caranito', t:'Carañito', cp:'Traditional Latin', k:'Dm', bpm:115, sec:'developing',
+        m:['Dm','Dm','Gm','A7','Dm','Dm','A7','Dm'],
+        tb:['Latin/flamenco-influenced tune in Dm.','D harmonic minor scale is the main color.','Clave-based phrasing.']
+      }),
+      mkProg({id:'im-the-president', t:'I\'m the President', cp:'Knower', k:'Bbm', bpm:105, sec:'developing',
+        m:['Bbm7','Bbm7','Ebm7','Ebm7','Bbm7','F7','Bbm7','Bbm7'],
+        tb:['Knower-style minor funk.','Bb dorian scale.','Angular rhythmic phrasing.']
+      }),
+
+      // ---------- DUSTY LIST ----------
+      mkProg({id:'1612', t:'1612', cp:'Vulfpeck / Groove Catchers', k:'C', bpm:110, sec:'dusty',
+        m:['C','C','F','F','C','G7','C','C'],
+        tb:['Vulfpeck groove in C.','C mixolydian for the funk sound.','Clean, pocket-focused phrasing.']
+      }),
+      mkProg({id:'blue-monk', t:'Blue Monk', cp:'Thelonious Monk', k:'Bb', bpm:100, sec:'dusty',
+        m:['Bb7','Bb7','Bb7','Bb7','Eb7','Eb7','Bb7','Bb7','F7','Eb7','Bb7','F7'],
+        tb:['Monk\'s classic 12-bar blues.','Bb blues scale + Monk-style angularity.','Play "wrong" notes on purpose — Monk-style.'],
+        ti:['Monk\'s whole-tone phrases over the V7 (F7).','Target the b5 (E) and flat 9 for Monk flavor.','Space and silence are as important as notes.'],
+        ta:['Listen to Monk\'s original for the phrasing vocabulary.','Use Monk\'s characteristic minor 2nd clusters.','Don\'t swing it too hard — Monk plays on top of the beat.']
+      }),
+      mkProg({id:'cayuco', t:'Cayuco', cp:'Grupo Fantasma', k:'Bb', bpm:115, sec:'dusty',
+        m:['Bb7','Bb7','Eb7','Eb7','Bb7','F7','Bb7','Bb7'],
+        tb:['Latin funk from Grupo Fantasma in Bb.','Bb mixolydian + blues notes.','Clave-driven phrasing.']
+      }),
+      mkProg({id:'holiday', t:'Holiday', cp:'Green Day', k:'Fm', bpm:125, sec:'dusty',
+        m:['Fm','Fm','Db','Db','Bbm','Ab','Eb','Eb'],
+        tb:['Green Day punk anthem in Fm.','F natural minor + F minor pentatonic.','Aggressive, driving phrasing.']
+      }),
+      mkProg({id:'odessa-bulgar', t:'Odessa Bulgar', cp:'Traditional Klezmer', k:'Gm', bpm:130, sec:'dusty',
+        m:['Gm','Gm','D7','Gm','Gm','D7','Gm','Gm'],
+        tb:['Klezmer dance tune in Gm.','G Phrygian dominant (G Ab B C D Eb F) for Jewish color.','Ornamentation and trills are essential.']
+      }),
+      mkProg({id:'xonk', t:'Xonk', cp:'Hoot Band', k:'Fm', bpm:110, sec:'dusty',
+        m:['Fm7','Fm7','Bbm7','Bbm7','Fm7','C7','Fm7','Fm7'],
+        tb:['Hoot Band groove in Fm.','F dorian mode.','Funk-fusion phrasing.']
+      }),
+
+      // ---------- VAULT ----------
+      mkProg({id:'amazing-grace', t:'Amazing Grace', cp:'John Newton / Traditional', k:'G', bpm:70, sec:'vault',
+        m:['G','G','C','G','G','D7','G','G','G','G','C','G','Em','D7','G','G'],
+        tb:['The world\'s most beloved hymn. Play it with reverence.','G major pentatonic is enough for a lifetime.','Slow, dignified, singable.']
+      }),
+      mkProg({id:'bella-ciao', t:'Bella Ciao', cp:'Traditional Italian', k:'Gm', bpm:105, sec:'vault',
+        m:['Gm','Gm','D7','D7','Gm','Gm','D7','Gm','Gm','Gm','Cm','Gm','D7','Gm','D7','Gm'],
+        tb:['Italian partisan song. Resistance music.','G harmonic minor scale.','Play defiant and rhythmic.']
+      }),
+      mkProg({id:'beds-burning', t:'Beds Are Burning', cp:'Midnight Oil', k:'Eb', bpm:130, sec:'vault',
+        m:['Eb','Eb','Ab','Ab','Eb','Bb7','Eb','Eb'],
+        tb:['Midnight Oil protest rock in Eb.','Eb major scale.','Anthemic, driving phrasing.']
+      }),
+      mkProg({id:'buck', t:'Buck', cp:'Traditional', k:'C', bpm:115, sec:'vault',
+        m:['C','C','F','C','G7','F','C','C'],
+        tb:['Traditional tune in C.','C major pentatonic.','Simple, joyful phrasing.']
+      }),
+      mkProg({id:'bubamara', t:'Bubamara', cp:'Traditional Balkan', k:'Bb', bpm:140, sec:'vault',
+        m:['Bb','Bb','Eb','Bb','Bb','F7','Bb','Bb'],
+        tb:['Balkan wedding tune in Bb.','Bb phrygian dominant for Balkan flavor.','Ornaments and trills.']
+      }),
+      mkProg({id:'caravan', t:'Caravan', cp:'Duke Ellington / Juan Tizol', k:'Fm', bpm:130, sec:'vault',
+        m:['Fm','Fm','C7','C7','Fm','Fm','C7','Fm','Fm','Fm','C7','C7','Fm','Fm','C7','Fm'],
+        tb:['Duke Ellington exotica. Fm with desert vibes.','F phrygian dominant (F Gb A Bb C Db Eb).','Middle-Eastern inflected phrasing.']
+      }),
+      mkProg({id:'carnival-time', t:'Carnival Time', cp:'Al Johnson', k:'Eb', bpm:115, sec:'vault',
+        m:['Eb','Eb','Bb7','Eb','Eb','Eb','Bb7','Eb'],
+        tb:['NOLA Mardi Gras classic.','Eb major pentatonic.','Parade bounce.']
+      }),
+      mkProg({id:'cissy-strut', t:'Cissy Strut', cp:'The Meters', k:'C', bpm:95, sec:'vault',
+        m:['Cm7','Cm7','Fm7','Cm7','Cm7','Fm7','G7','Cm7'],
+        tb:['The Meters NOLA funk classic. Minor groove in Cm.','C dorian mode is the sound.','Super-pocket funk phrasing.'],
+        ti:['Ghost notes are as important as the pitched notes.','Target C (root) and Eb (b3) on downbeats.','Leave tons of space — the groove speaks.']
+      }),
+      mkProg({id:'dance-to-the-music', t:'Dance to the Music', cp:'Sly & the Family Stone', k:'Ab', bpm:125, sec:'vault',
+        m:['Ab7','Ab7','Db7','Ab7','Ab7','Eb7','Ab7','Ab7'],
+        tb:['Sly Stone funk-soul anthem.','Ab mixolydian.','Bright, driving funk.']
+      }),
+      mkProg({id:'didnt-he-ramble', t:'Didn\'t He Ramble', cp:'Louis Armstrong', k:'Bb', bpm:125, sec:'vault',
+        m:['Bb','Bb','F7','Bb','Bb','Bb7','Eb','Eb','Bb','F7','Bb','Bb'],
+        tb:['NOLA funeral tradition. Dirge to celebration.','Bb major + blues inflections.','Start slow, build to celebration.']
+      }),
+      mkProg({id:'eyes-on-the-prize', t:'Eyes On The Prize / Give Peace A Chance', cp:'A. Wine / J. Lennon', k:'Bb', bpm:100, sec:'vault',
+        m:['Bb','Bb','Eb','Eb','Bb','F7','Bb','Bb'],
+        tb:['Civil rights anthem meets Lennon peace song.','Bb major pentatonic.','Sing-along, protest phrasing.']
+      }),
+      mkProg({id:'fortunes-favor', t:'Fortune\'s Favor', cp:'Good Trouble', k:'Bb', bpm:110, sec:'vault',
+        m:['Bb7','Bb7','Eb7','Bb7','Bb7','F7','Bb7','Bb7'],
+        tb:['Bb second line groove.','Bb blues scale.','Classic NOLA phrasing.']
+      }),
+      mkProg({id:'funeral-march', t:'Funeral March', cp:'Traditional NOLA', k:'Fm', bpm:60, sec:'vault',
+        m:['Fm','Fm','Bbm','Fm','Fm','C7','Fm','Fm'],
+        tb:['Traditional NOLA funeral dirge. Play slow and somber.','F natural minor scale.','Long tones, vibrato, gravitas.']
+      }),
+      mkProg({id:'happy', t:'Happy', cp:'Pharrell Williams', k:'Fm', bpm:160, sec:'vault',
+        m:['Fm','Ab','Cm','Bb','Fm','Ab','Cm','Bb'],
+        tb:['Pharrell\'s mega-hit. Minor-key but joyful.','F dorian with major lift.','Bright, bouncy, clap-along phrasing.']
+      }),
+      mkProg({id:'happy-birthday', t:'Happy Birthday', cp:'Mildred Hill', k:'C', bpm:100, sec:'vault',
+        m:['C','C','G7','C','C','F','C','G7','C','C'],
+        tb:['The universal birthday song. Everyone knows it.','C major scale — super simple.','Clear, singable phrasing.']
+      }),
+      mkProg({id:'hot-headed-hootenanny', t:'Hot Headed Hootenanny', cp:'K. Field', k:'F', bpm:130, sec:'vault',
+        m:['F','F','Bb','F','F','C7','F','F'],
+        tb:['Uptempo NOLA dance tune in F.','F major + F mixolydian.','Fast, loose, celebratory.']
+      }),
+      mkProg({id:'ice-cream', t:'Ice Cream', cp:'Howard Johnson / Traditional', k:'Bb', bpm:115, sec:'vault',
+        m:['Bb','Bb','F7','F7','F7','F7','Bb','Bb','Bb','Bb','F7','F7','F7','F7','Bb','Bb'],
+        tb:['Classic hot jazz standard.','Bb major scale.','Bouncy dixieland phrasing.']
+      }),
+      mkProg({id:'just-another-soldier', t:'I\'m Just Another Soldier', cp:'Staple Singers', k:'Eb', bpm:100, sec:'vault',
+        m:['Eb','Eb','Ab','Eb','Eb','Bb7','Eb','Eb'],
+        tb:['Staple Singers gospel-soul.','Eb major pentatonic.','Hand-clap, gospel phrasing.']
+      }),
+      mkProg({id:'its-all-over-now', t:'It\'s All Over Now', cp:'The Rolling Stones / Valentinos', k:'Bb', bpm:115, sec:'vault',
+        m:['Bb','Bb','Eb','Bb','Bb','F7','Bb','Bb'],
+        tb:['Stones rock-R&B tune in Bb.','Bb mixolydian.','Country-rock meets NOLA.']
+      }),
+      mkProg({id:'just-a-little-while', t:'Just A Little While', cp:'Traditional Gospel', k:'Ab', bpm:95, sec:'vault',
+        m:['Ab','Ab','Db','Ab','Ab','Eb7','Ab','Ab'],
+        tb:['Gospel spiritual in Ab.','Ab major pentatonic.','Hopeful, sustained phrasing.']
+      }),
+      mkProg({id:'kid-ory-medley', t:'Kid Ory Medley', cp:'Kid Ory', k:'Bb', bpm:120, sec:'vault',
+        m:['Bb','Bb','F7','Bb','Bb','Bb7','Eb','Eb','Bb','F7','Bb','Bb'],
+        tb:['Classic NOLA trombonist\'s medley.','Bb major scale.','Tailgate trombone style.']
+      }),
+      mkProg({id:'lets-go-get-em', t:'Let\'s Go Get Em', cp:'Rebirth Brass Band', k:'Bb', bpm:100, sec:'vault',
+        m:['Bb7','Bb7','Eb7','Eb7','Bb7','F7','Bb7','Bb7'],
+        tb:['Rebirth second line groove.','Bb blues scale.','Classic Rebirth phrasing.']
+      }),
+      mkProg({id:'liza-jane', t:'Liza Jane', cp:'Traditional', k:'Bb', bpm:130, sec:'vault',
+        m:['Bb','Bb','F7','F7','Bb','F7','Bb','Bb'],
+        tb:['Traditional folk/blues tune.','Bb major pentatonic.','Spirited, fiddle-tune phrasing.']
+      }),
+      mkProg({id:'muskrat-ramble', t:'Muskrat Ramble', cp:'Kid Ory / Louis Armstrong', k:'Bb', bpm:135, sec:'vault',
+        m:['Bb','Bb','F7','F7','F7','F7','Bb','Bb','Bb','Bb7','Eb','Eb','Bb','F7','Bb','Bb'],
+        tb:['Classic NOLA dixieland standard.','Bb major + blues inflections.','Fast, joyful, collective improv.']
+      }),
+      mkProg({id:'never-grow-old', t:'Never Grow Old', cp:'James C. Moore (Aretha/Statler Bros.)', k:'D', bpm:80, sec:'vault',
+        m:['D','D','G','D','D','A7','D','D'],
+        tb:['Gospel classic in D. Aretha\'s version is definitive.','D major pentatonic.','Soaring, testimony-style phrasing.']
+      }),
+      mkProg({id:'nothing-but-truth', t:'Nothing But The Truth', cp:'Al Grey', k:'F', bpm:120, sec:'vault',
+        m:['F7','F7','Bb7','Bb7','F7','C7','F7','F7'],
+        tb:['Al Grey blues-jazz in F.','F blues scale.','Trombone-forward phrasing with plunger feel.']
+      }),
+      mkProg({id:'pick-up-the-pieces', t:'Pick Up the Pieces', cp:'Average White Band', k:'Eb', bpm:105, sec:'vault',
+        m:['Eb7','Eb7','Ab7','Ab7','Eb7','Bb7','Eb7','Eb7'],
+        tb:['AWB funk classic. Nail the unison line.','Eb mixolydian + blues notes.','Tight, locked-in section playing.']
+      }),
+      mkProg({id:'saint-james-infirmary', t:'Saint James Infirmary', cp:'Traditional / Armstrong', k:'Dm', bpm:85, sec:'vault',
+        m:['Dm','Dm','A7','A7','Dm','F','E7','A7','Dm','Dm','Gm','A7','Dm','Gm','A7','Dm'],
+        tb:['NOLA funeral blues. Louis Armstrong\'s iconic version.','D harmonic minor scale.','Slow, mournful, vocal-style phrasing.'],
+        ti:['On A7 (V7), use C# (3rd) as leading tone into Dm.','Long tones with heavy vibrato.','Bend notes up into target pitches.']
+      }),
+      mkProg({id:'second-line-wynton', t:'Second Line', cp:'Wynton Marsalis', k:'Bb', bpm:115, sec:'vault',
+        m:['Bb7','Bb7','Eb7','Bb7','Bb7','F7','Bb7','Bb7'],
+        tb:['Wynton\'s take on the NOLA second line.','Bb blues scale.','Traditional brass band phrasing.']
+      }),
+      mkProg({id:'new-second-line', t:'(New) Second Line', cp:'Paul Barbarin', k:'F', bpm:115, sec:'vault',
+        m:['F','F','C7','F','F','F7','Bb','Bb','F','C7','F','F'],
+        tb:['Paul Barbarin\'s parade classic.','F major scale.','Traditional parade bounce.']
+      }),
+      mkProg({id:'sixteen-tons', t:'Sixteen Tons / Rich Man\'s House', cp:'Merle Travis / Trad', k:'Dm', bpm:100, sec:'vault',
+        m:['Dm','Dm','Gm','Dm','Dm','A7','Dm','Dm'],
+        tb:['Coal miner\'s lament meets trad arrangement.','D natural minor.','Heavy, dragging phrasing.']
+      }),
+      mkProg({id:'skunk', t:'Skunk', cp:'Traditional', k:'G', bpm:110, sec:'vault',
+        m:['G','G','D7','G','G','C','D7','G'],
+        tb:['Traditional tune in G.','G major pentatonic.','Simple, singable phrasing.']
+      }),
+      mkProg({id:'song-for-my-father', t:'Song For My Father', cp:'Horace Silver', k:'Fm', bpm:100, sec:'vault',
+        m:['Fm7','Fm7','Eb7','Eb7','Fm7','Fm7','Eb7','Eb7','Fm7','Fm7','Ab7','Ab7','Gm7','C7','Fm7','C7'],
+        tb:['Horace Silver bossa-funk classic.','F dorian mode.','Bossa-style phrasing with jazz lines.']
+      }),
+      mkProg({id:'street-fighting-man', t:'Street Fighting Man', cp:'Rolling Stones', k:'C', bpm:130, sec:'vault',
+        m:['C','C','Bb','F','C','C','Bb','F'],
+        tb:['Stones protest-rock in C.','C mixolydian.','Driving rock phrasing.']
+      }),
+      mkProg({id:'sunny-side', t:'On The Sunny Side of the Street', cp:'Dorothy Fields / Jimmy McHugh', k:'C', bpm:120, sec:'vault',
+        m:['C','A7','Dm7','G7','C','A7','Dm7','G7','C','C7','F','F','C','G7','C','C'],
+        tb:['Jazz standard in C.','C major scale + chromatic passing tones.','Swing feel.']
+      }),
+      mkProg({id:'syeedas-song-flute', t:'Syeeda\'s Song Flute', cp:'John Coltrane', k:'Eb', bpm:140, sec:'vault',
+        m:['Eb','Eb','Fm7','Bb7','Eb','Eb','Fm7','Bb7'],
+        tb:['Coltrane\'s Giant Steps-era melody.','Eb major + Eb bebop.','Coltrane-style changes and phrasing.']
+      }),
+      mkProg({id:'thats-enough-stuff', t:'That\'s Enough of That Stuff', cp:'Traditional', k:'C', bpm:115, sec:'vault',
+        m:['C','C','G7','G7','C','C','G7','C'],
+        tb:['Traditional tune in C.','C major pentatonic.','Playful, jaunty phrasing.']
+      }),
+      mkProg({id:'this-little-light', t:'This Little Light of Mine', cp:'Harry Dixon Loes / Trad', k:'C', bpm:110, sec:'vault',
+        m:['C','C','F','C','C','G7','C','C'],
+        tb:['Gospel classic. Joyful and simple.','C major pentatonic.','Sing-along, radiant phrasing.']
+      }),
+      mkProg({id:'tiger-rag', t:'Tiger Rag', cp:'Original Dixieland Jazz Band', k:'Bb', bpm:180, sec:'vault',
+        m:['Bb','Bb','F7','Bb','Bb','Bb7','Eb','Eb','Bb','F7','Bb','Bb'],
+        tb:['Classic fast dixieland tune. Lightning tempo.','Bb major scale.','Virtuoso dixieland phrasing.']
+      }),
+      mkProg({id:'tootie-ma', t:'Tootie Ma', cp:'Tom Waits / Danny Barker', k:'F', bpm:105, sec:'vault',
+        m:['F','F','C7','F','F','Bb','F','F'],
+        tb:['NOLA-style tune with Tom Waits grit.','F major + blues notes.','Raspy, characterful phrasing.']
+      }),
+      mkProg({id:'treme-second-line', t:'Tremé Second Line', cp:'Kermit Ruffins', k:'F', bpm:115, sec:'vault',
+        m:['F','F','Bb','F','F','C7','F','F'],
+        tb:['Kermit\'s tribute to Tremé neighborhood.','F major scale.','Traditional second line phrasing.']
+      }),
+      mkProg({id:'war', t:'War', cp:'Edwin Starr', k:'D', bpm:105, sec:'vault',
+        m:['D','D','C','C','D','D','C','C'],
+        tb:['Edwin Starr protest funk in D.','D mixolydian.','Aggressive horn stabs.']
+      }),
+      mkProg({id:'water-no-enemy', t:'Water No Get Enemy', cp:'Fela Kuti', k:'F', bpm:110, sec:'vault',
+        m:['F7','F7','F7','F7','F7','F7','F7','F7'],
+        tb:['Fela Kuti afrobeat masterpiece. One-chord modal jam.','F mixolydian.','Hypnotic, rhythmic phrasing — African call-and-response.']
+      }),
+      mkProg({id:'water-fountain', t:'Water Fountain', cp:'tUnE-yArDs', k:'Dm', bpm:130, sec:'vault',
+        m:['Dm','Dm','G','Dm','Dm','G','Dm','Dm'],
+        tb:['Art-pop groove in Dm.','D dorian mode.','Bouncy, percussive phrasing.']
+      }),
+      mkProg({id:'watermelon-man', t:'Watermelon Man', cp:'Herbie Hancock', k:'F', bpm:115, sec:'vault',
+        m:['F7','F7','F7','F7','Bb7','Bb7','F7','F7','C7','Bb7','F7','F7'],
+        tb:['Herbie Hancock\'s 1962 hit. Blues with a twist.','F blues scale + F mixolydian.','Boogaloo/blues feel.']
+      }),
+      mkProg({id:'we-will-rock-you', t:'We Will Rock You', cp:'Queen', k:'Ab', bpm:80, sec:'vault',
+        m:['Ab','Ab','Ab','Ab'],
+        tb:['Queen stadium anthem. Stomp-stomp-clap.','Ab major scale.','Block-chord vocal phrasing.']
+      })
+    ].forEach(p => { PROGRESSIONS[p.id] = p; });
+
+    // ======================================================================
+    // LEGACY PROGRESSIONS — kept for backwards compat. Rebuilt below.
+    // ======================================================================
+
+    Object.assign(PROGRESSIONS, {
+
 
       // ====================================================================
       // PRACTICE FUNDAMENTALS — generic progressions, de-prioritized.
@@ -2211,7 +2469,15 @@
           ]
         }
       }
-    };
+    });
+
+    // Tag legacy progressions with bookSection so the dropdown can group them.
+    ['bb-blues', 'f-blues', 'eb-blues', 'c-minor-blues', 'ii-v-i-bb'].forEach(id => {
+      if (PROGRESSIONS[id]) PROGRESSIONS[id].bookSection = 'fundamentals';
+    });
+    ['nola-second-line', 'nola-funk', 'nola-traditional'].forEach(id => {
+      if (PROGRESSIONS[id]) PROGRESSIONS[id].bookSection = 'grooves';
+    });
 
     // =========================================================================
     // LICK LIBRARY — Graduated Curriculum
@@ -4958,7 +5224,48 @@
     // INIT
     // =========================================================================
 
+    // Populate the progression dropdown dynamically from PROGRESSIONS,
+    // grouped by bookSection (core, active, developing, dusty, vault,
+    // grooves, fundamentals).
+    function populateProgressionSelect() {
+      const SECTION_ORDER = [
+        ['core',         '🎺 Core Standards'],
+        ['active',       '🎵 Active Repertoire'],
+        ['developing',   '🔨 Developing'],
+        ['dusty',        '🎷 Dusty List'],
+        ['vault',        '🏛️ Vault'],
+        ['grooves',      '🪗 NOLA Grooves'],
+        ['fundamentals', '📚 Practice Fundamentals']
+      ];
+      const byCat = {};
+      Object.values(PROGRESSIONS).forEach(p => {
+        const cat = p.bookSection || 'fundamentals';
+        (byCat[cat] = byCat[cat] || []).push(p);
+      });
+      // Sort within each category alphabetically
+      Object.values(byCat).forEach(arr => arr.sort((a,b) => a.title.localeCompare(b.title)));
+
+      const select = document.getElementById('progressionSelect');
+      select.innerHTML = '';
+      SECTION_ORDER.forEach(([key, label]) => {
+        const progs = byCat[key];
+        if (!progs || !progs.length) return;
+        const og = document.createElement('optgroup');
+        og.label = label;
+        progs.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          const keyBadge = p.key ? ` [${p.key}]` : '';
+          opt.textContent = p.title + keyBadge;
+          og.appendChild(opt);
+        });
+        select.appendChild(og);
+      });
+    }
+
     function init() {
+      // Build the progression dropdown from data
+      populateProgressionSelect();
       // Sync UI to currentMode (default: licks)
       document.querySelectorAll('.mode-btn').forEach(b => {
         b.classList.toggle('active', b.dataset.mode === currentMode);

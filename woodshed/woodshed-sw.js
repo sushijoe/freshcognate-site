@@ -1,7 +1,6 @@
-const CACHE_NAME = 'woodshed-v3';
+const CACHE_NAME = 'woodshed-v4-repertoire';
 const ASSETS = [
-  './',
-  './index.html',
+  './woodshed.html',
   './woodshed-manifest.json',
   './woodshed-icon-192.svg',
   './woodshed-icon-512.svg',
