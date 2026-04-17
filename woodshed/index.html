@@ -1706,24 +1706,27 @@
       // 16-bar form with a signature chromatic passage: Bbm → Eb → Gb7 → Bb
       // (iv-minor plagal + bVII7 passing chord). Form: Solo tbn, Low brass
       // soli, Head x 2, Sing/Solos, Head, Mama, Head.
+      // Melody extracted from band's 9/11/24 MusicXML source — trumpet part
+      // transposed to concert Bb. Chord progression matches: Bb-F7 turnarounds
+      // with the chromatic Bbm → Eb → Gb7 passage in bars 11-13.
       mkProg({id:'saints', t:'Saints Go Marching In / Mama Don\'t Allow', cp:'Traditional', k:'Bb', bpm:200, sec:'core',
         m:[
-          {c:'Bb',  ml:[{keys:['d/4'],duration:'2r'},{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'}]},
-          {c:'Bb',  ml:[{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'2'},{keys:['d/4'],duration:'4r'}]},
-          {c:'Bb',  ml:[{keys:['d/4'],duration:'4r'},{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'}]},
-          {c:'Bb',  ml:[{keys:['Bb/4'],duration:'2'},{keys:['d/4'],duration:'2r'}]},
-          {c:'Bb',  ml:[{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
-          {c:'F7',  ml:[{keys:['Bb/4'],duration:'2'},{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'4'}]},
-          {c:'Bb',  ml:[{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['A/3'],duration:'4'}]},
-          {c:'Bb',  ml:[{keys:['Bb/3'],duration:'2'},{keys:['d/4'],duration:'2r'}]},
-          {c:'Bb',  ml:[{keys:['G/3'],duration:'4'},{keys:['G/3'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['Eb/4'],duration:'4'}]},
-          {c:'Bbm', ml:[{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['d/4'],duration:'2r'}]},
-          {c:'Eb',  ml:[{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['d/4'],duration:'4r'}]},
-          {c:'Gb7', ml:[{keys:['Gb/3'],duration:'w'}]},
-          {c:'Bb',  ml:[{keys:['Bb/3'],duration:'w'}]},
-          {c:'F7',  ml:[{keys:['F/3'],duration:'2'},{keys:['C/4'],duration:'2'}]},
-          {c:'Bb',  ml:[{keys:['Bb/3'],duration:'w'}]},
-          {c:'Bb',  ml:[{keys:['Bb/3'],duration:'w'}]}
+          {c:'Bb',  ml:[{keys:['d/4'],duration:'8r'},{keys:['Bb/4'],duration:'8'},{keys:['Bb/4'],duration:'4'},{keys:['D/5'],duration:'4'},{keys:['Eb/5'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['F/5'],duration:'w'}]},
+          {c:'Bb',  ml:[{keys:['d/4'],duration:'8r'},{keys:['Bb/4'],duration:'8'},{keys:['Bb/4'],duration:'4'},{keys:['D/5'],duration:'4'},{keys:['Eb/5'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['F/5'],duration:'w'}]},
+          {c:'Bb',  ml:[{keys:['d/4'],duration:'8r'},{keys:['Bb/4'],duration:'8'},{keys:['Bb/4'],duration:'4'},{keys:['D/5'],duration:'4'},{keys:['Eb/5'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['F/5'],duration:'2'},{keys:['D/5'],duration:'2'}]},
+          {c:'Bb',  ml:[{keys:['Bb/4'],duration:'2'},{keys:['D/5'],duration:'2'}]},
+          {c:'F7',  ml:[{keys:['C/5'],duration:'w'}]},
+          {c:'Bb',  ml:[{keys:['d/4'],duration:'4r'},{keys:['D/5'],duration:'4'},{keys:['D/5'],duration:'4'},{keys:['C/5'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['Bb/4'],duration:'2'},{keys:['Bb/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
+          {c:'Bbm', ml:[{keys:['D/5'],duration:'2'},{keys:['F/5'],duration:'4'},{keys:['F/5'],duration:'4'}]},
+          {c:'Eb',  ml:[{keys:['F/5'],duration:'4'},{keys:['Eb/5'],duration:'2'},{keys:['Eb/5'],duration:'4'}]},
+          {c:'Gb7', ml:[{keys:['d/4'],duration:'8r'},{keys:['D/5'],duration:'8'},{keys:['D/5'],duration:'4'},{keys:['D/5'],duration:'4'},{keys:['Eb/5'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['F/5'],duration:'2'},{keys:['D/5'],duration:'2'}]},
+          {c:'F7',  ml:[{keys:['Bb/4'],duration:'2'},{keys:['C/5'],duration:'2'}]},
+          {c:'Bb',  ml:[{keys:['Bb/4'],duration:'w'}]}
         ],
         tb:['The most iconic NOLA tune. ♩=200 up-tempo parade feel.','Mostly Bb major — only F7 on the turnaround. Hymn changes.','Form segues into "Mama Don\'t Allow" on the 2nd head.'],
         ti:['The chromatic Bbm → Eb → Gb7 → Bb passage (bars 10-13) is the hook — lean into it.','Bb major pentatonic sounds pure and hymn-like.','Tailgate trombone: glide smears into target notes.'],
