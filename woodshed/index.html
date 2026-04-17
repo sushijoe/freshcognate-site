@@ -1547,6 +1547,7 @@
       'Ab7':  ['Gb3', 'Ab3', 'C4', 'Eb4'],
       'Db7':  ['Db3', 'F3', 'Ab3', 'B3'],
       'F#7':  ['F#3', 'A#3', 'C#4', 'E4'],
+      'Gb7':  ['Gb3', 'Bb3', 'Db4', 'Fb4'],
       // Major 7ths
       'BbMaj7': ['A3', 'Bb3', 'D4', 'F4'],
       'EbMaj7': ['D3', 'Eb3', 'G3', 'Bb3'],
@@ -1597,6 +1598,7 @@
       'Ab7':  ['Ab2', 'C3', 'Eb3', 'C3'],
       'Db7':  ['Db2', 'F2', 'Ab2', 'F2'],
       'F#7':  ['F#2', 'A#2', 'C#3', 'A#2'],
+      'Gb7':  ['Gb2', 'Bb2', 'Db3', 'Bb2'],
       'BbMaj7':['Bb2', 'D3', 'F3', 'D3'],
       'EbMaj7':['Eb2', 'G2', 'Bb2', 'G2'],
       'FMaj7': ['F2', 'A2', 'C3', 'A2'],
@@ -1690,24 +1692,33 @@
 
     [
       // ---------- CORE STANDARDS (the 10) ----------
-      mkProg({id:'saints', t:'Saints Go Marching In / Mama Don\'t Allow', cp:'Traditional', k:'Bb', bpm:110, sec:'core',
+      // Verified against band's 9/11/24 tuba score — Bb concert (2 flats),
+      // ♩=200 (fast! old guess 110 was way off). Major triads, not Bb7.
+      // 16-bar form with a signature chromatic passage: Bbm → Eb → Gb7 → Bb
+      // (iv-minor plagal + bVII7 passing chord). Form: Solo tbn, Low brass
+      // soli, Head x 2, Sing/Solos, Head, Mama, Head.
+      mkProg({id:'saints', t:'Saints Go Marching In / Mama Don\'t Allow', cp:'Traditional', k:'Bb', bpm:200, sec:'core',
         m:[
-          {c:'Bb7', ml:[{keys:['d/4'],duration:'2r'},{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'}]},
-          {c:'Bb7', ml:[{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'2'},{keys:['d/4'],duration:'4r'}]},
-          {c:'F7',  ml:[{keys:['d/4'],duration:'4r'},{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'}]},
-          {c:'Bb7', ml:[{keys:['Bb/4'],duration:'2'},{keys:['d/4'],duration:'2r'}]},
-          {c:'Bb7', ml:[{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
-          {c:'Bb7', ml:[{keys:['Bb/4'],duration:'2'},{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'4'}]},
-          {c:'Bb7', ml:[{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['A/3'],duration:'4'}]},
-          {c:'Eb7', ml:[{keys:['Bb/3'],duration:'2'},{keys:['d/4'],duration:'2r'}]},
-          {c:'Eb7', ml:[{keys:['G/3'],duration:'4'},{keys:['G/3'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['Eb/4'],duration:'4'}]},
-          {c:'Bb7', ml:[{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['d/4'],duration:'2r'}]},
-          {c:'F7',  ml:[{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['d/4'],duration:'4r'}]},
-          {c:'Bb7', ml:[{keys:['Bb/3'],duration:'w'}]}
+          {c:'Bb',  ml:[{keys:['d/4'],duration:'2r'},{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'2'},{keys:['d/4'],duration:'4r'}]},
+          {c:'Bb',  ml:[{keys:['d/4'],duration:'4r'},{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['Bb/4'],duration:'2'},{keys:['d/4'],duration:'2r'}]},
+          {c:'Bb',  ml:[{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
+          {c:'F7',  ml:[{keys:['Bb/4'],duration:'2'},{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['A/3'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['Bb/3'],duration:'2'},{keys:['d/4'],duration:'2r'}]},
+          {c:'Bb',  ml:[{keys:['G/3'],duration:'4'},{keys:['G/3'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['Eb/4'],duration:'4'}]},
+          {c:'Bbm', ml:[{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['d/4'],duration:'2r'}]},
+          {c:'Eb',  ml:[{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['d/4'],duration:'4r'}]},
+          {c:'Gb7', ml:[{keys:['Gb/3'],duration:'w'}]},
+          {c:'Bb',  ml:[{keys:['Bb/3'],duration:'w'}]},
+          {c:'F7',  ml:[{keys:['F/3'],duration:'2'},{keys:['C/4'],duration:'2'}]},
+          {c:'Bb',  ml:[{keys:['Bb/3'],duration:'w'}]},
+          {c:'Bb',  ml:[{keys:['Bb/3'],duration:'w'}]}
         ],
-        tb:['The most iconic NOLA tune. Start by playing just the melody clean.','Form: I - V7 - I - IV - I - V - I. Classic hymn changes.','Dirge on the way to the cemetery, uptempo on the way back.'],
-        ti:['Paraphrase the melody with grace notes and approach tones.','Bb major pentatonic sounds pure and hymn-like.','Tailgate trombone: glide smears into target notes.'],
-        ta:['Play the melody "out" — displaced rhythms, octave shifts.','Bb blues scale works on any bar — lean into Db for grit.','Louis Armstrong\'s version is the Rosetta Stone.']
+        tb:['The most iconic NOLA tune. ♩=200 up-tempo parade feel.','Mostly Bb major — only F7 on the turnaround. Hymn changes.','Form segues into "Mama Don\'t Allow" on the 2nd head.'],
+        ti:['The chromatic Bbm → Eb → Gb7 → Bb passage (bars 10-13) is the hook — lean into it.','Bb major pentatonic sounds pure and hymn-like.','Tailgate trombone: glide smears into target notes.'],
+        ta:['Play the melody "out" — displaced rhythms, octave shifts.','Over Gb7 (bVII7), use Gb lydian dominant for spice.','Louis Armstrong\'s version is the Rosetta Stone — study his paraphrase.']
       }),
       // Verified against band's 9/11/24 tuba score — Eb concert, ♩=100.
       // Only 2 chords: Eb7 and Ab7 (I7-IV7). Form: Intro / sing / 3 choruses /
@@ -1763,11 +1774,16 @@
         ti:['Add the b7 (Eb) for mixolydian township color over F.','The "African Mkt" section has a different feel than "Homecoming" — less bluesy, more chant-like.','Abdullah Ibrahim solos are sparse — leave tons of space.'],
         ta:['Use F lydian (F G A B C D E) for an exotic color over F.','Over the C chord, C mixolydian (C D E F G A Bb) gives a bluesy lift.','Listen to Abdullah\'s piano solos for pacing and the modal texture.']
       }),
-      mkProg({id:'thousand-island', t:'Thousand Island', cp:'Rebirth Brass Band', k:'Eb', bpm:105, sec:'core',
-        m:['Eb7','Eb7','Ab7','Ab7','Eb7','Eb7','Bb7','Eb7'],
-        tb:['Rebirth groove in Eb. 8-bar I-IV-V vamp.','Eb blues scale covers the whole thing.','Percussive, rhythmic phrasing — not legato.'],
-        ti:['Lean into the blue 3rd (Gb) for that Rebirth sound.','The "and of 2" snare hit — land your phrases around it.','Short 2-bar phrases with space in between.'],
-        ta:['Polyrhythmic 3-against-4 dotted-8th patterns.','Build intensity through each chorus — don\'t peak early.','Octave-jump answers from one phrase to the next.']
+      // Verified against band's 9/11/24 tuba score — Eb concert (3 flats),
+      // ♩=100. Static ONE-CHORD Eb vamp (modal). Form: Intro, 1, 2, 3,
+      // solos, drums, tuba solo, 1/3 (reeds), 3/1 (reeds), 2. Solos go
+      // "length per soloist, lead into next solo" — open-ended. Section 3
+      // has "Trombone riff second time".
+      mkProg({id:'thousand-island', t:'Thousand Island', cp:'Rebirth Brass Band', k:'Eb', bpm:100, sec:'core',
+        m:['Eb7','Eb7','Eb7','Eb7','Eb7','Eb7','Eb7','Eb7'],
+        tb:['Rebirth one-chord Eb vamp — modal NOLA groove.','Eb mixolydian (Eb F G Ab Bb C Db) is the scale.','Bass-drum-tuba lock creates the whole groove. Stay in Eb.'],
+        ti:['Eb blues scale (Eb Gb Ab A Bb Db) for gritty licks.','Repeated 2-bar rhythmic cells — build hypnotic intensity.','Solos are "length per soloist" — you decide when to pass the bone.'],
+        ta:['Over the static Eb, outside colors work — try Bbm7 arpeggios.','Section 3 has a trombone riff 2nd time — leave space for it.','Superimpose Ab7 or Bb7 mentally for harmonic movement against the drone.']
       }),
       // Verified against band's 6/16/25 tuba score — F minor (4 flats),
       // ♩=200. Modal tune by S. Isler (not Silvio Rodriguez as I guessed).
