@@ -1522,6 +1522,7 @@
   <!-- Scripts -->
   <script src="https://unpkg.com/vexflow@4.2.5/build/cjs/vexflow.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tone@15.0.4/build/Tone.min.js"></script>
+  <script src="woodshed-tunes-core.js"></script>
   <script>
   (function() {
     'use strict';
@@ -1581,14 +1582,22 @@
       'C':   ['B3', 'C4', 'E4', 'G4'],
       'G':   ['F#3', 'G3', 'B3', 'D4'],
       'D':   ['C#3', 'D3', 'F#3', 'A3'],
+      'A':   ['A3', 'C#4', 'E4', 'G4'],
+      'E':   ['E3', 'G#3', 'B3', 'D4'],
+      'B':   ['B3', 'D#4', 'F#4', 'A4'],
+      'F#':  ['F#3', 'A#3', 'C#4', 'E4'],
+      'Gb':  ['Gb3', 'Bb3', 'Db4', 'F4'],
       'Ab':  ['G3', 'Ab3', 'C4', 'Eb4'],
+      'Db':  ['Db3', 'F3', 'Ab3', 'C4'],
       'Cm':  ['C3', 'Eb3', 'G3', 'Bb3'],
       'Dm':  ['D3', 'F3', 'A3', 'C4'],
       'Em':  ['E3', 'G3', 'B3', 'D4'],
       'Fm':  ['F3', 'Ab3', 'C4', 'Eb4'],
       'Gm':  ['G3', 'Bb3', 'D4', 'F4'],
       'Am':  ['A3', 'C4', 'E4', 'G4'],
-      'Bbm': ['Bb3', 'Db4', 'F4', 'Ab4']
+      'Bbm': ['Bb3', 'Db4', 'F4', 'Ab4'],
+      'Ebm': ['Eb3', 'Gb3', 'Bb3', 'Db4'],
+      'F#m': ['F#3', 'A3', 'C#4', 'E4']
     };
 
     // Bass patterns: root-3-5-3 shuffle by default. Pulled per-chord.
@@ -1636,14 +1645,22 @@
       'C':   ['C2', 'E2', 'G2', 'E2'],
       'G':   ['G2', 'B2', 'D3', 'B2'],
       'D':   ['D2', 'F#2', 'A2', 'F#2'],
+      'A':   ['A2', 'C#3', 'E3', 'C#3'],
+      'E':   ['E2', 'G#2', 'B2', 'G#2'],
+      'B':   ['B2', 'D#3', 'F#3', 'D#3'],
+      'F#':  ['F#2', 'A#2', 'C#3', 'A#2'],
+      'Gb':  ['Gb2', 'Bb2', 'Db3', 'Bb2'],
       'Ab':  ['Ab2', 'C3', 'Eb3', 'C3'],
+      'Db':  ['Db2', 'F2', 'Ab2', 'F2'],
       'Cm':  ['C2', 'Eb2', 'G2', 'Eb2'],
       'Dm':  ['D2', 'F2', 'A2', 'F2'],
       'Em':  ['E2', 'G2', 'B2', 'G2'],
       'Fm':  ['F2', 'Ab2', 'C3', 'Ab2'],
       'Gm':  ['G2', 'Bb2', 'D3', 'Bb2'],
       'Am':  ['A2', 'C3', 'E3', 'C3'],
-      'Bbm': ['Bb2', 'Db3', 'F3', 'Db3']
+      'Bbm': ['Bb2', 'Db3', 'F3', 'Db3'],
+      'Ebm': ['Eb2', 'Gb2', 'Bb2', 'Gb2'],
+      'F#m': ['F#2', 'A2', 'C#3', 'A2']
     };
 
     // Compact song builder. def = { id, t: title, cp: composer, k: key,
@@ -1885,29 +1902,9 @@
       // captures the Closer Walk head. Up-tempo section (♩=200) and
       // IFA/LLL/Amen come after. Using 60 BPM default for the Dirge feel;
       // user can bump to 200 for the uptempo sections.
-      mkProg({id:'gospel-medley', t:'Gospel Medley (Closer Walk / I\'ll Fly Away / Lord Lord Lord)', cp:'Traditional', k:'Bb', bpm:60, sec:'core',
-        m:[
-          {c:'Bb',  ml:[{keys:['F/4'],duration:'2d'},{keys:['Gb/4'],duration:'4'}]},
-          {c:'Bb',  ml:[{keys:['G/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['E/4'],duration:'4'}]},
-          {c:'F7',  ml:[{keys:['Eb/4'],duration:'w'}]},
-          {c:'F7',  ml:[{keys:['d/4'],duration:'4r'},{keys:['F/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['A/4'],duration:'8'},{keys:['Bb/4'],duration:'8'},{keys:['A/4'],duration:'4'}]},
-          {c:'F',   ml:[{keys:['C/5'],duration:'2'},{keys:['C/5'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
-          {c:'F',   ml:[{keys:['A/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
-          {c:'Bb',  ml:[{keys:['G/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['F/4'],duration:'4'},{keys:['F/4'],duration:'2'}]},
-          {c:'Bb',  ml:[{keys:['d/4'],duration:'4r'},{keys:['F/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['A/4'],duration:'8'},{keys:['Bb/4'],duration:'4'},{keys:['d/4'],duration:'8r'}]},
-          {c:'Bb',  ml:[{keys:['D/5'],duration:'2'},{keys:['D/5'],duration:'4'},{keys:['D/5'],duration:'4'}]},
-          {c:'Bb7', ml:[{keys:['C/5'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['C/5'],duration:'4'},{keys:['D/5'],duration:'4'}]},
-          {c:'Eb',  ml:[{keys:['C/5'],duration:'2'},{keys:['Bb/4'],duration:'4'},{keys:['Ab/4'],duration:'4'}]},
-          {c:'C7',  ml:[{keys:['G/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['G/4'],duration:'4'}]},
-          {c:'Bb',  ml:[{keys:['F/4'],duration:'w'}]},
-          {c:'F7',  ml:[{keys:['A/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
-          {c:'Bb',  ml:[{keys:['Bb/4'],duration:'w'}]},
-          {c:'Bb',  ml:[{keys:['d/4'],duration:'wr'}]}
-        ],
-        tb:['Three gospel standards: Closer Walk → I\'ll Fly Away → Lord Lord Lord → Amen.','Starts as a Dirge ♩=60, then uptempo ♩=200 for the celebration.','Major triads (not 7ths) on I — Bb is pure major church sound.'],
-        ti:['Bb7 → Eb is V7-of-IV — classic gospel lift.','The Amen cadence: Ab7 → Fm7 → F7 → Bb | Eb → Bb (plagal amen).','Each tune steps up a notch in energy — go up an octave on the repeat.'],
-        ta:['Bridge has "Drums only" measures — you can tag the band back in with a hit.','Gospel lick: bluesy descending riffs from Bb down through the blues scale.','Quote Amazing Grace or other hymns — the tradition loves family references.']
-      }),
+      // gospel-medley: now loaded from band's MusicXML via BAND_TUNES_CORE
+      // (see woodshed-tunes-core.js). The old inline transcription is
+      // superseded by per-instrument parts with triplets + correct chords.
       // Verified against band's 9/11/24 tuba score — 4-flat key signature,
       // Bb7#9 center, ♩=95. Form: Tuba vamp, Follow the leader, Solos over
       // [1]. Section [1] is Bb7#9 (hip bluesy dominant). Section [2] is
@@ -2672,6 +2669,54 @@
         tb:['Queen stadium anthem. Stomp-stomp-clap.','Ab major scale.','Block-chord vocal phrasing.']
       })
     ].forEach(registerTune);
+
+    // ======================================================================
+    // BAND REPERTOIRE FROM MUSICXML — authoritative per-instrument parts
+    // extracted from the band's actual charts via /tmp/band-scores/
+    // xml_to_parts.py pipeline. These OVERRIDE any earlier mkProg() definitions
+    // for the same id, because they carry real per-instrument data instead of
+    // hand-transcribed melodies.
+    // ======================================================================
+    function registerBandTune(tune) {
+      const chordSet = new Set(tune.measures.map(function(m){return m.chord;}));
+      const V = {}, B = {};
+      chordSet.forEach(function(c){
+        V[c] = VOICINGS[c] || VOICINGS['Bb7'];
+        B[c] = BASS_NOTES[c] || BASS_NOTES['Bb7'];
+      });
+      const tempo = tune.defaultTempo || 120;
+      const enriched = Object.assign({}, tune, {
+        tempoRange: [Math.max(40, tempo - 40), Math.max(260, tempo + 60)],
+        layout: { measuresPerLine: 4, clef: 'bass' },
+        audio: { type: 'synth', voicings: V, bassNotes: B },
+        tips: tune.tips || {
+          beginner: [
+            'Play the root of each chord on beat 1.',
+            'Use the ' + (tune.key || 'Bb') + ' major/blues scale for solos.',
+            'Lock with the tuba for groove.'
+          ],
+          intermediate: [
+            'Target the 3rd and b7 of each chord on strong beats.',
+            'Call-and-response with 2-bar phrases.',
+            'Accent the "and" of beats for second-line bounce.'
+          ],
+          advanced: [
+            'Paraphrase the melody with rhythmic displacement.',
+            'Chromatic approach tones and enclosures.',
+            'Double-time feel passages for contrast.'
+          ]
+        },
+        dataSource: 'musicxml',
+      });
+      // Delete the old version before re-registering so console doesn't see both
+      delete PROGRESSIONS[enriched.id];
+      registerTune(enriched);
+    }
+
+    if (window.BAND_TUNES_CORE) {
+      window.BAND_TUNES_CORE.forEach(registerBandTune);
+      console.log('[Woodshed] Registered ' + window.BAND_TUNES_CORE.length + ' tunes from MusicXML source');
+    }
 
     // ======================================================================
     // LEGACY PROGRESSIONS — kept for backwards compat. Rebuilt below.

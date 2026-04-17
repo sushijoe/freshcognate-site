@@ -1,6 +1,7 @@
-const CACHE_NAME = 'woodshed-v6-tools';
+const CACHE_NAME = 'woodshed-v7-xml';
 const ASSETS = [
-  './woodshed.html',
+  './index.html',
+  './woodshed-tunes-core.js',
   './woodshed-manifest.json',
   './woodshed-icon-192.svg',
   './woodshed-icon-512.svg',
