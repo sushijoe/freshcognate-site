@@ -1670,6 +1670,9 @@
           if (typeof mm === 'string') return { chord: mm, beats: 4 };
           const out = { chord: mm.c, beats: 4 };
           if (mm.ml) out.melody = mm.ml;
+          // Per-instrument parts — { tuba: [...], trombone: [...], ... }
+          // Each part is in concert pitch. Renderer handles transposition.
+          if (mm.parts) out.parts = mm.parts;
           return out;
         }),
         layout: { measuresPerLine: def.mpl || 4, clef: def.cl || 'bass' },
@@ -1694,8 +1697,99 @@
       };
     }
 
+    // ======================================================================
+    // DATA VALIDATION — fail loudly on bad tune data.
+    // Every tune produced by mkProg() is checked for:
+    //   - Required fields (id, title, key, tempo, measures)
+    //   - Measure beats summing to time signature
+    //   - Valid duration strings
+    //   - Chords having voicings defined
+    //   - Instruments in parts matching INSTRUMENT_LIST names
+    // Tunes that fail validation are logged to console.error and excluded
+    // from PROGRESSIONS so they never render. No silent wrong data.
+    // ======================================================================
+
+    const VALID_INSTRUMENTS = new Set([
+      'tuba','trombone','horn','trumpet','bari-sax','alto-sax','tenor-sax','clarinet','piano'
+    ]);
+    const DURATION_RE = /^(w|16|2|4|8|32|1|64)(d?)(r?)$/;
+
+    function durationBeats(dur) {
+      const m = DURATION_RE.exec(dur);
+      if (!m) return NaN;
+      const base = { 'w': 4, '2': 2, '4': 1, '8': 0.5, '16': 0.25, '32': 0.125, '64': 0.0625 }[m[1]];
+      return base * (m[2] === 'd' ? 1.5 : 1);
+    }
+
+    function validateTune(tune) {
+      const errors = [];
+      if (!tune.id) errors.push('missing id');
+      if (!tune.title) errors.push('missing title');
+      if (!tune.key) errors.push('missing key');
+      if (!tune.defaultTempo) errors.push('missing defaultTempo');
+      if (!tune.measures || !tune.measures.length) errors.push('no measures');
+      if (!tune.audio || !tune.audio.voicings) errors.push('no audio.voicings');
+
+      (tune.measures || []).forEach((m, i) => {
+        if (!m.chord) errors.push('m' + (i+1) + ': no chord');
+        if (tune.audio && tune.audio.voicings && m.chord && !tune.audio.voicings[m.chord]) {
+          errors.push('m' + (i+1) + ': chord "' + m.chord + '" has no voicing');
+        }
+        // Validate per-instrument parts (if present)
+        if (m.parts) {
+          Object.keys(m.parts).forEach(inst => {
+            if (!VALID_INSTRUMENTS.has(inst)) {
+              errors.push('m' + (i+1) + ': unknown instrument "' + inst + '" in parts');
+            }
+            const notes = m.parts[inst];
+            if (!Array.isArray(notes)) {
+              errors.push('m' + (i+1) + '.' + inst + ': notes not an array');
+              return;
+            }
+            let beatsSum = 0;
+            notes.forEach((n, ni) => {
+              if (!n.duration || !DURATION_RE.test(n.duration)) {
+                errors.push('m' + (i+1) + '.' + inst + '[' + ni + ']: bad duration "' + n.duration + '"');
+              }
+              beatsSum += durationBeats(n.duration) || 0;
+            });
+            if (Math.abs(beatsSum - (m.beats || 4)) > 0.001) {
+              errors.push('m' + (i+1) + '.' + inst + ': beats sum to ' + beatsSum + ', expected ' + (m.beats || 4));
+            }
+          });
+        }
+        // Validate legacy single melody
+        if (m.melody) {
+          let beatsSum = 0;
+          m.melody.forEach((n, ni) => {
+            if (!n.duration || !DURATION_RE.test(n.duration)) {
+              errors.push('m' + (i+1) + '.melody[' + ni + ']: bad duration "' + n.duration + '"');
+            }
+            beatsSum += durationBeats(n.duration) || 0;
+          });
+          if (Math.abs(beatsSum - (m.beats || 4)) > 0.001) {
+            errors.push('m' + (i+1) + '.melody: beats sum to ' + beatsSum + ', expected ' + (m.beats || 4));
+          }
+        }
+      });
+
+      return errors;
+    }
+
     // Build the full progression map from compact definitions.
+    // Any tune that fails validation is REJECTED (logged + excluded).
     const PROGRESSIONS = {};
+    const _REJECTED_TUNES = [];
+
+    function registerTune(tune) {
+      const errs = validateTune(tune);
+      if (errs.length) {
+        console.error('Tune "' + (tune.id || '?') + '" rejected:\n  ' + errs.join('\n  '));
+        _REJECTED_TUNES.push({ id: tune.id, errors: errs });
+        return;
+      }
+      PROGRESSIONS[tune.id] = tune;
+    }
 
     // ======================================================================
     // GOOD TROUBLE BRASS BAND REPERTOIRE
@@ -1800,7 +1894,7 @@
           {c:'F',   ml:[{keys:['C/5'],duration:'2'},{keys:['C/5'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
           {c:'F',   ml:[{keys:['A/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
           {c:'Bb',  ml:[{keys:['G/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['F/4'],duration:'4'},{keys:['F/4'],duration:'2'}]},
-          {c:'Bb',  ml:[{keys:['d/4'],duration:'4r'},{keys:['F/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['A/4'],duration:'8'},{keys:['Bb/4'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['d/4'],duration:'4r'},{keys:['F/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['A/4'],duration:'8'},{keys:['Bb/4'],duration:'4'},{keys:['d/4'],duration:'8r'}]},
           {c:'Bb',  ml:[{keys:['D/5'],duration:'2'},{keys:['D/5'],duration:'4'},{keys:['D/5'],duration:'4'}]},
           {c:'Bb7', ml:[{keys:['C/5'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['C/5'],duration:'4'},{keys:['D/5'],duration:'4'}]},
           {c:'Eb',  ml:[{keys:['C/5'],duration:'2'},{keys:['Bb/4'],duration:'4'},{keys:['Ab/4'],duration:'4'}]},
@@ -1946,24 +2040,63 @@
       }),
 
       // ---------- ACTIVE REPERTOIRE ----------
-      // Verified against band's PDF — Bb concert, ♩=160. Structure:
-      // A (4x) → B (4x) → C (4x) → D (8x). Section A is the signature
-      // riff. Melody extracted from Bb-high trumpet part (transposed to
-      // concert) — captures the classic "do-whatcha-wanna" hook contour.
+      // FIRST TUNE WITH PER-INSTRUMENT PARTS (proper implementation).
+      // Every instrument sees the PART THEY ACTUALLY PLAY in the band's
+      // arrangement. No more shared melody forced into the wrong register.
+      //
+      // Do Whatcha Wanna (Rebirth Brass Band, New Orleans) — concert Bb,
+      // ♩=160. Tuba + Trombone + Trumpet parts transcribed directly from
+      // the band's PDFs. Each part is in concert pitch; app transposes
+      // per instrument. Other instruments (horn, saxes, clarinet, piano)
+      // still need their PDFs transcribed — they currently fall back to
+      // slash notation (which is the proper "part not yet available"
+      // state, not wrong data).
       mkProg({id:'do-whatcha-wanna', t:'Do Whatcha Wanna', cp:'Rebirth Brass Band', k:'Bb', bpm:160, sec:'active',
         m:[
-          {c:'Bb7', ml:[{keys:['d/4'],duration:'2r'},{keys:['d/4'],duration:'8r'},{keys:['C/5'],duration:'8'},{keys:['D/5'],duration:'4'}]},
-          {c:'Bb7', ml:[{keys:['d/4'],duration:'4r'},{keys:['D/5'],duration:'8'},{keys:['F/5'],duration:'8'},{keys:['F/5'],duration:'8'},{keys:['D/5'],duration:'8'},{keys:['C/5'],duration:'4'}]},
-          {c:'Eb7', ml:[{keys:['Eb/5'],duration:'8'},{keys:['D/5'],duration:'8'},{keys:['C/5'],duration:'8'},{keys:['Bb/4'],duration:'8'},{keys:['Ab/4'],duration:'2'}]},
-          {c:'Eb7', ml:[{keys:['d/4'],duration:'4r'},{keys:['Bb/4'],duration:'8'},{keys:['D/5'],duration:'8'},{keys:['F/5'],duration:'2'}]},
-          {c:'Bb7', ml:[{keys:['F/5'],duration:'4'},{keys:['D/5'],duration:'4'},{keys:['Bb/4'],duration:'2'}]},
-          {c:'Bb7', ml:[{keys:['d/4'],duration:'2r'},{keys:['F/5'],duration:'4'},{keys:['D/5'],duration:'4'}]},
-          {c:'F7',  ml:[{keys:['C/5'],duration:'8'},{keys:['A/4'],duration:'8'},{keys:['F/4'],duration:'4'},{keys:['d/4'],duration:'2r'}]},
-          {c:'Bb7', ml:[{keys:['Bb/4'],duration:'w'}]}
+          {c:'Bb7', parts:{
+            tuba:     [{keys:['Bb/2'],duration:'4d'},{keys:['F/3'],duration:'8'},{keys:['Bb/3'],duration:'4d'},{keys:['F/3'],duration:'8'}],
+            trombone: [{keys:['d/4'],duration:'4r'},{keys:['Bb/3'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['Ab/3'],duration:'4'},{keys:['Bb/3'],duration:'4'}],
+            trumpet:  [{keys:['d/4'],duration:'2r'},{keys:['F/5'],duration:'4'},{keys:['D/5'],duration:'4'}]
+          }},
+          {c:'Bb7', parts:{
+            tuba:     [{keys:['Bb/2'],duration:'4d'},{keys:['F/3'],duration:'8'},{keys:['Bb/3'],duration:'4'},{keys:['Bb/2'],duration:'4'}],
+            trombone: [{keys:['Ab/3'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['d/4'],duration:'2r'},{keys:['Bb/3'],duration:'4'}],
+            trumpet:  [{keys:['F/5'],duration:'4'},{keys:['D/5'],duration:'4'},{keys:['Bb/4'],duration:'2'}]
+          }},
+          {c:'Eb7', parts:{
+            tuba:     [{keys:['Eb/3'],duration:'4d'},{keys:['Bb/2'],duration:'8'},{keys:['Eb/3'],duration:'4d'},{keys:['G/3'],duration:'8'}],
+            trombone: [{keys:['Bb/3'],duration:'2'},{keys:['Eb/4'],duration:'2'}],
+            trumpet:  [{keys:['d/4'],duration:'2r'},{keys:['G/5'],duration:'4'},{keys:['Eb/5'],duration:'4'}]
+          }},
+          {c:'Eb7', parts:{
+            tuba:     [{keys:['Eb/3'],duration:'4'},{keys:['G/3'],duration:'4'},{keys:['Bb/2'],duration:'2'}],
+            trombone: [{keys:['Ab/3'],duration:'w'}],
+            trumpet:  [{keys:['G/5'],duration:'4'},{keys:['Eb/5'],duration:'4'},{keys:['Bb/4'],duration:'2'}]
+          }},
+          {c:'Bb7', parts:{
+            tuba:     [{keys:['Bb/2'],duration:'4d'},{keys:['F/3'],duration:'8'},{keys:['Bb/3'],duration:'4d'},{keys:['F/3'],duration:'8'}],
+            trombone: [{keys:['d/4'],duration:'4r'},{keys:['Bb/3'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['Ab/3'],duration:'4'},{keys:['Bb/3'],duration:'4'}],
+            trumpet:  [{keys:['d/4'],duration:'2r'},{keys:['F/5'],duration:'4'},{keys:['D/5'],duration:'4'}]
+          }},
+          {c:'Bb7', parts:{
+            tuba:     [{keys:['Bb/2'],duration:'4d'},{keys:['F/3'],duration:'8'},{keys:['Bb/3'],duration:'4'},{keys:['Bb/2'],duration:'4'}],
+            trombone: [{keys:['Ab/3'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['d/4'],duration:'2r'},{keys:['Bb/3'],duration:'4'}],
+            trumpet:  [{keys:['F/5'],duration:'4'},{keys:['D/5'],duration:'4'},{keys:['Bb/4'],duration:'2'}]
+          }},
+          {c:'F7', parts:{
+            tuba:     [{keys:['F/3'],duration:'4d'},{keys:['C/3'],duration:'8'},{keys:['F/3'],duration:'4'},{keys:['A/2'],duration:'4'}],
+            trombone: [{keys:['F/3'],duration:'4'},{keys:['A/3'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['A/3'],duration:'4'}],
+            trumpet:  [{keys:['d/4'],duration:'4r'},{keys:['C/5'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['F/4'],duration:'4'}]
+          }},
+          {c:'Bb7', parts:{
+            tuba:     [{keys:['Bb/2'],duration:'w'}],
+            trombone: [{keys:['Bb/3'],duration:'w'}],
+            trumpet:  [{keys:['Bb/4'],duration:'w'}]
+          }}
         ],
-        tb:['Rebirth signature tune in Bb. I7-IV7-V7 vamp at a hot 160 BPM.','Bb blues scale (Bb Db Eb E F Ab) covers everything.','Form: A (4x) → B (4x) → C (4x) → D (8x).'],
-        ti:['Major 3rd (D) + minor 3rd (Db) together = classic NOLA bend.','Call-and-response: phrase on Bb7, answer on Eb7.','Accent the "and of 2" and "and of 4" for the second line pocket.'],
-        ta:['Over F7 (bar 7), use B natural (tritone) for tension → Bb.','Quote "Iko Iko" or other NOLA classics freely.','Phil Frazier\'s tuba dotted-rhythm line drives this — listen and match it.']
+        tb:['Rebirth signature tune in Bb. I7-IV7-V7 vamp at ♩=160.','Each instrument has its own part — switch to your instrument and see what YOU play.','Form: A (4x) → B (4x) → C (4x) → D (8x).'],
+        ti:['Tuba plays the iconic dotted-quarter + 8th "up-down" bass line.','Trombone plays a syncopated harmonic counter-line.','Trumpet plays the high "do whatcha wanna" hook.'],
+        ta:['Major 3rd (D) + minor 3rd (Db) together = classic NOLA bend.','Phil Frazier\'s tuba line drives the groove — match his swing.','For other instruments (horn, saxes, clarinet, piano), parts still need transcribing.']
       }),
       // Verified against band's tuba + Bb trumpet scores — Eb major
       // (3 flats), ballad tempo ~85. Only two chords: Eb7 and Ab7 (I7-IV7).
@@ -2538,7 +2671,7 @@
         m:['Ab','Ab','Ab','Ab'],
         tb:['Queen stadium anthem. Stomp-stomp-clap.','Ab major scale.','Block-chord vocal phrasing.']
       })
-    ].forEach(p => { PROGRESSIONS[p.id] = p; });
+    ].forEach(registerTune);
 
     // ======================================================================
     // LEGACY PROGRESSIONS — kept for backwards compat. Rebuilt below.
@@ -5043,11 +5176,22 @@
     }
 
     function makeMelodyNotes(measure) {
-      // Melody data lives on the measure itself: measure.melody = [{keys:['D/4'], duration:'4'}, ...]
-      if (!measure.melody || !measure.melody.length) return makeSlashNotes();
+      // Prefer per-instrument parts: measure.parts = { tuba: [...], trombone: [...], ... }
+      // Each part array is in CONCERT pitch. The renderer then transposes
+      // per the current instrument's semitone offset (trumpet goes up M2,
+      // etc.). Fallback: legacy single-melody field for tunes not yet
+      // converted to per-instrument data.
+      let partNotes = null;
+      if (measure.parts && measure.parts[currentInstrumentName]) {
+        partNotes = measure.parts[currentInstrumentName];
+      } else if (measure.melody && measure.melody.length) {
+        partNotes = measure.melody;
+      }
+      if (!partNotes || !partNotes.length) return makeSlashNotes();
+
       const clef = currentInstrument.clef;
       const restKey = clef === 'bass' ? 'd/4' : 'b/4';
-      return measure.melody.map(n => {
+      return partNotes.map(n => {
         const isRest = n.duration.endsWith('r');
         if (isRest) {
           return new VF.StaveNote({ clef, keys: [restKey], duration: n.duration });
@@ -5843,6 +5987,10 @@
     // Returns the array of notes for a measure given the current mode
     function getPlayableNotesForMeasure(measure) {
       if (currentMode === 'melody') {
+        // Prefer per-instrument parts, fall back to legacy single melody
+        if (measure.parts && measure.parts[currentInstrumentName]) {
+          return measure.parts[currentInstrumentName];
+        }
         return measure.melody || null;
       }
       if (currentMode === 'licks') {
