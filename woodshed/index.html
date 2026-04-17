@@ -1741,11 +1741,17 @@
         ti:['Bb7 → Eb is V7-of-IV — classic gospel lift.','The Amen cadence: Ab7 → Fm7 → F7 → Bb | Eb → Bb (plagal amen).','Each tune steps up a notch in energy — go up an octave on the repeat.'],
         ta:['Bridge has "Drums only" measures — you can tag the band back in with a hit.','Gospel lick: bluesy descending riffs from Bb down through the blues scale.','Quote Amazing Grace or other hymns — the tradition loves family references.']
       }),
-      mkProg({id:'new-orleans-music', t:'New Orleans Music', cp:'Rebirth Brass Band', k:'Bb', bpm:100, sec:'core',
-        m:['Bb7','Bb7','Eb7','Eb7','Bb7','F7','Bb7','Bb7'],
-        tb:['Rebirth\'s love letter to the city. Celebratory 8-bar vamp in Bb.','Bb major pentatonic + blue 3rd (Db).','Play with joy and swagger — this is a party anthem.'],
-        ti:['Repeated rhythmic hooks work better than long lines.','Use octave jumps for excitement.','Call-and-response with the melody of the tune.'],
-        ta:['Trombone glisses into each chord change.','Quote "New Orleans" melodies from other tunes — meta and fun.','High-register wails on the F7 (bar 6) before resolving.']
+      // Verified against band's 9/11/24 tuba score — 4-flat key signature,
+      // Bb7#9 center, ♩=95. Form: Tuba vamp, Follow the leader, Solos over
+      // [1]. Section [1] is Bb7#9 (hip bluesy dominant). Section [2] is
+      // Ab-Bbm-Ab-Bbm alternation. Section [3] leads via pickups back to 1.
+      // Lyrics: "New Orleans music, we gonna rock all day, gonna rock all
+      // night."
+      mkProg({id:'new-orleans-music', t:'New Orleans Music', cp:'Rebirth Brass Band', k:'Bb', bpm:95, sec:'core',
+        m:['Bb7','Bb7','Ab','Bbm','Ab','Bbm','Bb7','Bb7'],
+        tb:['Rebirth\'s love letter to the city. Bb7#9 tonic with Ab/Bbm color.','The #9 (Db) makes it bluesy — same note as the minor 3rd.','Play with joy and swagger — shout "we gonna rock all day".'],
+        ti:['Over Bb7, use Bb blues scale (Bb Db Eb E F Ab).','Over Ab, switch to Ab mixolydian (Ab Bb C Db Eb F Gb).','Trade 2 bars with another horn — tune is built for call and response.'],
+        ta:['Bb altered scale over Bb7#9 (Bb B Db D E Gb Ab).','The Ab-Bbm shift is bVII-i — classic NOLA modal move.','Build energy through each chorus — the last section goes to solos.']
       }),
       // Verified against band's 9/11/24 tuba score — F major (1 flat), ♩=120.
       // Simple I-V (F and C) harmony — modal/hypnotic. Form: Trombone Intro
@@ -1910,11 +1916,16 @@
         ti:['Standard second line phrasing — short, rhythmic.','Call-and-response in 2-bar chunks.','Target the 3rd and b7 of each chord.'],
         ta:['Chromatic lead-ins to target notes on strong beats.','Displaced rhythms — start on the "and of 4".','Building intensity over 3 choruses.']
       }),
-      mkProg({id:'she-works-hard', t:'She Works Hard For the Money', cp:'Donna Summer', k:'Gm', bpm:115, sec:'active',
-        m:['Gm','Gm','Eb','Eb','Gm','Gm','D7','Gm'],
-        tb:['Disco classic in Gm. That iconic bass line.','Gm pentatonic + Gm natural minor.','Dancey but driving.'],
-        ti:['On D7, use Eb (b9) for tension.','Eb section (bar 3-4) is the major moment — lean into it.','Disco-style staccato phrasing.'],
-        ta:['Harmonic minor on D7 for the B-C# motion.','80s soprano sax-inspired runs (think Kenny G\'s better days).','High-energy double-time over the V7.']
+      // Verified against band's 8/13/24 tuba score (SO arrangement) —
+      // G dorian (1 flat key sig, Gm tonic), ♩=140. Solo section chords:
+      // Gm / F / Cm7 / Dm7 / Gm. Form: Intro, 1, 2, 3, 2, 3, sing over 1,
+      // 4, solos, 4, 5. Small band version: 1, 2, 3, 2, 3, sing over 1, 4,
+      // solos, 4, 2. Sections 2/5/singing are interchangeable.
+      mkProg({id:'she-works-hard', t:'She Works Hard For the Money', cp:'Donna Summer, arr. SO', k:'Gm', bpm:140, sec:'active',
+        m:['Gm','Gm','F','F','Cm7','Dm7','Gm','Gm'],
+        tb:['Disco anthem in G dorian (1 flat). Solo over Gm-F-Cm7-Dm7.','G minor pentatonic (G Bb C D F) covers the whole form.','That iconic bass line drives the whole tune — lock in tight.'],
+        ti:['Gm-F-Cm7-Dm7 is i-bVII-iv-v in G dorian — all modal, no V7.','Target chord tones: Bb (3rd of Gm), A (3rd of F), Eb (3rd of Cm7), F (3rd of Dm7).','Disco-style staccato 8ths and ghost notes add funk.'],
+        ta:['G dorian (G A Bb C D E F) — note the natural 6th (E) distinguishes it from natural minor.','Chromatic walk from Gm through F to Cm: Bb A Ab G.','Listen to Donna Summer Giorgio Moroder productions for the groove template.']
       }),
       mkProg({id:'sidewinder', t:'Sidewinder', cp:'Lee Morgan (arr. Skatalites)', k:'Eb', bpm:130, sec:'active',
         m:['Eb7','Eb7','Ab7','Ab7','Eb7','Eb7','Bb7','Ab7','Eb7','Bb7','Eb7','Eb7','Ab7','Bb7','Eb7','Eb7'],
