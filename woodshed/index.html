@@ -1718,11 +1718,17 @@
         ti:['Second line snare on the "and" of 2 is the key to the feel.','Major 3rd (G) + minor 3rd (Gb) over Eb7 = NOLA blues tension.','Trade 4 bars with another horn — the "Solos" section builds up on the 2nd 8.'],
         ta:['Over Ab7, target C (3rd) and Gb (b7) on strong beats.','Build intensity across each 8-bar chorus — BU on 2nd 8.','Quote Rebirth phrases or "Iko Iko" — tradition loves references.']
       }),
-      mkProg({id:'later-than-you-think', t:'Later Than You Think (Enjoy Yourself)', cp:'Carr/Magidson, arr. Rebirth', k:'Bb', bpm:120, sec:'core',
-        m:['Bb7','Bb7','F7','F7','F7','F7','Bb7','Bb7','Eb7','Eb7','Bb7','Bb7','F7','F7','Bb7','Bb7'],
-        tb:['Swing standard, brass-band-fied. Play the melody like you\'re singing it.','I-V changes. Bb major scale works throughout.','The tune is philosophical but happy — keep it light.'],
-        ti:['Second line OR medium swing feel both work. Try both.','Guide tones on F7: A (3rd) and Eb (b7).','Trade 4s — this tune loves conversational phrasing.'],
-        ta:['Three-chorus arc: melody, paraphrase, double-time.','Bb bebop dominant adds chromatic motion everywhere.','Quote other NOLA party tunes for wink-wink moments.']
+      // Verified against band's 9/11/24 tuba score — Bb concert, ♩=90.
+      // This is a KERMIT RUFFINS / REBIRTH original (not the Carr/Magidson
+      // swing standard from 1949). Form: 1, 2, 1, 2, Solos (partner), sing
+      // 1, sing 2 (no rhythm/bass 1st half), 1, slowly change to Outro.
+      // Section 1 has a descending walking bass: Bb-A-G-F per beat.
+      // Outro: Bb | F7/A | Gm | F | Eb | Bb/F | Cm7 | F | Bb (turnaround).
+      mkProg({id:'later-than-you-think', t:'It\'s Later Than You Think', cp:'Kermit Ruffins & Rebirth', k:'Bb', bpm:90, sec:'core',
+        m:['Bb','Eb','Bb','F7','Bb','Eb','Bb','F7'],
+        tb:['Kermit Ruffins & Rebirth original. Not the Carr/Magidson standard.','The bass line walks down Bb-A-G-F in bar 1 — that\'s the signature motion.','Play the melody first. The lyric "It\'s later than you think" is the feel.'],
+        ti:['Over the descending Bb walk, use chromatic approach notes.','The outro adds Gm and Cm7 — sweet ii-V movement back to Bb.','Sing sections have "no rhythm/bass 1st half" — play sparse when that hits.'],
+        ta:['Bb blues scale + major 7 (A) for gospel-blues color.','The Bb7/F in bar 1 sets up Eb — voice-lead into Eb through A-Ab-G.','Quote Somerville references or NOLA party tunes in your solo.']
       }),
       // Verified against band's 4/8/26 tuba score — Bb concert, traditional.
       // Full form: CW Dirge ♩=60 (solo tpt) → CW Dirge whole band → CW
@@ -1741,11 +1747,15 @@
         ti:['Repeated rhythmic hooks work better than long lines.','Use octave jumps for excitement.','Call-and-response with the melody of the tune.'],
         ta:['Trombone glisses into each chord change.','Quote "New Orleans" melodies from other tunes — meta and fun.','High-register wails on the F7 (bar 6) before resolving.']
       }),
-      mkProg({id:'african-marketplace', t:'African Marketplace / Homecoming', cp:'Abdullah Ibrahim', k:'F', bpm:95, sec:'core',
-        m:['Fm7','Fm7','Bbm7','Bbm7','Eb7','Eb7','Ab','Ab','Dbm7','Dbm7','Gm7','C7','Fm7','Fm7','C7','Fm7'],
-        tb:['Abdullah Ibrahim\'s modal township jazz masterpiece.','F dorian mode (F G Ab Bb C D Eb F) is the primary color.','Let the groove breathe — lots of space between phrases.'],
-        ti:['The ii-V into Eb major (bars 5) is the harmonic lift.','Ab major section (bars 7-8) is the "homecoming" feeling.','Abdullah Ibrahim solos are sparse — leave tons of space.'],
-        ta:['Use the Ebmaj7 arpeggio over Fm7 for a modal sound.','Bbm7 → Eb7 → Ab is a ii-V-I in Ab — play Ab melodies there.','Listen to Abdullah\'s piano solos for pacing and texture.']
+      // Verified against band's 9/11/24 tuba score — F major (1 flat), ♩=120.
+      // Simple I-V (F and C) harmony — modal/hypnotic. Form: Trombone Intro
+      // (8 bars) → 1 (African Mkt A) → 2 (B) → 1 → Solo over 1 → 1 → Drum
+      // Breakdown → 3 (Homecoming A) → 3 → 4 (Homecoming B) → 3.
+      mkProg({id:'african-marketplace', t:'African Marketplace / Homecoming', cp:'Abdullah Ibrahim', k:'F', bpm:120, sec:'core',
+        m:['F','F','C','F','F','C','F','F'],
+        tb:['Abdullah Ibrahim\'s township jazz. Simple I-V harmony (F and C).','F major pentatonic (F G A C D) is the core vocabulary.','Let the groove breathe — lots of space between phrases.'],
+        ti:['Add the b7 (Eb) for mixolydian township color over F.','The "African Mkt" section has a different feel than "Homecoming" — less bluesy, more chant-like.','Abdullah Ibrahim solos are sparse — leave tons of space.'],
+        ta:['Use F lydian (F G A B C D E) for an exotic color over F.','Over the C chord, C mixolydian (C D E F G A Bb) gives a bluesy lift.','Listen to Abdullah\'s piano solos for pacing and the modal texture.']
       }),
       mkProg({id:'thousand-island', t:'Thousand Island', cp:'Rebirth Brass Band', k:'Eb', bpm:105, sec:'core',
         m:['Eb7','Eb7','Ab7','Ab7','Eb7','Eb7','Bb7','Eb7'],
