@@ -1553,6 +1553,8 @@
       'Gbdim': ['F#3', 'A3', 'C4', 'Eb4'],
       'Cdim':  ['C3', 'Eb3', 'Gb3', 'A3'],
       'Ddim':  ['D3', 'F3', 'Ab3', 'B3'],
+      'Abdim': ['Ab3', 'B3', 'D4', 'F4'],
+      'Bbdim': ['Bb3', 'Db4', 'E4', 'G4'],
       // Major 7ths
       'BbMaj7': ['A3', 'Bb3', 'D4', 'F4'],
       'EbMaj7': ['D3', 'Eb3', 'G3', 'Bb3'],
@@ -1608,6 +1610,8 @@
       'Gbdim': ['F#2', 'A2', 'C3', 'A2'],
       'Cdim':  ['C2', 'Eb2', 'Gb2', 'Eb2'],
       'Ddim':  ['D2', 'F2', 'Ab2', 'F2'],
+      'Abdim': ['Ab2', 'B2', 'D3', 'B2'],
+      'Bbdim': ['Bb2', 'Db3', 'E3', 'Db3'],
       'BbMaj7':['Bb2', 'D3', 'F3', 'D3'],
       'EbMaj7':['Eb2', 'G2', 'Bb2', 'G2'],
       'FMaj7': ['F2', 'A2', 'C3', 'A2'],
@@ -1816,11 +1820,25 @@
       // Ab-Bbm-Ab-Bbm alternation. Section [3] leads via pickups back to 1.
       // Lyrics: "New Orleans music, we gonna rock all day, gonna rock all
       // night."
+      // Verified via MusicXML — Bb7#9 tonic with Ab/Bbm color. ♩=95.
+      // Original trumpet/horn parts had dense 16th-note arpeggios (30+
+      // notes per measure) which don't render well in simple notation.
+      // Simplified to chord-tone arpeggios on each chord — captures the
+      // harmonic motion without the ornamental 16ths.
       mkProg({id:'new-orleans-music', t:'New Orleans Music', cp:'Rebirth Brass Band', k:'Bb', bpm:95, sec:'core',
-        m:['Bb7','Bb7','Ab','Bbm','Ab','Bbm','Bb7','Bb7'],
-        tb:['Rebirth\'s love letter to the city. Bb7#9 tonic with Ab/Bbm color.','The #9 (Db) makes it bluesy — same note as the minor 3rd.','Play with joy and swagger — shout "we gonna rock all day".'],
+        m:[
+          {c:'Bb7', ml:[{keys:['Bb/4'],duration:'4'},{keys:['Db/5'],duration:'4'},{keys:['F/5'],duration:'2'}]},
+          {c:'Bb7', ml:[{keys:['F/5'],duration:'4'},{keys:['Db/5'],duration:'4'},{keys:['Bb/4'],duration:'2'}]},
+          {c:'Ab',  ml:[{keys:['Ab/4'],duration:'4'},{keys:['C/5'],duration:'4'},{keys:['Eb/5'],duration:'2'}]},
+          {c:'Bbm', ml:[{keys:['Bb/4'],duration:'4'},{keys:['Db/5'],duration:'4'},{keys:['F/5'],duration:'2'}]},
+          {c:'Ab',  ml:[{keys:['Ab/4'],duration:'4'},{keys:['C/5'],duration:'4'},{keys:['Eb/5'],duration:'4'},{keys:['F/5'],duration:'4'}]},
+          {c:'Bbm', ml:[{keys:['Bb/4'],duration:'4'},{keys:['Db/5'],duration:'4'},{keys:['F/5'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
+          {c:'Bb7', ml:[{keys:['Bb/4'],duration:'2'},{keys:['Db/5'],duration:'2'}]},
+          {c:'Bb7', ml:[{keys:['F/4'],duration:'w'}]}
+        ],
+        tb:['Rebirth\'s love letter to the city. Bb7#9 tonic with Ab/Bbm color.','The #9 (Db) makes it bluesy — same note as the minor 3rd.','Lyrics: "New Orleans music, we gonna rock all day, gonna rock all night."'],
         ti:['Over Bb7, use Bb blues scale (Bb Db Eb E F Ab).','Over Ab, switch to Ab mixolydian (Ab Bb C Db Eb F Gb).','Trade 2 bars with another horn — tune is built for call and response.'],
-        ta:['Bb altered scale over Bb7#9 (Bb B Db D E Gb Ab).','The Ab-Bbm shift is bVII-i — classic NOLA modal move.','Build energy through each chorus — the last section goes to solos.']
+        ta:['Real arrangement has busy 16th-note arpeggios — the melody here is a chord-tone outline.','The Ab-Bbm shift is bVII-i — classic NOLA modal move.','Build energy through each chorus — the last section goes to solos.']
       }),
       // Verified against band's 9/11/24 tuba score — F major (1 flat), ♩=120.
       // Simple I-V (F and C) harmony — modal/hypnotic. Form: Trombone Intro
@@ -1872,11 +1890,25 @@
       // with a "Modal Scale for solos" indicated at the end. Form: Perc →
       // 1 saxes → Drums → Bass Groove (2X) → 2 (4X) → 1... → Drums →
       // 2' (Rhythm out for 1st 16) → 1.
+      // Verified via MusicXML — Fm phrygian modal groove, ♩=200. No chord
+      // changes on the chart. Using the TROMBONE's 8-bar bass groove as
+      // the "melody" since the tune's hook IS the bass line. F/2-C/3-F/3
+      // octave-jump pattern with a Gb/Db parallel move (phrygian b2).
+      // Raised up an octave so it reads across instruments.
       mkProg({id:'montserrat-serrat', t:'Montserrat Serrat', cp:'S. Isler', k:'Fm', bpm:200, sec:'core',
-        m:['Fm7','Fm7','Fm7','Fm7','Fm7','Fm7','Fm7','Fm7'],
-        tb:['S. Isler original. 4 flats, Fm modal groove at a hot ♩=200.','No chord changes — just a static Fm drone. Stay in the mode.','The bass groove is the star. Tuba plays an 8-bar pattern.'],
-        ti:['F dorian (F G Ab Bb C D Eb) is the primary color.','Build phrases from the b3 (Ab), 5 (C), and b7 (Eb).','Chart notes "Modal Scale for solos" — stay inside the mode.'],
-        ta:['F phrygian dominant (F Gb A Bb C Db Eb) for exotic tension.','Over a 16-bar solo, the 2nd 8 is the build — intensity goes up.','Section 2-prime has "Rhythm out for 1st 16" — you solo over just drums for 16 bars. Use texture, not harmony.']
+        m:[
+          {c:'Fm7', ml:[{keys:['F/3'],duration:'4'},{keys:['F/3'],duration:'8'},{keys:['C/4'],duration:'8'},{keys:['C/4'],duration:'4'},{keys:['F/4'],duration:'4'}]},
+          {c:'Fm7', ml:[{keys:['Gb/4'],duration:'4'},{keys:['Gb/4'],duration:'8'},{keys:['Db/4'],duration:'8'},{keys:['Db/4'],duration:'4'},{keys:['Gb/3'],duration:'4'}]},
+          {c:'Fm7', ml:[{keys:['F/3'],duration:'4'},{keys:['F/3'],duration:'8'},{keys:['C/4'],duration:'8'},{keys:['C/4'],duration:'4'},{keys:['F/4'],duration:'4'}]},
+          {c:'Fm7', ml:[{keys:['Eb/4'],duration:'2'},{keys:['d/4'],duration:'2r'}]},
+          {c:'Fm7', ml:[{keys:['F/3'],duration:'4'},{keys:['F/3'],duration:'8'},{keys:['C/4'],duration:'8'},{keys:['C/4'],duration:'4'},{keys:['F/4'],duration:'4'}]},
+          {c:'Fm7', ml:[{keys:['Gb/4'],duration:'4'},{keys:['Gb/4'],duration:'8'},{keys:['Db/4'],duration:'8'},{keys:['Db/4'],duration:'4'},{keys:['Gb/3'],duration:'4'}]},
+          {c:'Fm7', ml:[{keys:['F/3'],duration:'2'},{keys:['Eb/3'],duration:'2'}]},
+          {c:'Fm7', ml:[{keys:['F/3'],duration:'2'},{keys:['d/4'],duration:'2r'}]}
+        ],
+        tb:['S. Isler original. 4 flats, Fm phrygian groove at a hot ♩=200.','The "melody" is the bass groove: F-C-F octave jumps + Gb-Db-Gb.','Section 2\' has "Rhythm out for 1st 16" — drums only, build texture.'],
+        ti:['F phrygian (F Gb Ab Bb C Db Eb) — note the b2 (Gb) is the key color.','The Gb/F alternation is the signature phrygian move.','Chart notes "Modal Scale for solos" — stay inside the mode.'],
+        ta:['F phrygian dominant (F Gb A Bb C Db Eb) with raised 3rd for flamenco flavor.','Build phrases using chord tones of both Fm and Gb.','Over the drum breakdown, use purely rhythmic textures.']
       }),
       // Verified against band's 9/11/24 tuba score — Cm concert (3 flats),
       // ♩=85, "Swing 16ths" feel. Chord progression is C7 - F7 - Dø7 -
@@ -1914,12 +1946,22 @@
       }),
 
       // ---------- ACTIVE REPERTOIRE ----------
-      // Verified against band's tuba score — Bb concert, ♩=160. Structure:
-      // 2-bar intro rest → A (repeat) → B (4x) → C (4x) → bridge → D (8x).
-      // We capture the main 8-bar I7-IV7-V7 groove.
+      // Verified against band's PDF — Bb concert, ♩=160. Structure:
+      // A (4x) → B (4x) → C (4x) → D (8x). Section A is the signature
+      // riff. Melody extracted from Bb-high trumpet part (transposed to
+      // concert) — captures the classic "do-whatcha-wanna" hook contour.
       mkProg({id:'do-whatcha-wanna', t:'Do Whatcha Wanna', cp:'Rebirth Brass Band', k:'Bb', bpm:160, sec:'active',
-        m:['Bb7','Bb7','Eb7','Eb7','Bb7','Bb7','F7','Bb7'],
-        tb:['Rebirth signature tune in Bb. I7-IV7-V7 vamp at a hot 160 BPM.','Bb blues scale (Bb Db Eb E F Ab) covers everything.','The hook is a 2-bar riff — internalize it, then improvise around it.'],
+        m:[
+          {c:'Bb7', ml:[{keys:['d/4'],duration:'2r'},{keys:['d/4'],duration:'8r'},{keys:['C/5'],duration:'8'},{keys:['D/5'],duration:'4'}]},
+          {c:'Bb7', ml:[{keys:['d/4'],duration:'4r'},{keys:['D/5'],duration:'8'},{keys:['F/5'],duration:'8'},{keys:['F/5'],duration:'8'},{keys:['D/5'],duration:'8'},{keys:['C/5'],duration:'4'}]},
+          {c:'Eb7', ml:[{keys:['Eb/5'],duration:'8'},{keys:['D/5'],duration:'8'},{keys:['C/5'],duration:'8'},{keys:['Bb/4'],duration:'8'},{keys:['Ab/4'],duration:'2'}]},
+          {c:'Eb7', ml:[{keys:['d/4'],duration:'4r'},{keys:['Bb/4'],duration:'8'},{keys:['D/5'],duration:'8'},{keys:['F/5'],duration:'2'}]},
+          {c:'Bb7', ml:[{keys:['F/5'],duration:'4'},{keys:['D/5'],duration:'4'},{keys:['Bb/4'],duration:'2'}]},
+          {c:'Bb7', ml:[{keys:['d/4'],duration:'2r'},{keys:['F/5'],duration:'4'},{keys:['D/5'],duration:'4'}]},
+          {c:'F7',  ml:[{keys:['C/5'],duration:'8'},{keys:['A/4'],duration:'8'},{keys:['F/4'],duration:'4'},{keys:['d/4'],duration:'2r'}]},
+          {c:'Bb7', ml:[{keys:['Bb/4'],duration:'w'}]}
+        ],
+        tb:['Rebirth signature tune in Bb. I7-IV7-V7 vamp at a hot 160 BPM.','Bb blues scale (Bb Db Eb E F Ab) covers everything.','Form: A (4x) → B (4x) → C (4x) → D (8x).'],
         ti:['Major 3rd (D) + minor 3rd (Db) together = classic NOLA bend.','Call-and-response: phrase on Bb7, answer on Eb7.','Accent the "and of 2" and "and of 4" for the second line pocket.'],
         ta:['Over F7 (bar 7), use B natural (tritone) for tension → Bb.','Quote "Iko Iko" or other NOLA classics freely.','Phil Frazier\'s tuba dotted-rhythm line drives this — listen and match it.']
       }),
@@ -1967,18 +2009,57 @@
         ti:['Secondary dominants: A7 leads to D7, D7 leads to G7, G7 leads to C.','Tailgate trombone glisses were invented for this kind of tune.','Section 2 (for sung/solos) is just G → C alternation — much simpler.'],
         ta:['Bebop reharmonization: substitute ii-V approaches for each dominant.','F → Gbdim → C is the NOLA chromatic passage to emphasize.','Listen to Sam Morgan\'s 1927 Columbia recordings.']
       }),
-      mkProg({id:'bourbon-street', t:'Bourbon Street Parade', cp:'Paul Barbarin', k:'Ab', bpm:115, sec:'active',
-        m:['Ab','Ab','Ab7','Db','Ab','Eb7','Ab','Ab','Ab','Ab','Ab7','Db','Ab','Eb7','Ab','Ab'],
-        tb:['NOLA parade classic. Ab is the traditional key.','Ab major scale + Ab blues scale both work.','Strut tempo — imagine marching down Bourbon Street.'],
-        ti:['On the Ab7 (bar 3), lean into Gb (b7) to set up the Db.','Parade-style octave jumps and stabs.','Let the trombone smears speak — that\'s the sound.'],
-        ta:['Db major section (bar 4) — switch to Db major pentatonic.','Chromatic approaches from below on strong beats.','Listen to Preservation Hall and Paul Barbarin recordings.']
+      // Verified against band's Bb-horns PDF — Ab concert, ♩=192. Classic
+      // Paul Barbarin Dixieland parade. 32-bar form with Abdim chromatic
+      // bridge + secondary dominants (F7-Bb7-Eb7-Ab circle of fifths).
+      // Added Abdim/Bbdim to VOICINGS library.
+      mkProg({id:'bourbon-street', t:'Bourbon Street Parade', cp:'Paul Barbarin', k:'Ab', bpm:192, sec:'active',
+        m:[
+          {c:'Ab',    ml:[{keys:['Eb/4'],duration:'8'},{keys:['Eb/4'],duration:'8'},{keys:['Ab/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['C/5'],duration:'4'}]},
+          {c:'Ab',    ml:[{keys:['Ab/4'],duration:'w'}]},
+          {c:'Eb7',   ml:[{keys:['d/4'],duration:'4r'},{keys:['Ab/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['C/5'],duration:'4'}]},
+          {c:'Eb7',   ml:[{keys:['C/5'],duration:'2'},{keys:['Bb/4'],duration:'2'}]},
+          {c:'Ab',    ml:[{keys:['Ab/4'],duration:'2'},{keys:['Eb/5'],duration:'2'}]},
+          {c:'Ab7',   ml:[{keys:['Eb/5'],duration:'4'},{keys:['D/5'],duration:'4'},{keys:['C/5'],duration:'2'}]},
+          {c:'Db',    ml:[{keys:['Db/5'],duration:'2'},{keys:['Bb/4'],duration:'2'}]},
+          {c:'Ab',    ml:[{keys:['Ab/4'],duration:'w'}]},
+          {c:'Db',    ml:[{keys:['Ab/4'],duration:'2'},{keys:['Db/5'],duration:'2'}]},
+          {c:'Abdim', ml:[{keys:['D/5'],duration:'4'},{keys:['B/4'],duration:'4'},{keys:['Ab/4'],duration:'2'}]},
+          {c:'Ab',    ml:[{keys:['Eb/5'],duration:'2'},{keys:['C/5'],duration:'2'}]},
+          {c:'F7',    ml:[{keys:['A/4'],duration:'4'},{keys:['C/5'],duration:'4'},{keys:['F/4'],duration:'2'}]},
+          {c:'Bb7',   ml:[{keys:['D/5'],duration:'4'},{keys:['F/5'],duration:'4'},{keys:['Bb/4'],duration:'2'}]},
+          {c:'Eb7',   ml:[{keys:['G/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['Eb/4'],duration:'2'}]},
+          {c:'Ab',    ml:[{keys:['Ab/4'],duration:'w'}]},
+          {c:'Ab',    ml:[{keys:['d/4'],duration:'wr'}]}
+        ],
+        tb:['NOLA parade classic by Paul Barbarin. ♩=192 strut tempo.','Ab is the traditional key. Ab major + Ab blues both work.','32-bar Dixieland form with secondary dominants + Abdim bridge.'],
+        ti:['On Ab7 (bar 6), lean into Gb (b7) to set up Db.','Abdim (bar 10) is a chromatic bridge — use diminished arpeggio.','Parade-style octave jumps and tailgate trombone smears.'],
+        ta:['Db major section — switch to Db major pentatonic.','Secondary dominants: F7 → Bb7 → Eb7 → Ab circle of fifths.','Listen to Preservation Hall Jazz Band and Paul Barbarin originals.']
       }),
-      // Verified against band's tuba score — F major (1 flat), ♩=190.
-      // 16-bar form with F7 and Bb7 color chords. Title "By and By" on
-      // the score (book index had "Bye and Bye").
+      // Verified against band's tuba + Bb-horns scores — F major, ♩=190.
+      // 16-bar gospel hymn form. Melody extracted from Bb-horns part
+      // (trumpet/clarinet) transposed to concert F. Lyrics: "Bye and bye,
+      // when the morning comes, when the saints all have gathered home".
       mkProg({id:'bye-and-bye', t:'By and By', cp:'Traditional', k:'F', bpm:190, sec:'active',
-        m:['F','F','Bb','F','F','F','C','C7','F','F7','Bb','Bb7','F','C7','F','F'],
-        tb:['Gospel standard at ♩=190 — brisk and joyful.','F major scale, with F7 and Bb7 adding bluesy color.','The V7-of-IV (F7) in bar 10 sets up Bb — classic gospel move.'],
+        m:[
+          {c:'F',   ml:[{keys:['d/4'],duration:'4r'},{keys:['F/4'],duration:'2'},{keys:['A/4'],duration:'4'}]},
+          {c:'F',   ml:[{keys:['A/4'],duration:'2'},{keys:['d/4'],duration:'2r'}]},
+          {c:'Bb',  ml:[{keys:['F/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['C/5'],duration:'4'},{keys:['A/4'],duration:'4'}]},
+          {c:'F',   ml:[{keys:['G/4'],duration:'2'},{keys:['d/4'],duration:'2r'}]},
+          {c:'F',   ml:[{keys:['d/4'],duration:'4r'},{keys:['F/4'],duration:'2'},{keys:['A/4'],duration:'4'}]},
+          {c:'F',   ml:[{keys:['A/4'],duration:'2'},{keys:['d/4'],duration:'2r'}]},
+          {c:'C',   ml:[{keys:['G/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['G/4'],duration:'4'}]},
+          {c:'C7',  ml:[{keys:['A/4'],duration:'2'},{keys:['d/4'],duration:'2r'}]},
+          {c:'F',   ml:[{keys:['d/4'],duration:'4r'},{keys:['F/4'],duration:'2'},{keys:['A/4'],duration:'4'}]},
+          {c:'F7',  ml:[{keys:['A/4'],duration:'2'},{keys:['C/5'],duration:'2'}]},
+          {c:'Bb',  ml:[{keys:['D/5'],duration:'4'},{keys:['C/5'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'4'}]},
+          {c:'Bb7', ml:[{keys:['Ab/4'],duration:'2'},{keys:['d/4'],duration:'2r'}]},
+          {c:'F',   ml:[{keys:['F/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['C/5'],duration:'4'},{keys:['A/4'],duration:'4'}]},
+          {c:'C7',  ml:[{keys:['G/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['G/4'],duration:'4'}]},
+          {c:'F',   ml:[{keys:['F/4'],duration:'w'}]},
+          {c:'F',   ml:[{keys:['d/4'],duration:'wr'}]}
+        ],
+        tb:['Gospel standard at ♩=190 — brisk and joyful.','F major scale, with F7 and Bb7 adding bluesy color.','Lyrics: "Bye and bye, when the morning comes, all have gathered home".'],
         ti:['Target the 3rd of each chord — A over F, D over Bb, E over C.','Bb7 (bar 12) is the IV7 — use Ab (b7) for bluesy lift.','Call-and-response phrasing.'],
         ta:['Gospel turnaround: F - A7 - Dm - G7 - C7 - F (substitute over bars 14-16).','Quote Amazing Grace or another hymn in the final chorus.','F major pentatonic + blue note (Ab) covers 90% of the tune.']
       }),
@@ -2071,9 +2152,22 @@
       // Gm / F / Cm7 / Dm7 / Gm. Form: Intro, 1, 2, 3, 2, 3, sing over 1,
       // 4, solos, 4, 5. Small band version: 1, 2, 3, 2, 3, sing over 1, 4,
       // solos, 4, 2. Sections 2/5/singing are interchangeable.
+      // Verified against band's 8/13/24 Trumpet PDF — solo progression
+      // trumpet Am-G-Dm7-Em7-Am = concert Gm-F-Cm7-Dm7-Gm ✓. Tempo 140.
+      // G dorian (1 flat key sig). Melody approximated from the section 2
+      // vocal hook contour.
       mkProg({id:'she-works-hard', t:'She Works Hard For the Money', cp:'Donna Summer, arr. SO', k:'Gm', bpm:140, sec:'active',
-        m:['Gm','Gm','F','F','Cm7','Dm7','Gm','Gm'],
-        tb:['Disco anthem in G dorian (1 flat). Solo over Gm-F-Cm7-Dm7.','G minor pentatonic (G Bb C D F) covers the whole form.','That iconic bass line drives the whole tune — lock in tight.'],
+        m:[
+          {c:'Gm',  ml:[{keys:['Bb/4'],duration:'8'},{keys:['Bb/4'],duration:'8'},{keys:['Bb/4'],duration:'8'},{keys:['D/5'],duration:'8'},{keys:['F/5'],duration:'8'},{keys:['D/5'],duration:'8'},{keys:['C/5'],duration:'8'},{keys:['Bb/4'],duration:'8'}]},
+          {c:'Gm',  ml:[{keys:['C/5'],duration:'2'},{keys:['Bb/4'],duration:'2'}]},
+          {c:'F',   ml:[{keys:['A/4'],duration:'8'},{keys:['A/4'],duration:'8'},{keys:['A/4'],duration:'8'},{keys:['C/5'],duration:'8'},{keys:['A/4'],duration:'4'},{keys:['F/4'],duration:'4'}]},
+          {c:'F',   ml:[{keys:['C/5'],duration:'2'},{keys:['A/4'],duration:'2'}]},
+          {c:'Cm7', ml:[{keys:['Eb/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
+          {c:'Dm7', ml:[{keys:['F/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['D/5'],duration:'4'}]},
+          {c:'Gm',  ml:[{keys:['D/5'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['F/4'],duration:'4'}]},
+          {c:'Gm',  ml:[{keys:['G/4'],duration:'w'}]}
+        ],
+        tb:['Disco anthem in G dorian (1 flat). Solo over Gm-F-Cm7-Dm7.','G minor pentatonic (G Bb C D F) covers the whole form.','Section 2 is the "she works hard for the money" vocal hook.'],
         ti:['Gm-F-Cm7-Dm7 is i-bVII-iv-v in G dorian — all modal, no V7.','Target chord tones: Bb (3rd of Gm), A (3rd of F), Eb (3rd of Cm7), F (3rd of Dm7).','Disco-style staccato 8ths and ghost notes add funk.'],
         ta:['G dorian (G A Bb C D E F) — note the natural 6th (E) distinguishes it from natural minor.','Chromatic walk from Gm through F to Cm: Bb A Ab G.','Listen to Donna Summer Giorgio Moroder productions for the groove template.']
       }),
