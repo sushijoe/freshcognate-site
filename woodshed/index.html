@@ -1839,12 +1839,22 @@
         ti:['Major 3rd (D) + minor 3rd (Db) together = classic NOLA bend.','Call-and-response: phrase on Bb7, answer on Eb7.','Accent the "and of 2" and "and of 4" for the second line pocket.'],
         ta:['Over F7 (bar 7), use B natural (tritone) for tension → Bb.','Quote "Iko Iko" or other NOLA classics freely.','Phil Frazier\'s tuba dotted-rhythm line drives this — listen and match it.']
       }),
-      // Verified against band's tuba score — Eb major (3 flats), ballad
-      // tempo ~85. Only two chords: Eb7 and Ab7 (I7-IV7). Three sections
-      // with voltas. (Previous version had an invented I-vi-ii-V-I jazz
-      // turnaround — wrong.)
+      // Verified against band's tuba + Bb trumpet scores — Eb major
+      // (3 flats), ballad tempo ~85. Only two chords: Eb7 and Ab7 (I7-IV7).
+      // Three sections with voltas: 1 is intro (2x only), 2 is main melody,
+      // 3 is a variation (also 2x only). Melody approximated from the
+      // trumpet part's contour.
       mkProg({id:'ballad-of-kami-jean', t:'Ballad of Kami Jean', cp:'Mama Digdown\'s Brass Band', k:'Eb', bpm:85, sec:'active',
-        m:['Eb7','Eb7','Ab7','Ab7','Eb7','Eb7','Ab7','Ab7'],
+        m:[
+          {c:'Eb7', ml:[{keys:['d/4'],duration:'2r'},{keys:['Eb/4'],duration:'4'},{keys:['G/4'],duration:'4'}]},
+          {c:'Eb7', ml:[{keys:['Bb/4'],duration:'2'},{keys:['d/4'],duration:'2r'}]},
+          {c:'Ab7', ml:[{keys:['d/4'],duration:'4r'},{keys:['C/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['Gb/4'],duration:'4'}]},
+          {c:'Ab7', ml:[{keys:['Eb/4'],duration:'w'}]},
+          {c:'Eb7', ml:[{keys:['G/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'}]},
+          {c:'Eb7', ml:[{keys:['Eb/4'],duration:'w'}]},
+          {c:'Ab7', ml:[{keys:['C/4'],duration:'4'},{keys:['Bb/3'],duration:'4'},{keys:['Ab/3'],duration:'2'}]},
+          {c:'Ab7', ml:[{keys:['Ab/3'],duration:'w'}]}
+        ],
         tb:['Ballad in Eb — just I7 and IV7. Play the melody first, clean.','Long tones with vibrato — this is a lyrical tune.','Space is your friend on ballads.'],
         ti:['Eb blues scale (Eb Gb Ab A Bb Db) works over both chords.','Target the 3rd (G) and b7 (Db) on Eb7 for guide tones.','Grace notes and bends make it sing.'],
         ta:['Over Ab7, switch to Ab mixolydian for harmonic clarity.','Chromatic approach from G down to F down to Eb on the turnaround.','Listen to Mama Digdown\'s for the phrasing vocabulary.']
