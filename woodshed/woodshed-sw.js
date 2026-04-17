@@ -1,4 +1,4 @@
-const CACHE_NAME = 'woodshed-v5-instrument-voices';
+const CACHE_NAME = 'woodshed-v6-tools';
 const ASSETS = [
   './woodshed.html',
   './woodshed-manifest.json',

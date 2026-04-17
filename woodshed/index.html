@@ -1039,6 +1039,137 @@
     }
     .ear-streak { margin-left: 12px; color: var(--accent); font-weight: 600; }
 
+    /* Tools row — buttons alongside Ear Training */
+    .tools-row {
+      margin-left: 12px;
+      display: inline-flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    @media (max-width: 479px) {
+      .tools-row { margin-left: 0; margin-top: 4px; display: flex; }
+      .tools-row .ear-btn { padding: 5px 10px; font-size: 11px; }
+    }
+
+    /* Quotes modal — grid of quote buttons */
+    .quotes-panel { max-width: 480px; }
+    .quotes-body { padding: 14px 16px 18px; }
+    .quotes-hint {
+      font-size: 12px; color: var(--text-secondary);
+      margin-bottom: 12px; line-height: 1.4;
+    }
+    .quotes-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .quote-btn {
+      padding: 12px 10px;
+      font-size: 13px; font-weight: 600;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    .quote-btn:hover {
+      border-color: var(--accent);
+      background: rgba(232,74,39,0.1);
+    }
+    .quote-btn.playing {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* Call & Response */
+    .cnr-stage {
+      padding: 14px 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      text-align: center;
+      min-height: 60px;
+    }
+    .cnr-stage.active { color: var(--accent); font-weight: 600; }
+    .cnr-countdown {
+      text-align: center;
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--accent);
+      height: 60px;
+      line-height: 60px;
+    }
+    .cnr-controls {
+      padding: 12px 16px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .cnr-label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .cnr-difficulty { display: flex; gap: 0; }
+    .cnr-diff {
+      flex: 1; padding: 7px 4px;
+      font-size: 11px; font-weight: 600;
+      background: var(--bg-card); color: var(--text-secondary);
+      border: 1px solid rgba(255,255,255,0.08);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .cnr-diff:first-child { border-radius: 6px 0 0 6px; }
+    .cnr-diff:last-child { border-radius: 0 6px 6px 0; }
+    .cnr-diff.active {
+      background: rgba(200,80,192,0.2);
+      color: var(--accent2);
+      border-color: var(--accent2);
+    }
+
+    /* Recording indicator + transport record button */
+    .record-indicator {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: rgba(232,74,39,0.15);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .record-indicator.on { display: inline-flex; }
+    .record-dot {
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: recpulse 1s infinite;
+    }
+    @keyframes recpulse { 50% { opacity: 0.3; } }
+    .recording-playback {
+      display: none;
+      align-items: center; gap: 8px;
+      padding: 6px 12px;
+      margin-top: 8px;
+      background: var(--bg-card);
+      border-radius: 8px;
+    }
+    .recording-playback.show { display: flex; }
+    .recording-playback audio { flex: 1; height: 32px; }
+    .recording-playback button {
+      background: none; border: none;
+      color: var(--text-secondary);
+      cursor: pointer; font-size: 16px;
+    }
+    .recording-playback button:hover { color: var(--accent); }
+
     /* Share */
     .share-btn {
       display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -1256,7 +1387,9 @@
 
     <div class="chorus-counter" id="chorusCounter">
       Chorus <span id="chorusNum">1</span>
-      <span style="margin-left:12px">
+      <span class="tools-row">
+        <button class="ear-btn" id="quotesBtn" title="Drop a quote into your solo"><i class="bi bi-chat-quote"></i> Quotes</button>
+        <button class="ear-btn" id="callResponseBtn" title="Call & Response practice"><i class="bi bi-arrow-left-right"></i> Call &amp; Response</button>
         <button class="ear-btn" id="earTrainBtn"><i class="bi bi-ear"></i> Ear Training</button>
       </span>
     </div>
@@ -1279,6 +1412,43 @@
           <div class="ear-score">
             Score: <span id="earScore">0</span> / <span id="earTotal">0</span>
             <span id="earStreak" class="ear-streak"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quotes Modal -->
+    <div class="ear-overlay" id="quotesOverlay">
+      <div class="ear-panel quotes-panel">
+        <div class="ear-header">
+          <span class="ear-title"><i class="bi bi-chat-quote"></i> Quote Library</span>
+          <button class="ear-close" id="quotesClose"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="quotes-body">
+          <div class="quotes-hint">Classic riffs for dropping into your solo. Tap to hear one, then try to land it on the next downbeat.</div>
+          <div class="quotes-grid" id="quotesGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Call & Response Modal -->
+    <div class="ear-overlay" id="cnrOverlay">
+      <div class="ear-panel">
+        <div class="ear-header">
+          <span class="ear-title"><i class="bi bi-arrow-left-right"></i> Call &amp; Response</span>
+          <button class="ear-close" id="cnrClose"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="ear-body">
+          <div class="cnr-stage" id="cnrStage">Press play. Listen to the call (2 bars), then play your response (2 bars).</div>
+          <div class="cnr-countdown" id="cnrCountdown"></div>
+          <button class="ear-play-btn" id="cnrPlayBtn"><i class="bi bi-play-fill"></i> Start</button>
+          <div class="cnr-controls">
+            <label class="cnr-label">Difficulty</label>
+            <div class="cnr-difficulty">
+              <button class="cnr-diff active" data-cnr-level="beginner">Beginner</button>
+              <button class="cnr-diff" data-cnr-level="intermediate">Intermediate</button>
+              <button class="cnr-diff" data-cnr-level="advanced">Advanced</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1325,6 +1495,13 @@
       <button class="transport-btn" id="micBtn" title="Microphone">
         <i class="bi bi-mic" id="micIcon"></i>
       </button>
+      <button class="transport-btn" id="recordBtn" title="Record your solo">
+        <i class="bi bi-record-circle" id="recordIcon"></i>
+      </button>
+    </div>
+    <div class="recording-playback" id="recPlayback">
+      <audio id="recAudio" controls></audio>
+      <button id="recDelete" title="Delete recording"><i class="bi bi-trash"></i></button>
     </div>
     <div class="tempo-row">
       <span class="tempo-label">Tempo</span>
@@ -3415,6 +3592,63 @@
 
     };
 
+    // =========================================================================
+    // QUOTE LIBRARY — recognizable melodic phrases to drop into a solo
+    // =========================================================================
+    // NOLA tradition: drop a familiar melody into your improv. Every quote
+    // is written in concert pitch, 1-2 bars long. Keep them short so they
+    // land as "winks" rather than whole-tune hijacks.
+    const QUOTES = [
+      { name: 'Saints (riff)', notes: [
+        {keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}
+      ]},
+      { name: 'Iko Iko', notes: [
+        {keys:['G/4'],duration:'8'},{keys:['A/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['C/4'],duration:'4'},{keys:['Bb/3'],duration:'4'}
+      ]},
+      { name: 'Happy Birthday', notes: [
+        {keys:['C/4'],duration:'8'},{keys:['C/4'],duration:'8'},{keys:['D/4'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['E/4'],duration:'2'}
+      ]},
+      { name: 'Amazing Grace', notes: [
+        {keys:['G/3'],duration:'4'},{keys:['C/4'],duration:'2'},{keys:['E/4'],duration:'4'},{keys:['D/4'],duration:'2'}
+      ]},
+      { name: 'Shave & Haircut', notes: [
+        {keys:['C/4'],duration:'8'},{keys:['G/3'],duration:'8'},{keys:['G/3'],duration:'8'},{keys:['A/3'],duration:'8'},{keys:['G/3'],duration:'4'},{keys:['d/4'],duration:'4r'},{keys:['B/3'],duration:'4'},{keys:['C/4'],duration:'4'}
+      ]},
+      { name: 'Here Comes the Bride', notes: [
+        {keys:['C/4'],duration:'4'},{keys:['F/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['F/4'],duration:'2'}
+      ]},
+      { name: 'Twinkle Twinkle', notes: [
+        {keys:['C/4'],duration:'4'},{keys:['C/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['G/4'],duration:'2'}
+      ]},
+      { name: 'Little Light of Mine', notes: [
+        {keys:['C/4'],duration:'4'},{keys:['E/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['C/5'],duration:'4'}
+      ]},
+      { name: 'Westminster Chimes', notes: [
+        {keys:['G/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['Bb/3'],duration:'4'}
+      ]},
+      { name: 'Hava Nagila', notes: [
+        {keys:['E/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['A/4'],duration:'8'},{keys:['G/4'],duration:'4'},{keys:['F/4'],duration:'4'}
+      ]},
+      { name: 'Mardi Gras Mambo', notes: [
+        {keys:['F/4'],duration:'8'},{keys:['Eb/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['F/4'],duration:'2'}
+      ]},
+      { name: 'Saints (head)', notes: [
+        {keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'2'},{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['Bb/3'],duration:'2'}
+      ]},
+      { name: 'Iko Iko (hook 2)', notes: [
+        {keys:['Bb/3'],duration:'8'},{keys:['C/4'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['A/3'],duration:'8'},{keys:['G/3'],duration:'4'},{keys:['F/3'],duration:'4'}
+      ]},
+      { name: 'Chopsticks', notes: [
+        {keys:['F/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['F/4'],duration:'4'}
+      ]},
+      { name: 'Funeral March', notes: [
+        {keys:['G/3'],duration:'4'},{keys:['G/3'],duration:'4'},{keys:['G/3'],duration:'8'},{keys:['Ab/3'],duration:'8'},{keys:['G/3'],duration:'2'}
+      ]},
+      { name: 'La Cucaracha', notes: [
+        {keys:['C/4'],duration:'8'},{keys:['C/4'],duration:'8'},{keys:['C/4'],duration:'8'},{keys:['F/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['d/4'],duration:'4r'}
+      ]}
+    ];
+
     const CHORD_TONES = {
       'Bb7': {
         chord: ['Bb/2', 'D/3', 'F/3', 'Ab/3', 'Bb/3', 'D/4', 'F/4', 'Ab/4'],
@@ -4409,6 +4643,14 @@
             note.addModifier(ann, 0);
           }
         }
+        // Smear/gliss marker — note with smear:true gets a ↗ annotation above
+        // the notehead. Trombone tailgate style.
+        if (n.smear) {
+          const smearAnn = new VF.Annotation('↗')
+            .setFont('Arial', 16, 'bold')
+            .setVerticalJustification(VF.Annotation.VerticalJustify.TOP);
+          note.addModifier(smearAnn, 0);
+        }
         return note;
       });
     }
@@ -4426,6 +4668,13 @@
         const transposedKeys = n.keys.map(k => transposeVexKey(k));
         const note = new VF.StaveNote({ clef, keys: transposedKeys, duration: n.duration });
         addAccidentals(note, transposedKeys);
+        // Smear marker — melody notes with smear:true get ↗ above
+        if (n.smear) {
+          const smearAnn = new VF.Annotation('↗')
+            .setFont('Arial', 16, 'bold')
+            .setVerticalJustification(VF.Annotation.VerticalJustify.TOP);
+          note.addModifier(smearAnn, 0);
+        }
         return note;
       });
     }
@@ -4777,6 +5026,247 @@
         gamification.showToastPublic('info',
           'Ear training: ' + earScore + '/' + earTotal + ' correct', 'bi-ear');
       }
+    }
+
+    // =========================================================================
+    // QUOTE LIBRARY — drop classic riffs into your solo
+    // =========================================================================
+
+    function renderQuotesGrid() {
+      const grid = document.getElementById('quotesGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      QUOTES.forEach((q, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'quote-btn';
+        btn.textContent = q.name;
+        btn.dataset.quoteIdx = i;
+        btn.addEventListener('click', () => playQuote(i, btn));
+        grid.appendChild(btn);
+      });
+    }
+
+    let quotePlayGen = 0;
+
+    async function playQuote(idx, btn) {
+      const q = QUOTES[idx];
+      if (!q) return;
+      await initAudio();
+      quotePlayGen++;
+      const myGen = quotePlayGen;
+      // Visual feedback
+      document.querySelectorAll('.quote-btn').forEach(b => b.classList.remove('playing'));
+      if (btn) btn.classList.add('playing');
+      // Use current instrument voice
+      const voice = instrumentVoices[currentInstrumentName] || lickSynth;
+      const bpm = 110;
+      const beatSec = 60 / bpm;
+      const now = Tone.now() + 0.05;
+      let offset = 0;
+      q.notes.forEach(n => {
+        const beats = durationToBeats(n.duration);
+        if (!n.duration.endsWith('r')) {
+          const noteName = vexToTone(n.keys[0]);
+          voice.triggerAttackRelease(noteName, beats * beatSec * 0.85, now + offset);
+        }
+        offset += beats * beatSec;
+      });
+      setTimeout(() => {
+        if (myGen === quotePlayGen && btn) btn.classList.remove('playing');
+      }, offset * 1000 + 300);
+    }
+
+    function openQuotes() {
+      document.getElementById('quotesOverlay').classList.add('open');
+      renderQuotesGrid();
+    }
+    function closeQuotes() {
+      document.getElementById('quotesOverlay').classList.remove('open');
+      document.querySelectorAll('.quote-btn').forEach(b => b.classList.remove('playing'));
+    }
+
+    // =========================================================================
+    // CALL & RESPONSE — app plays 2 bars, you answer 2 bars via mic
+    // =========================================================================
+
+    // Library of "call" phrases per difficulty level. Each call is 2 bars
+    // (8 beats) in concert pitch. We pick one at random each round.
+    const CNR_CALLS = {
+      beginner: [
+        // Simple chord tone calls in Bb
+        [{keys:['Bb/3'],duration:'2'},{keys:['F/4'],duration:'2'},{keys:['D/4'],duration:'2'},{keys:['Bb/3'],duration:'2'}],
+        [{keys:['Bb/3'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['d/4'],duration:'4r'},{keys:['D/4'],duration:'2'},{keys:['Bb/3'],duration:'2'}],
+        [{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['F/4'],duration:'2'},{keys:['Bb/3'],duration:'w'}],
+        [{keys:['D/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'2'},{keys:['Bb/3'],duration:'w'}]
+      ],
+      intermediate: [
+        // Pentatonic + blues scale phrases in Bb
+        [{keys:['Bb/3'],duration:'8'},{keys:['D/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['Ab/4'],duration:'8'},{keys:['F/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['Bb/3'],duration:'2'},{keys:['d/4'],duration:'2r'}],
+        [{keys:['Bb/3'],duration:'8'},{keys:['Db/4'],duration:'8'},{keys:['D/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['Bb/4'],duration:'2'},{keys:['F/4'],duration:'4'},{keys:['Bb/3'],duration:'4'},{keys:['d/4'],duration:'2r'}],
+        [{keys:['F/4'],duration:'8'},{keys:['D/4'],duration:'8'},{keys:['Bb/3'],duration:'4'},{keys:['F/3'],duration:'4'},{keys:['d/4'],duration:'4r'},{keys:['D/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Bb/3'],duration:'2'}]
+      ],
+      advanced: [
+        // Bebop minor / chromatic vocab
+        [{keys:['Bb/3'],duration:'8'},{keys:['C/4'],duration:'8'},{keys:['Db/4'],duration:'8'},{keys:['D/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['Ab/4'],duration:'8'},{keys:['F/4'],duration:'4'},{keys:['Bb/3'],duration:'w'}],
+        [{keys:['D/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['Ab/4'],duration:'8'},{keys:['F/4'],duration:'4'},{keys:['d/4'],duration:'8r'},{keys:['Eb/4'],duration:'8'},{keys:['D/4'],duration:'8'},{keys:['C/4'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['d/4'],duration:'4r'}],
+        [{keys:['A/3'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['D/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['Ab/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['F/4'],duration:'4'},{keys:['Bb/3'],duration:'w'}]
+      ]
+    };
+    let cnrLevel = 'beginner';
+    let cnrRunning = false;
+    let cnrGen = 0;
+
+    async function startCallResponse() {
+      if (cnrRunning) { stopCallResponse(); return; }
+      await initAudio();
+      cnrGen++;
+      const myGen = cnrGen;
+      cnrRunning = true;
+      const stage = document.getElementById('cnrStage');
+      const countdown = document.getElementById('cnrCountdown');
+      const playBtn = document.getElementById('cnrPlayBtn');
+      playBtn.innerHTML = '<i class="bi bi-stop-fill"></i> Stop';
+      playBtn.classList.add('playing');
+
+      const calls = CNR_CALLS[cnrLevel];
+      const call = calls[Math.floor(Math.random() * calls.length)];
+      const bpm = 100;
+      const beatSec = 60 / bpm;
+      const voice = instrumentVoices[currentInstrumentName] || lickSynth;
+
+      stage.textContent = 'Listening… play back the 2-bar phrase you hear.';
+      stage.classList.add('active');
+      countdown.textContent = '';
+
+      // Countdown 4 beats before call
+      for (let i = 4; i >= 1; i--) {
+        if (myGen !== cnrGen) return;
+        countdown.textContent = i;
+        await new Promise(r => setTimeout(r, beatSec * 1000));
+      }
+      if (myGen !== cnrGen) return;
+      countdown.textContent = '';
+
+      // Play the call (2 bars = 8 beats)
+      stage.textContent = 'The call...';
+      const callStart = Tone.now() + 0.05;
+      let offset = 0;
+      call.forEach(n => {
+        const beats = durationToBeats(n.duration);
+        if (!n.duration.endsWith('r')) {
+          const noteName = vexToTone(n.keys[0]);
+          voice.triggerAttackRelease(noteName, beats * beatSec * 0.85, callStart + offset);
+        }
+        offset += beats * beatSec;
+      });
+      await new Promise(r => setTimeout(r, offset * 1000 + 100));
+      if (myGen !== cnrGen) return;
+
+      // Response phase — 2 bars (8 beats)
+      stage.textContent = 'Your turn! Respond with 2 bars.';
+      const responseBeats = 8;
+      const responseMs = responseBeats * beatSec * 1000;
+      // Countdown during response
+      for (let i = responseBeats; i >= 1; i--) {
+        if (myGen !== cnrGen) return;
+        countdown.textContent = i;
+        await new Promise(r => setTimeout(r, beatSec * 1000));
+      }
+      if (myGen !== cnrGen) return;
+
+      stage.textContent = 'Nice. Starting next call in 2 beats...';
+      countdown.textContent = '';
+      await new Promise(r => setTimeout(r, beatSec * 2000));
+      if (myGen !== cnrGen) return;
+
+      // Auto-repeat with a new call
+      if (cnrRunning) startCallResponse();
+    }
+
+    function stopCallResponse() {
+      cnrRunning = false;
+      cnrGen++;
+      const playBtn = document.getElementById('cnrPlayBtn');
+      playBtn.innerHTML = '<i class="bi bi-play-fill"></i> Start';
+      playBtn.classList.remove('playing');
+      document.getElementById('cnrStage').textContent = 'Press start. Listen to the call (2 bars), then play your response (2 bars).';
+      document.getElementById('cnrStage').classList.remove('active');
+      document.getElementById('cnrCountdown').textContent = '';
+    }
+
+    function openCallResponse() {
+      document.getElementById('cnrOverlay').classList.add('open');
+    }
+    function closeCallResponse() {
+      document.getElementById('cnrOverlay').classList.remove('open');
+      stopCallResponse();
+    }
+
+    // =========================================================================
+    // RECORDING — capture your solo via mic, play it back
+    // =========================================================================
+
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let recordedStream = null;
+    let isRecording = false;
+
+    async function toggleRecording() {
+      if (isRecording) {
+        stopRecording();
+        return;
+      }
+      try {
+        recordedStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        recordedChunks = [];
+        const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+          ? 'audio/webm;codecs=opus'
+          : (MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '');
+        mediaRecorder = mime ? new MediaRecorder(recordedStream, { mimeType: mime })
+                              : new MediaRecorder(recordedStream);
+        mediaRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
+          const url = URL.createObjectURL(blob);
+          const audio = document.getElementById('recAudio');
+          audio.src = url;
+          document.getElementById('recPlayback').classList.add('show');
+          if (recordedStream) {
+            recordedStream.getTracks().forEach(t => t.stop());
+            recordedStream = null;
+          }
+        };
+        mediaRecorder.start();
+        isRecording = true;
+        updateRecordBtn();
+        gamification.showToastPublic('info', 'Recording... press again to stop', 'bi-record-circle');
+      } catch(e) {
+        console.error('Recording failed:', e);
+        gamification.showToastPublic('error', 'Mic access denied. Allow the browser to use your microphone.', 'bi-mic-mute');
+      }
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+      isRecording = false;
+      updateRecordBtn();
+      gamification.showToastPublic('success', 'Recording saved. Play it back below the transport.', 'bi-check-circle');
+    }
+
+    function updateRecordBtn() {
+      const btn = document.getElementById('recordBtn');
+      if (!btn) return;
+      btn.classList.toggle('active', isRecording);
+      btn.title = isRecording ? 'Stop recording' : 'Record your solo';
+    }
+
+    function deleteRecording() {
+      const audio = document.getElementById('recAudio');
+      if (audio.src) URL.revokeObjectURL(audio.src);
+      audio.src = '';
+      document.getElementById('recPlayback').classList.remove('show');
     }
 
     // =========================================================================
@@ -5388,6 +5878,28 @@
       document.getElementById('micBtn').addEventListener('click', () => {
         if (micActive) stopMic(); else startMic();
       });
+
+      // Quotes
+      document.getElementById('quotesBtn').addEventListener('click', openQuotes);
+      document.getElementById('quotesClose').addEventListener('click', closeQuotes);
+
+      // Call & Response
+      document.getElementById('callResponseBtn').addEventListener('click', openCallResponse);
+      document.getElementById('cnrClose').addEventListener('click', closeCallResponse);
+      document.getElementById('cnrPlayBtn').addEventListener('click', () => {
+        if (cnrRunning) stopCallResponse(); else startCallResponse();
+      });
+      document.querySelectorAll('.cnr-diff').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.cnr-diff').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          cnrLevel = btn.dataset.cnrLevel;
+        });
+      });
+
+      // Recording
+      document.getElementById('recordBtn').addEventListener('click', toggleRecording);
+      document.getElementById('recDelete').addEventListener('click', deleteRecording);
 
       // Ear Training
       document.getElementById('earTrainBtn').addEventListener('click', openEarTraining);
