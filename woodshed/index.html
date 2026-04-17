@@ -2154,11 +2154,33 @@
         ti:['Over F7 (V of Bbm), try the altered scale for tension.','Long phrases that weave through the changes.','Ghost notes and ambient textures.'],
         ta:['Outside playing over Bbm — try Emaj7 arpeggio for tension.','Bitonal: Cmaj over Bbm for dissonance.','Modal interchange — borrow from Bb harmonic minor.']
       }),
-      mkProg({id:'riverside', t:'Riverside', cp:'Good Trouble', k:'Bb', bpm:110, sec:'active',
-        m:['Bb7','Bb7','Eb7','Bb7','Bb7','F7','Bb7','Bb7'],
-        tb:['Original Bb blues-based tune. Straight-ahead second line.','Bb blues scale and major pentatonic.','Bounce second line feel.'],
-        ti:['Standard second line phrasing — short, rhythmic.','Call-and-response in 2-bar chunks.','Target the 3rd and b7 of each chord.'],
-        ta:['Chromatic lead-ins to target notes on strong beats.','Displaced rhythms — start on the "and of 4".','Building intensity over 3 choruses.']
+      // Verified against band's Bb-instruments PDF — this is "Down By the
+      // Riverside" (traditional gospel), NOT an original. Concert Bb,
+      // ♩=130. Two-section AB form with major triads (not 7ths): A uses
+      // Bb-F7 alternation, B adds Eb (IV) with a D major chromatic
+      // passing chord.
+      mkProg({id:'riverside', t:'Down By the Riverside', cp:'Traditional', k:'Bb', bpm:130, sec:'active',
+        m:[
+          {c:'Bb',  ml:[{keys:['d/4'],duration:'8r'},{keys:['F/4'],duration:'4'},{keys:['A/4'],duration:'8'},{keys:['Bb/4'],duration:'2'}]},
+          {c:'Bb',  ml:[{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['G/4'],duration:'2'}]},
+          {c:'Bb',  ml:[{keys:['F/4'],duration:'2'},{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'4'}]},
+          {c:'F7',  ml:[{keys:['G/4'],duration:'2'},{keys:['F/4'],duration:'2'}]},
+          {c:'Bb',  ml:[{keys:['d/4'],duration:'4r'},{keys:['F/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['G/4'],duration:'2'}]},
+          {c:'F7',  ml:[{keys:['F/4'],duration:'2'},{keys:['G/4'],duration:'2'}]},
+          {c:'Bb',  ml:[{keys:['Bb/4'],duration:'w'}]},
+          {c:'Eb',  ml:[{keys:['Eb/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['G/4'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['F/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'2'}]},
+          {c:'F7',  ml:[{keys:['G/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Eb/4'],duration:'2'}]},
+          {c:'Bb',  ml:[{keys:['Bb/4'],duration:'w'}]},
+          {c:'Eb',  ml:[{keys:['G/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['D/5'],duration:'2'}]},
+          {c:'D',   ml:[{keys:['D/5'],duration:'4'},{keys:['F#/4'],duration:'4'},{keys:['A/4'],duration:'2'}]},
+          {c:'F7',  ml:[{keys:['F/4'],duration:'2'},{keys:['G/4'],duration:'2'}]},
+          {c:'Bb',  ml:[{keys:['Bb/4'],duration:'w'}]}
+        ],
+        tb:['Traditional gospel spiritual. "Ain\'t gonna study war no more".','Concert Bb, ♩=130. Simple I-IV-V in Bb with gospel phrasing.','Play the melody first — this one has lyrics everyone knows.'],
+        ti:['F7 (V7) in A section brings the tension, resolves to Bb.','B section introduces Eb (IV) — the gospel lift.','The D major (III) in B is a classic chromatic passing chord — use D major arpeggio.'],
+        ta:['Gospel turnarounds: Bb - G7 - Cm7 - F7 - Bb on the last chorus.','Quote other gospel standards ("I\'ll Fly Away", "Amazing Grace").','Bluesy Db passing tone on the F7 gives classic gospel soul.']
       }),
       // Verified against band's 8/13/24 tuba score (SO arrangement) —
       // G dorian (1 flat key sig, Gm tonic), ♩=140. Solo section chords:
@@ -2184,10 +2206,13 @@
         ti:['Gm-F-Cm7-Dm7 is i-bVII-iv-v in G dorian — all modal, no V7.','Target chord tones: Bb (3rd of Gm), A (3rd of F), Eb (3rd of Cm7), F (3rd of Dm7).','Disco-style staccato 8ths and ghost notes add funk.'],
         ta:['G dorian (G A Bb C D E F) — note the natural 6th (E) distinguishes it from natural minor.','Chromatic walk from Gm through F to Cm: Bb A Ab G.','Listen to Donna Summer Giorgio Moroder productions for the groove template.']
       }),
-      mkProg({id:'sidewinder', t:'Sidewinder', cp:'Lee Morgan (arr. Skatalites)', k:'Eb', bpm:130, sec:'active',
+      // Verified against Lee Morgan trans. Jesse Metzler 3/14/17 trumpet
+      // PDF. Concert Eb, "Ska" feel ♩=140. 24-bar form approximated to 16
+      // bars of I7-IV7-V7 (Eb7-Ab7-Bb7). Head 2x, solos, head out.
+      mkProg({id:'sidewinder', t:'Sidewinder', cp:'Lee Morgan, arr. Rebirth', k:'Eb', bpm:140, sec:'active',
         m:['Eb7','Eb7','Ab7','Ab7','Eb7','Eb7','Bb7','Ab7','Eb7','Bb7','Eb7','Eb7','Ab7','Bb7','Eb7','Eb7'],
-        tb:['Lee Morgan\'s hit, reggae-fied by Skatalites.','Eb blues scale + Eb mixolydian.','Boogaloo feel — play into the groove.'],
-        ti:['Target Ab (b7 of Bb7) for smooth voice leading.','Morgan\'s signature rhythmic cells — short and cool.','Horace Silver-style comping idea translates to horn lines.'],
+        tb:['Lee Morgan\'s hit with Ska feel at ♩=140. Head 2x, solos, head out.','Eb blues scale + Eb mixolydian (Eb F G Ab Bb C Db).','Boogaloo feel — play ON TOP of the ska upbeats.'],
+        ti:['Target Ab (b7 of Bb7) for smooth voice leading.','Morgan\'s signature rhythmic cells — short and cool.','The Bb7 in bar 7 sets up the descent back to I.'],
         ta:['Bebop dominant scales over each chord.','Morgan quote: 5-6-b7-1 figure is his calling card.','Listen to the Blue Note original AND the Skatalites cover.']
       }),
       mkProg({id:'sweet-dreams', t:'Sweet Dreams', cp:'Eurythmics / Soul Rebels', k:'Cm', bpm:105, sec:'active',
