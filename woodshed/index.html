@@ -1548,6 +1548,11 @@
       'Db7':  ['Db3', 'F3', 'Ab3', 'B3'],
       'F#7':  ['F#3', 'A#3', 'C#4', 'E4'],
       'Gb7':  ['Gb3', 'Bb3', 'Db4', 'Fb4'],
+      // Diminished 7ths — used as chromatic passing chords
+      'F#dim': ['F#3', 'A3', 'C4', 'Eb4'],
+      'Gbdim': ['F#3', 'A3', 'C4', 'Eb4'],
+      'Cdim':  ['C3', 'Eb3', 'Gb3', 'A3'],
+      'Ddim':  ['D3', 'F3', 'Ab3', 'B3'],
       // Major 7ths
       'BbMaj7': ['A3', 'Bb3', 'D4', 'F4'],
       'EbMaj7': ['D3', 'Eb3', 'G3', 'Bb3'],
@@ -1599,6 +1604,10 @@
       'Db7':  ['Db2', 'F2', 'Ab2', 'F2'],
       'F#7':  ['F#2', 'A#2', 'C#3', 'A#2'],
       'Gb7':  ['Gb2', 'Bb2', 'Db3', 'Bb2'],
+      'F#dim': ['F#2', 'A2', 'C3', 'A2'],
+      'Gbdim': ['F#2', 'A2', 'C3', 'A2'],
+      'Cdim':  ['C2', 'Eb2', 'Gb2', 'Eb2'],
+      'Ddim':  ['D2', 'F2', 'Ab2', 'F2'],
       'BbMaj7':['Bb2', 'D3', 'F3', 'D3'],
       'EbMaj7':['Eb2', 'G2', 'Bb2', 'G2'],
       'FMaj7': ['F2', 'A2', 'C3', 'A2'],
@@ -1840,11 +1849,18 @@
         ti:['Eb blues scale (Eb Gb Ab A Bb Db) works over both chords.','Target the 3rd (G) and b7 (Db) on Eb7 for guide tones.','Grace notes and bends make it sing.'],
         ta:['Over Ab7, switch to Ab mixolydian for harmonic clarity.','Chromatic approach from G down to F down to Eb on the turnaround.','Listen to Mama Digdown\'s for the phrasing vocabulary.']
       }),
-      mkProg({id:'bogalusa-strut', t:'Bogalusa Strut', cp:'Sam Morgan\'s Jazz Band', k:'C', bpm:120, sec:'active',
-        m:['C7','C7','F7','C7','C7','G7','F7','C7'],
-        tb:['Classic early NOLA jazz strut. 8-bar blues in C.','C blues scale (C Eb F F# G Bb) works throughout.','Play with that old-timey dixieland bounce.'],
-        ti:['The G7 (bar 6) is the V7 — lean into B natural (3rd).','Tailgate trombone glisses were invented for this.','Trade lead with another horn — group improv is the point.'],
-        ta:['Collective improv: play around the melody, not over it.','Chromatic turnarounds into the C7 restart.','Listen to Sam Morgan\'s recordings from 1927.']
+      // Verified against band's 2/20/2026 tuba score — C major (no flats/
+      // sharps), ♩=180. Classic 1920s NOLA jazz with full circle-of-fifths
+      // secondary dominants (A7 → D7 → G7 → C). Section [1] is the main
+      // 16-bar head. Section [2] is a simpler G → C vamp used for the sung
+      // section and solos. Form: Intro, 1, 2, 2, sing (2), solos (2), 1,
+      // 2, Outro. Chart notes: "for simpler bass line, ignore parentheses
+      // and play upper stems"; "for silliness, hold it out if you can."
+      mkProg({id:'bogalusa-strut', t:'Bogalusa Strut', cp:'Sam Morgan', k:'C', bpm:180, sec:'active',
+        m:['F','F#dim','C','A7','D7','G7','C','C7'],
+        tb:['Classic 1920s NOLA jazz by Sam Morgan. ♩=180 strut tempo.','Section 1 has full circle-of-fifths movement: A → D → G → C.','F#dim is a chromatic passing chord between F and C.'],
+        ti:['Secondary dominants: A7 goes to D7, D7 goes to G7, G7 goes to C.','Tailgate trombone glisses were invented for this kind of tune.','Section 2 (for sung/solos) is just G → C alternation — much simpler.'],
+        ta:['Bebop reharmonization: substitute ii-V approaches for each dominant.','F → F#dim → C is a classic NOLA chromatic passage.','Listen to Sam Morgan\'s 1927 Columbia recordings.']
       }),
       mkProg({id:'bourbon-street', t:'Bourbon Street Parade', cp:'Paul Barbarin', k:'Ab', bpm:115, sec:'active',
         m:['Ab','Ab','Ab7','Db','Ab','Eb7','Ab','Ab','Ab','Ab','Ab7','Db','Ab','Eb7','Ab','Ab'],
@@ -1852,11 +1868,14 @@
         ti:['On the Ab7 (bar 3), lean into Gb (b7) to set up the Db.','Parade-style octave jumps and stabs.','Let the trombone smears speak — that\'s the sound.'],
         ta:['Db major section (bar 4) — switch to Db major pentatonic.','Chromatic approaches from below on strong beats.','Listen to Preservation Hall and Paul Barbarin recordings.']
       }),
-      mkProg({id:'bye-and-bye', t:'Bye and Bye', cp:'Traditional', k:'F', bpm:110, sec:'active',
-        m:['F','F','C7','F','F','C7','F','F'],
-        tb:['Gospel/traditional. Simple I-V changes in F.','F major pentatonic is enough for a whole chorus.','Hymn-like phrasing with dignity.'],
-        ti:['Add the 6th (D) for sweetness over F.','Call-and-response with the congregation in mind.','Long tones over quick phrases.'],
-        ta:['Gospel turnarounds: F - A7 - Dm - G7 - C7 - F.','Vibrato on held notes for soul.','Quote Amazing Grace in the last chorus.']
+      // Verified against band's tuba score — F major (1 flat), ♩=190.
+      // 16-bar form with F7 and Bb7 color chords. Title "By and By" on
+      // the score (book index had "Bye and Bye").
+      mkProg({id:'bye-and-bye', t:'By and By', cp:'Traditional', k:'F', bpm:190, sec:'active',
+        m:['F','F','Bb','F','F','F','C','C7','F','F7','Bb','Bb7','F','C7','F','F'],
+        tb:['Gospel standard at ♩=190 — brisk and joyful.','F major scale, with F7 and Bb7 adding bluesy color.','The V7-of-IV (F7) in bar 10 sets up Bb — classic gospel move.'],
+        ti:['Target the 3rd of each chord — A over F, D over Bb, E over C.','Bb7 (bar 12) is the IV7 — use Ab (b7) for bluesy lift.','Call-and-response phrasing.'],
+        ta:['Gospel turnaround: F - A7 - Dm - G7 - C7 - F (substitute over bars 14-16).','Quote Amazing Grace or another hymn in the final chorus.','F major pentatonic + blue note (Ab) covers 90% of the tune.']
       }),
       mkProg({id:'canaan-land', t:'(On My Way To) Canaan Land', cp:'Denise Gordon arr.', k:'Cm', bpm:100, sec:'active',
         m:['Cm','Cm','Fm','Cm','Cm','G7','Cm','Cm'],
