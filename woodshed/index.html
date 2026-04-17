@@ -1765,11 +1765,14 @@
       }),
 
       // ---------- ACTIVE REPERTOIRE ----------
-      mkProg({id:'do-whatcha-wanna', t:'Do Whatcha Wanna', cp:'Rebirth Brass Band', k:'Eb', bpm:95, sec:'active',
-        m:['Eb7','Eb7','Ab7','Ab7','Eb7','Eb7','Bb7','Eb7'],
-        tb:['Rebirth signature tune in Eb. I-IV-V vamp, infinite groove.','Eb blues scale (Eb Gb Ab A Bb Db) covers everything.','The hook is a 2-bar riff — internalize then improvise.'],
-        ti:['Major 3rd (G) + minor 3rd (Gb) together = classic NOLA bend.','Call-and-response: phrase on Eb7, answer on Ab7.','"And of 2" and "and of 4" for the second line pocket.'],
-        ta:['Over Bb7 (bar 7), use E natural (tritone) for tension → Eb.','Quote "Iko Iko" or other NOLA classics freely.','Phil Frazier\'s tuba lines inspire horn octave jumps.']
+      // Verified against band's tuba score — Bb concert, ♩=160. Structure:
+      // 2-bar intro rest → A (repeat) → B (4x) → C (4x) → bridge → D (8x).
+      // We capture the main 8-bar I7-IV7-V7 groove.
+      mkProg({id:'do-whatcha-wanna', t:'Do Whatcha Wanna', cp:'Rebirth Brass Band', k:'Bb', bpm:160, sec:'active',
+        m:['Bb7','Bb7','Eb7','Eb7','Bb7','Bb7','F7','Bb7'],
+        tb:['Rebirth signature tune in Bb. I7-IV7-V7 vamp at a hot 160 BPM.','Bb blues scale (Bb Db Eb E F Ab) covers everything.','The hook is a 2-bar riff — internalize it, then improvise around it.'],
+        ti:['Major 3rd (D) + minor 3rd (Db) together = classic NOLA bend.','Call-and-response: phrase on Bb7, answer on Eb7.','Accent the "and of 2" and "and of 4" for the second line pocket.'],
+        ta:['Over F7 (bar 7), use B natural (tritone) for tension → Bb.','Quote "Iko Iko" or other NOLA classics freely.','Phil Frazier\'s tuba dotted-rhythm line drives this — listen and match it.']
       }),
       mkProg({id:'ballad-of-kami-jean', t:'Ballad of Kami Jean', cp:'Mama Digdown\'s Brass Band', k:'Eb', bpm:85, sec:'active',
         m:['Eb','Cm7','Fm7','Bb7','Eb','Cm7','Fm7','Bb7','Ab','Eb','Ab','Eb','Fm7','Bb7','Eb','Eb'],
