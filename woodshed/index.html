@@ -1848,9 +1848,21 @@
       // solos, drums, tuba solo, 1/3 (reeds), 3/1 (reeds), 2. Solos go
       // "length per soloist, lead into next solo" — open-ended. Section 3
       // has "Trombone riff second time".
+      // Verified via MusicXML — Eb (3 flats), ♩=100. One-chord modal
+      // vamp. Melody sourced from the TROMBONE part (trumpet was busy
+      // 16ths). Shows the Db-centric riff with G/Bb/Eb chord tones.
       mkProg({id:'thousand-island', t:'Thousand Island', cp:'Rebirth Brass Band', k:'Eb', bpm:100, sec:'core',
-        m:['Eb7','Eb7','Eb7','Eb7','Eb7','Eb7','Eb7','Eb7'],
-        tb:['Rebirth one-chord Eb vamp — modal NOLA groove.','Eb mixolydian (Eb F G Ab Bb C Db) is the scale.','Bass-drum-tuba lock creates the whole groove. Stay in Eb.'],
+        m:[
+          {c:'Eb7', ml:[{keys:['Db/4'],duration:'w'}]},
+          {c:'Eb7', ml:[{keys:['Db/4'],duration:'2'},{keys:['Db/4'],duration:'8'},{keys:['Db/4'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['Ab/3'],duration:'8'}]},
+          {c:'Eb7', ml:[{keys:['Bb/3'],duration:'8'},{keys:['G/3'],duration:'8'},{keys:['G/3'],duration:'4'},{keys:['G/3'],duration:'2'}]},
+          {c:'Eb7', ml:[{keys:['G/3'],duration:'2'},{keys:['G/3'],duration:'4'},{keys:['Bb/3'],duration:'8'},{keys:['C/4'],duration:'8'}]},
+          {c:'Eb7', ml:[{keys:['Db/4'],duration:'w'}]},
+          {c:'Eb7', ml:[{keys:['Db/4'],duration:'2'},{keys:['Db/4'],duration:'8'},{keys:['Db/4'],duration:'8'},{keys:['Bb/3'],duration:'8'},{keys:['Ab/3'],duration:'8'}]},
+          {c:'Eb7', ml:[{keys:['Bb/3'],duration:'8'},{keys:['Eb/4'],duration:'8'},{keys:['Eb/4'],duration:'4'},{keys:['Eb/4'],duration:'2'}]},
+          {c:'Eb7', ml:[{keys:['Eb/4'],duration:'2'},{keys:['d/4'],duration:'4r'},{keys:['Bb/3'],duration:'8'},{keys:['C/4'],duration:'8'}]}
+        ],
+        tb:['Rebirth one-chord Eb vamp — modal NOLA groove.','Eb mixolydian (Eb F G Ab Bb C Db) is the scale.','The trombone riff (Db-Bb-Ab) is iconic — learn it.'],
         ti:['Eb blues scale (Eb Gb Ab A Bb Db) for gritty licks.','Repeated 2-bar rhythmic cells — build hypnotic intensity.','Solos are "length per soloist" — you decide when to pass the bone.'],
         ta:['Over the static Eb, outside colors work — try Bbm7 arpeggios.','Section 3 has a trombone riff 2nd time — leave space for it.','Superimpose Ab7 or Bb7 mentally for harmonic movement against the drone.']
       }),
@@ -1882,10 +1894,22 @@
       // 3, 1, 1+2, 3, 4 (Play 4X), Solos (3 solo backups), 1, 1+2, 3.
       // Title on score is "You Move You Lose" (not "Ya Lose" as in the
       // book index).
+      // Verified via MusicXML — Fm dorian tonal center (4-flat key sig =
+      // Ab), ♩=175. Melody sourced from the HORN part (trumpet + alto
+      // were mostly rests). Shows the dorian 7-6 oscillation (Eb-D).
       mkProg({id:'you-move-ya-lose', t:'You Move You Lose', cp:'Rebirth Brass Band', k:'Fm', bpm:175, sec:'core',
-        m:['Fm7','Fm7','Fm7','Fm7','Fm7','Fm7','Fm7','Fm7'],
-        tb:['Rebirth modal Fm groove at ♩=175. Static one-chord vamp.','Fm pentatonic (F Ab Bb C Eb) is home. Stay in the mode.','Different sections have different horn arrangements (trombones, then trumpets+tbn).'],
-        ti:['F dorian (F G Ab Bb C D Eb) for brighter color with natural 6.','Repeated rhythmic cells — hypnotic, relentless.','3 Solo Backups give you 3 different textures to solo over.'],
+        m:[
+          {c:'Fm7', ml:[{keys:['d/4'],duration:'8r'},{keys:['Eb/4'],duration:'8'},{keys:['D/4'],duration:'8'},{keys:['d/4'],duration:'8r'},{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'}]},
+          {c:'Fm7', ml:[{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'}]},
+          {c:'Fm7', ml:[{keys:['Eb/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['Eb/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['d/4'],duration:'8r'},{keys:['F/4'],duration:'8'}]},
+          {c:'Fm7', ml:[{keys:['d/4'],duration:'wr'}]},
+          {c:'Fm7', ml:[{keys:['d/4'],duration:'2r'},{keys:['C/5'],duration:'8'},{keys:['Bb/4'],duration:'8'},{keys:['Ab/4'],duration:'8'},{keys:['Bb/4'],duration:'8'}]},
+          {c:'Fm7', ml:[{keys:['Bb/4'],duration:'4'},{keys:['Ab/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['Ab/4'],duration:'4'}]},
+          {c:'Fm7', ml:[{keys:['Bb/4'],duration:'4'},{keys:['Ab/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['Ab/4'],duration:'8'},{keys:['Bb/4'],duration:'8'}]},
+          {c:'Fm7', ml:[{keys:['Bb/4'],duration:'4'},{keys:['C/5'],duration:'4'},{keys:['d/4'],duration:'2r'}]}
+        ],
+        tb:['Rebirth modal Fm groove at ♩=175. Static one-chord vamp.','Horn/brass plays Eb-D (7-6) alternation — signature dorian move.','Section 1 is trombones, section 2 adds trumpets.'],
+        ti:['F dorian (F G Ab Bb C D Eb) — note the natural 6 (D) is key.','The 7-6 (Eb-D) oscillation in bars 1-3 is the hook.','3 Solo Backups give you 3 different textures to solo over.'],
         ta:['Against the Fm drone, try Dbmaj7 or Ebmaj7 arpeggios for outside color.','Bitonal: play in Ab major over the Fm for a floating effect.','Build tension with upper-structure triads (G/Fm, A/Fm).']
       }),
 
