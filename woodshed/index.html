@@ -1489,8 +1489,8 @@
       <button class="transport-btn active" id="loopBtn" title="Loop">
         <i class="bi bi-repeat"></i>
       </button>
-      <button class="transport-btn active" id="muteBtn" title="Mute">
-        <i class="bi bi-volume-mute-fill" id="muteIcon"></i>
+      <button class="transport-btn" id="muteBtn" title="Mute backing track">
+        <i class="bi bi-volume-up-fill" id="muteIcon"></i>
       </button>
       <button class="transport-btn" id="micBtn" title="Microphone">
         <i class="bi bi-mic" id="micIcon"></i>
@@ -3744,7 +3744,7 @@
     let currentMeasure = -1;
     let measureBounds = [];
     let audioReady = false;
-    let isMuted = true; // Start muted
+    let isMuted = false; // Start UNMUTED — user hits play, they hear the band
     let masterVol = null;
     let piano, bass, hihat, kick;
     let lickSynth = null;
@@ -5720,6 +5720,14 @@
       sessionStartTime_g = true;
     }
 
+    // Auto-pause helper — called when user changes instrument/mode/level/feel
+    // mid-playback so they can finish making their selection without hearing
+    // a conflicting sound. Also stops any hear-lick/hear-melody playback.
+    function pauseIfPlaying() {
+      if (isPlayingLick) stopLickDemo();
+      if (isPlaying) pause();
+    }
+
     function stop() {
       gamification.endSession();
       sessionStartTime_g = false;
@@ -5774,6 +5782,9 @@
       // Instrument selector — icon buttons
       document.querySelectorAll('.inst-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+          // Pause mid-playback so user can finish selecting without hearing
+          // a conflicting sound. They can resume with the new instrument.
+          pauseIfPlaying();
           document.querySelectorAll('.inst-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           const name = btn.dataset.name;
@@ -5781,9 +5792,6 @@
           if (entry) {
             currentInstrumentName = entry.name;
             currentInstrument = INSTRUMENTS[entry.transposition] || INSTRUMENTS['bass-concert'];
-            // Swap the Hear Lick / Hear Melody voice to match the new instrument.
-            // Stop any in-flight playback first so the old voice doesn't leak.
-            if (isPlayingLick) stopLickDemo();
             if (instrumentVoices[currentInstrumentName]) {
               lickSynth = instrumentVoices[currentInstrumentName];
             }
@@ -5806,6 +5814,7 @@
 
       document.querySelectorAll('.mode-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+          pauseIfPlaying();
           document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           currentMode = btn.dataset.mode;
@@ -5827,6 +5836,7 @@
       // Level selector
       document.querySelectorAll('.level-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+          pauseIfPlaying();
           document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           currentLevel = btn.dataset.level;
@@ -5862,15 +5872,12 @@
       // Swing feel toggle
       document.querySelectorAll('.swing-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+          pauseIfPlaying();
           document.querySelectorAll('.swing-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           currentSwing = parseInt(btn.dataset.swing);
           Tone.Transport.swing = SWING_SETTINGS[currentSwing].value;
           Tone.Transport.swingSubdivision = '8n';
-          // If playing, reschedule to apply swing
-          if (isPlaying) {
-            scheduleProgression();
-          }
         });
       });
 
