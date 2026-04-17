@@ -2063,35 +2063,57 @@
         ti:['Target the 3rd of each chord — A over F, D over Bb, E over C.','Bb7 (bar 12) is the IV7 — use Ab (b7) for bluesy lift.','Call-and-response phrasing.'],
         ta:['Gospel turnaround: F - A7 - Dm - G7 - C7 - F (substitute over bars 14-16).','Quote Amazing Grace or another hymn in the final chorus.','F major pentatonic + blue note (Ab) covers 90% of the tune.']
       }),
-      mkProg({id:'canaan-land', t:'(On My Way To) Canaan Land', cp:'Denise Gordon arr.', k:'Cm', bpm:100, sec:'active',
-        m:['Cm','Cm','Fm','Cm','Cm','G7','Cm','Cm'],
-        tb:['Gospel in C minor. Dark but hopeful.','C harmonic minor (C D Eb F G Ab B) is the main color.','Play like you\'re praying and dancing at once.'],
-        ti:['On G7 (bar 6), use the C harmonic minor for the B natural.','Target Eb (3rd) and G (5th) of Cm for grounding.','Let the phrases breathe — this is spiritual music.'],
+      // Verified trumpet PDF: "I'm On My Way To Canaan Land" (Traditional),
+      // ♩=120, concert Cm. Chord progression: Cm | G7 | Cm | C (picardy) |
+      // Fm | Cm | G7 | Cm. Classic gospel i-V7-i with major III borrowed.
+      mkProg({id:'canaan-land', t:'I\'m On My Way To Canaan Land', cp:'Traditional', k:'Cm', bpm:120, sec:'active',
+        m:['Cm','G7','Cm','C','Fm','Cm','G7','Cm'],
+        tb:['Gospel in C minor at ♩=120. "I\'m on my way" traditional.','C harmonic minor (C D Eb F G Ab B) is the main color.','The D major (picardy) in bar 4 is a classic gospel lift.'],
+        ti:['On G7, use C harmonic minor for the B natural.','The C major (not Cm) in bar 4 is a borrowed chord — lean into it.','Target Eb (3rd) and G (5th) of Cm for grounding.'],
         ta:['Bebop minor over Cm: C D Eb F G Ab B — 8 notes.','Quote Amazing Grace or Just a Closer Walk — gospel family.','Build from whisper to shout over 3 choruses.']
       }),
-      mkProg({id:'danza-del-guerrero', t:'Danza del Guerrero', cp:'Rim Bam Bum', k:'C', bpm:115, sec:'active',
+      // Verified trumpet + tuba PDFs — composer is Diegou! (as performed
+      // by Rim Bam Bum band). Concert C major, cut-time feel (tuba in 2/8,
+      // trumpet in 2/4). Complex arrangement: A B C D C2 B A D C2 B A.
+      // No explicit chord symbols on the trumpet part — pattern-driven
+      // modal dance tune. Keeping 4/4 notation since our app defaults to
+      // that; real feel is fast cut-time.
+      mkProg({id:'danza-del-guerrero', t:'Danza del Guerrero', cp:'Diegou! (Rim Bam Bum)', k:'C', bpm:115, sec:'active',
         m:['C','C','F','C','G7','F','C','C'],
-        tb:['Latin/NOLA fusion in C major.','C major scale + C blues for flavor.','Think Cuban timba meets second line.'],
+        tb:['Latin/NOLA fusion in C major. Cut-time feel at ♩=115.','C major scale + C blues for flavor. Clave-driven phrasing.','Arrangement: A B C D C2 B A D C2 B A — complex form.'],
         ti:['Clave-based phrasing — 3-2 or 2-3.','Montuno-inspired repeated figures.','Target the 3rd of each chord for brightness.'],
-        ta:['Mixed scales: C lydian for a floating feel.','Polyrhythmic 3 against 2 patterns.','Listen to Rim Bam Bum for the groove.']
+        ta:['Mixed scales: C lydian for a floating feel.','Polyrhythmic 3 against 2 patterns.','Listen to Rim Bam Bum for the groove, Diegou! for the composition.']
       }),
-      mkProg({id:'dumpster-bump', t:'Dumpster Bump', cp:'Good Trouble', k:'Bbm', bpm:105, sec:'active',
-        m:['Bbm7','Bbm7','Ebm7','Ebm7','Bbm7','F7','Bbm7','Bbm7'],
-        tb:['Minor funk groove in Bb minor.','Bb minor pentatonic (Bb Db Eb F Ab) is home.','Gritty and rhythmic — not pretty.'],
-        ti:['F7 (V7) is the tension — use Gb (b9) and C# (b13).','Ghost notes and percussive attacks.','Repeat 2-bar riffs to lock the groove.'],
-        ta:['Bb harmonic minor over F7 for the B natural.','Chromatic walks from Bbm down to Ebm.','Octave jumps on the "and of 4" for pop.']
+      // Verified trumpet PDF: Jack Brass Band tune, ♩=100, concert Bbm.
+      // Solo Backup Line shows: Bbm | Gb | Ebm7 | Cdim | F | progression.
+      // Form: Drums, Intro (Bones+Drums), 1 (Saxes), 1+2 (Trumpets+Bones),
+      // 3, 1, 1+2, 3, solos, X, 1, 1+2, 3.
+      mkProg({id:'dumpster-bump', t:'Dumpster Bump', cp:'Jack Brass Band', k:'Bbm', bpm:100, sec:'active',
+        m:['Bbm7','Gb','Ebm7','Cdim','F','Bbm7','Ebm7','F'],
+        tb:['Jack Brass Band minor funk at ♩=100 in Bbm.','Bb minor pentatonic + Cdim passing chord for color.','Gritty and rhythmic — not pretty.'],
+        ti:['Gb (bVI) → Ebm7 (iv) → Cdim passing → F (V) → Bbm (i).','F7 (V7) tension — use Gb (b9) and C# (b13).','Ghost notes and percussive attacks define the groove.'],
+        ta:['Bb harmonic minor over F7 for the B natural leading tone.','Cdim arpeggio as a passing device between Ebm7 and F.','Octave jumps on the "and of 4" for pop.']
       }),
-      mkProg({id:'love-of-money', t:'For the Love of Money', cp:'O\'Jay\'s', k:'Bbm', bpm:90, sec:'active',
-        m:['Bbm7','Bbm7','Bbm7','Bbm7','Ebm7','Ebm7','Bbm7','F7'],
-        tb:['Classic soul-funk in Bb minor. That iconic bass line.','Bb dorian (Bb C Db Eb F G Ab) is key.','The "money, money, money" chant — respect the melody.'],
-        ti:['Wah-wah-style phrasing with ghost notes.','F7 brings it home — lean into Ab (b3 of F alt).','Stay in the pocket — don\'t overplay.'],
-        ta:['Bb dorian + blue note (E natural) for outside color.','Build over 3 choruses — start sparse, end screaming.','Listen to the original for the horn arrangement.']
+      // Verified trumpet PDF — chart explicitly labels "C min".
+      // Key corrected from Bbm to Cm. Composer: Gamble & Huff (O'Jays).
+      // Form: Intro (tuba x2, +drums x2), A (x4 Bones), B (Tenor fill),
+      // C (x4), D (behind solos, Bone fill), E (x8 ends first 2 bars).
+      // Structure: Intro, A, B, C, B, solos with D, B, E.
+      mkProg({id:'love-of-money', t:'For the Love of Money', cp:'Gamble & Huff (O\'Jays)', k:'Cm', bpm:90, sec:'active',
+        m:['Cm7','Cm7','Fm7','Cm7','Cm7','Fm7','G7','Cm7'],
+        tb:['Classic O\'Jays soul-funk in C minor (chart label: "C min").','C dorian (C D Eb F G A Bb) is key. That iconic bass line drives it.','The "money, money, money" chant — respect the melody.'],
+        ti:['Wah-wah-style phrasing with ghost notes.','G7 brings it home — lean into Ab (b13 alt).','Stay in the pocket — don\'t overplay.'],
+        ta:['C dorian + blue note (Gb) for outside color.','Build over 3 choruses — start sparse, end screaming.','Listen to the O\'Jays original for the horn arrangement.']
       }),
-      mkProg({id:'grazin-in-the-grass', t:'Grazin\' in the Grass', cp:'Hugh Masekela', k:'F', bpm:110, sec:'active',
-        m:['F','Eb','F','Eb','F','Eb','F','F'],
-        tb:['Hugh Masekela\'s 1968 hit. Simple I-bVII vamp in F.','F mixolydian (F G A Bb C D Eb) fits the dominant sound.','Funky, joyful, repetitive.'],
-        ti:['Eb is the bVII — gives a modal, open quality.','Target F (root) and A (3rd) for the bright melody.','Pentatonic riffs work great here.'],
-        ta:['Blue notes (Ab and B natural) for grit.','Trumpet-style octave calls.','Listen to Masekela\'s trumpet solos for the language.']
+      // Verified Bb-trumpet PDF — Masekela / Jack Brass Band arrangement.
+      // Tempo ♩=200 (was 110 — big miss). Concert F. Chord progression
+      // uses F / C → concert F / Bb, plus a Bbm (concert) modal shift
+      // in section B. Form: A (repeat) → B (repeat) → C (repeat).
+      mkProg({id:'grazin-in-the-grass', t:'Grazin\' in the Grass', cp:'Hugh Masekela, arr. Jack Brass Band', k:'F', bpm:200, sec:'active',
+        m:['F','F','Bb','Bbm','F','F','Bb','Bbm'],
+        tb:['Masekela\'s 1968 hit at a fast ♩=200. F major tonic.','F — Bb — Bbm: the iv-minor adds classic African-jazz color.','Three-section form: A, B, C — each with repeat.'],
+        ti:['The Bbm (iv-minor) is the signature chromatic move.','Target F-A-C chord tones plus the Db (b3 of Bbm).','Pentatonic riffs on F work for the whole tune.'],
+        ta:['F mixolydian (F G A Bb C D Eb) over major sections.','Bb dorian over Bbm for the minor iv.','Listen to Masekela\'s trumpet solos for the language.']
       }),
       mkProg({id:'gross', t:'Gross', cp:'Balkan Beat Box', k:'Bbm', bpm:130, sec:'active',
         m:['Bbm','Bbm','Ebm','Bbm','Bbm','F7','Bbm','Bbm'],
@@ -2111,23 +2133,39 @@
         ti:['Over D7, use Eb (b9) and Bb (b13) for altered sound.','Heavy vibrato on long tones — Shorty-style.','Play loud — this is power music.'],
         ta:['Hemiola: 3-against-4 rhythmic figures.','Diminished runs from D7 resolving to Gm.','Watch Shorty Live for the phrasing and energy.']
       }),
-      mkProg({id:'la-misma-cancion', t:'La Misma Cancion', cp:'Traditional Latin', k:'C', bpm:115, sec:'active',
+      // Verified trumpet PDF — composer is OZOMATLI (not "Traditional Latin").
+      // Concert C major, time sig 2/4 (cut-time feel). No chord symbols on
+      // the part — tune is melody-driven.
+      mkProg({id:'la-misma-cancion', t:'La Misma Cancion', cp:'Ozomatli', k:'C', bpm:115, sec:'active',
         m:['C','C','G7','G7','C','C','G7','C'],
-        tb:['Latin standard in C. Simple I-V changes.','C major scale + C major pentatonic.','Think salsa or cumbia feel.'],
+        tb:['Ozomatli original in C major, 2/4 cut-time feel.','C major scale + C major pentatonic.','Latin-rock fusion with NOLA brass band treatment.'],
         ti:['Guide tones on G7: B (3rd) and F (b7).','Clave-based rhythmic phrasing.','Target arpeggio notes on strong beats.'],
-        ta:['Add b9 (Ab) over G7 for Latin jazz color.','Mix major and Mixolydian scales freely.','Listen to Cuban montuno for rhythmic vocabulary.']
+        ta:['Add b9 (Ab) over G7 for Latin jazz color.','Mix major and Mixolydian scales freely.','Listen to Ozomatli\'s original recording for the feel.']
       }),
-      mkProg({id:'lovely-day', t:'Lovely Day', cp:'Bill Withers / Soul Rebels', k:'Eb', bpm:105, sec:'active',
-        m:['Eb','Eb','Ab','Ab','Eb','Bb7','Eb','Eb'],
-        tb:['Bill Withers classic, brass-banded by Soul Rebels.','Eb major scale is the primary color.','Joyful, uplifting — play with smile.'],
-        ti:['Add 6th (C) and major 7th (D) over Eb for sweet pop sound.','Ab major section (bar 3-4) — lift the energy.','Soul Rebels-style horn section stabs.'],
-        ta:['That held high note — vibrato and bend up slightly.','Gospel turnarounds in the last chorus.','Listen to Soul Rebels\' version for the arrangement.']
+      // Verified trumpet PDF — Bill Withers & Skip Scarborough, arr. Angie
+      // Sassi as played by The Soul Rebels. Concert Eb, ♩=100. Form:
+      // Intro (drums/tuba/horns, 12 bars) → Part 1 → Part 2 → Al Coda
+      // (Part 4) → Part 3 (Chorus) → Solo Section → D.S. al Coda.
+      // Real Solo Section chords (written → concert): F-Dm7-Bbmaj9sus2-
+      // Bbm7-Eb → Eb-Cm7-Abmaj9sus2-Abm7-Db.
+      mkProg({id:'lovely-day', t:'Lovely Day', cp:'Bill Withers & Skip Scarborough, arr. Angie Sassi', k:'Eb', bpm:100, sec:'active',
+        m:['Eb','Cm7','AbMaj7','Abm7','Db','Eb','Cm7','Db'],
+        tb:['Bill Withers classic, brass-banded by Soul Rebels. ♩=100.','Eb major with iv-minor (Abm7) for the signature "lovely" color.','Part 3 is the chorus — the "lovely day" hook.'],
+        ti:['The Abmaj7 → Abm7 shift (IV to iv-minor) is the tune\'s magic move.','Target major 7 (G) on Abmaj7, then b3 (Cb) on Abm7.','Soul Rebels-style horn stabs on the chorus.'],
+        ta:['That held high note in the chorus — vibrato and bend up slightly.','Over the iv-minor Abm7, try Db mixolydian or Eb dorian.','Listen to the Soul Rebels\' version for the arrangement details.']
       }),
-      mkProg({id:'mardi-gras', t:'Mardi Gras', cp:'Traditional NOLA', k:'Bb', bpm:110, sec:'active',
-        m:['Bb','Bb','F7','Bb','Bb','Bb7','Eb','Eb','Bb','F7','Bb','Bb'],
-        tb:['NOLA Mardi Gras parade tune in Bb. Traditional form.','Bb major scale with occasional blue notes.','Play festive — it\'s carnival time.'],
-        ti:['The Bb7 (bar 6) sets up the IV (Eb). Blue 3rd (Db) works here.','Traditional parade phrasing — short, punchy, repeated figures.','Trade lead with the section.'],
-        ta:['Quote "Mardi Gras Mambo" or "Iko Iko" riffs.','Build to a shout chorus in high register.','Listen to Professor Longhair and Wild Tchoupitoulas.']
+      // Verified trumpet PDF: "(Go to the) Mardi Gras" by Professor Longhair,
+      // arr. Jesse Metzler 3/12/17. Concert Bb, chord progression Bb-Eb-
+      // F7 (written C-F-G7). Form: Tuba/Drums intro, horns join m.9, AA,
+      // V1, Solo, V2, Solo, V3, Solo, AB. Section B labeled "Musical
+      // Exhaustion until Bb7 chord" — classic Fess style.
+      // Lyrics: "Oh I\'m Going to New Orleans, I\'m gonna see that Mardi
+      // Gras... I\'m gonna see that Zulu King"
+      mkProg({id:'mardi-gras', t:'(Go to the) Mardi Gras', cp:'Professor Longhair, arr. Rebirth', k:'Bb', bpm:110, sec:'active',
+        m:['Bb','Bb','Eb','Bb','Bb','F7','Eb','Bb'],
+        tb:['Professor Longhair\'s Mardi Gras anthem. Concert Bb.','Simple I-IV-V progression: Bb-Eb-F7.','Lyrics: "I\'m gonna see that Zulu King" — classic NOLA.'],
+        ti:['Section B: "Musical Exhaustion until Bb7 chord" — break it down.','Target Bb/D/F chord tones. Bb7 sets up the Eb on bar 3.','Trade lead with the section on AA, V1, V2, V3 sections.'],
+        ta:['Quote "Iko Iko" riffs — same NOLA family.','Build to a shout chorus in high register on the final AB.','Listen to Professor Longhair\'s original recordings for the feel.']
       }),
       // Verified against Rebirth arrangement (trans. Jesse Metzler, 3/12/17)
       // Bb Trumpet PDF. Concert Bb, 4/4. Form: A (C7-F7 = Bb7-Eb7 concert)
@@ -2148,11 +2186,15 @@
         ti:['Section C moves Bb-Eb-Bb-F (I-IV-I-V). Simple diatonic approach.','Section D is a ii-iii-vi turnaround (Cm7-Dm7-Gm7) — jazz language.','Sanctified gospel phrasing with bends and slides throughout.'],
         ta:['The Bb-Db shift is chromatic mediant — target common tones (F is in both).','Zawinul\'s original voicings are the sound — listen.','Build slowly — Head 2x, solos over just AB section.']
       }),
-      mkProg({id:'planet-gibbous', t:'Planet Gibbous', cp:'Good Trouble', k:'Bbm', bpm:95, sec:'active',
-        m:['Bbm7','Bbm7','Ebm7','Ebm7','Bbm7','F7','Bbm7','Bbm7'],
-        tb:['Original minor-key vamp. Moody and modal.','Bb dorian scale for the main sound.','Play it dark and spacey.'],
-        ti:['Over F7 (V of Bbm), try the altered scale for tension.','Long phrases that weave through the changes.','Ghost notes and ambient textures.'],
-        ta:['Outside playing over Bbm — try Emaj7 arpeggio for tension.','Bitonal: Cmaj over Bbm for dissonance.','Modal interchange — borrow from Bb harmonic minor.']
+      // Verified trumpet PDF: "Gibbous" by Hypnotic Brass Ensemble, trans.
+      // Jesse Metzler 3/14/17. Concert Bbm, ♩=140 (was 95 — way off).
+      // Form: ABC AD, Solos BA. Half-time feel on section D.
+      // Progression: A=Fm7 vamp, B=Bbm7-Eb7-Gb-Db (4x), D=same half-time.
+      mkProg({id:'planet-gibbous', t:'Planet Gibbous', cp:'Hypnotic Brass Ensemble, arr. Rebirth', k:'Bbm', bpm:140, sec:'active',
+        m:['Fm7','Fm7','Bbm7','Eb7','Gb','Db','Bbm7','Fm7'],
+        tb:['Hypnotic Brass Ensemble tune. Concert Bbm, ♩=140.','Form: A (Fm7 vamp) → B (Bbm7-Eb7-Gb-Db) → C (rest) → D (half-time).','Section D has half-time feel — layered and spacey.'],
+        ti:['B progression: Bbm7-Eb7-Gb-Db is i-IV7-bVI-bIII — modal and mysterious.','Target chord tones: F-Ab on Fm7, Db-F on Bbm7, G-Bb on Eb7.','Long phrases that weave through the changes.'],
+        ta:['Over the Eb7, use Eb mixolydian for the brighter color.','Half-time D section: every note counts, use texture and dynamics.','Listen to Hypnotic Brass Ensemble for the ensemble sound.']
       }),
       // Verified against band's Bb-instruments PDF — this is "Down By the
       // Riverside" (traditional gospel), NOT an original. Concert Bb,
@@ -2215,35 +2257,56 @@
         ti:['Target Ab (b7 of Bb7) for smooth voice leading.','Morgan\'s signature rhythmic cells — short and cool.','The Bb7 in bar 7 sets up the descent back to I.'],
         ta:['Bebop dominant scales over each chord.','Morgan quote: 5-6-b7-1 figure is his calling card.','Listen to the Blue Note original AND the Skatalites cover.']
       }),
-      mkProg({id:'sweet-dreams', t:'Sweet Dreams', cp:'Eurythmics / Soul Rebels', k:'Cm', bpm:105, sec:'active',
-        m:['Cm','Cm','Bb','Bb','Cm','Cm','Bb','Bb','Ab','Ab','G7','G7','Cm','Cm','Bb','Bb'],
-        tb:['80s synth-pop made brass band by Soul Rebels.','C natural minor scale (C D Eb F G Ab Bb).','Dark, anthemic, relentless.'],
-        ti:['On G7 (V of Cm), use B natural (3rd of G7) + Ab (b13).','The Bb is bVII — classic minor-mode move.','Sustained tones over the vamp feel epic.'],
-        ta:['Modal mixture — Cm melodic minor for brightness.','Soul Rebels octave jumps — signature move.','Build three choruses from whisper to scream.']
+      // Verified trumpet PDF — Eurythmics tune, 2023-12-24 arrangement.
+      // Concert Cm, ♩=120 (was 105). Chord progression (written → concert):
+      // Dm-Bb-A → Cm-Ab-G. That's i-bVI-V(major) — classic minor-mode
+      // move with picardy V. Form: Intro(8), 2, 1, 2, 3, 4, 2x solo
+      // (2 backing on 2nd), 2x solo, sing, 2, 3, 4(sax), 1(tpts), +4, +tuba.
+      mkProg({id:'sweet-dreams', t:'Sweet Dreams', cp:'Eurythmics, arr. Rebirth', k:'Cm', bpm:120, sec:'active',
+        m:['Cm','Ab','G','Cm','Ab','G','Cm','Cm'],
+        tb:['Eurythmics 80s classic. Concert Cm at ♩=120.','Progression: Cm-Ab-G (i-bVI-V major picardy). Dark and anthemic.','C natural minor scale (C D Eb F G Ab Bb) + B natural on the V.'],
+        ti:['The G major (not G7, with B natural 3rd) is the picardy V.','Over Ab, use Ab major scale or Ab lydian for extra lift.','Sustained tones over the vamp feel epic and hypnotic.'],
+        ta:['Modal mixture — Cm melodic minor over the V chord.','Chromatic movement Ab → G → Cm reinforces the darkness.','Build three choruses from whisper to scream.']
       }),
-      mkProg({id:'thats-a-plenty', t:'That\'s A Plenty', cp:'Lew Pollack / Trad Dixieland', k:'Dm', bpm:140, sec:'active',
-        m:['Dm','Dm','A7','Dm','Gm','Gm','Dm','A7','Dm','Dm','A7','Dm','Gm','A7','Dm','Dm'],
-        tb:['Classic dixieland strut. Minor-key traditional jazz.','D harmonic minor (D E F G A Bb C#) over the changes.','Fast, joyful, collective improv tune.'],
-        ti:['C# (3rd of A7) is the leading tone into D.','Trade 2s or 4s — this tune is conversational.','Arpeggio-heavy old-school phrasing.'],
-        ta:['Diminished runs from A7 into Dm.','Double-time the last chorus before the out-head.','Classic Dixieland recordings — listen to them all.']
+      // Verified trumpet PDF — concert Dm tonic with an F major middle
+      // section. Tempo ♩=220 (was 140 — big miss). Form: A (Dm/A7), B
+       // (F major with C7, D7, G7 secondary dominants, "break", "Dogfight!"
+      // stop-time section), C (back to Em=Dm), D (C major=Bb concert)...
+      // Multi-section dixieland extravaganza.
+      mkProg({id:'thats-a-plenty', t:'That\'s A-Plenty', cp:'Lew Pollack (Dixieland trad)', k:'Dm', bpm:220, sec:'active',
+        m:['Dm','A7','Dm','A7','Dm','A7','Dm','Dm','F','C7','F','F7','Bb','F','C7','F'],
+        tb:['Classic dixieland strut at ♩=220. Minor-major duality.','A section: Dm-A7 (minor). B section: F major with secondary dominants.','Fast, joyful, collective improv tune.'],
+        ti:['C# (3rd of A7) is the leading tone into Dm.','F section is the relative major — switch to F major pentatonic.','"Dogfight!" section is stop-time — trade bars solo-style.'],
+        ta:['Diminished runs (Bdim, Cdim) between sections are classic passing chords.','Secondary dominants C7 → F, D7 → G, E7 → A7 give full circle of fifths.','Classic Dixieland recordings — Original Dixieland Jazz Band, Dukes of Dixieland.']
       }),
-      mkProg({id:'unclean-waters', t:'Unclean Waters', cp:'Good Trouble', k:'Dm', bpm:95, sec:'active',
+      // Verified trumpet PDF: "Unclean Waters" by Dirty Dozen Brass Band,
+      // arr. Jesse Metzler 3/12/17. Concert Dm (F major key sig). Multi-
+      // section form: A B C D E (Funky Bridge!) F (Solo 1 on A7/G7 concert)
+      // G (Solo 2 on G7/F7 concert). Form order: AB CB DEFG, ABD A.
+      mkProg({id:'unclean-waters', t:'Unclean Waters', cp:'Dirty Dozen Brass Band', k:'Dm', bpm:95, sec:'active',
         m:['Dm7','Dm7','Gm7','Gm7','Dm7','A7','Dm7','Dm7'],
-        tb:['Original Dm groove. Modal and murky.','D dorian (D E F G A B C) is the primary mode.','Long phrases that breathe.'],
-        ti:['The A7 provides the harmonic minor moment — C# leading tone.','Modal playing — don\'t chase every chord, live in the mode.','Space and texture over flashy notes.'],
-        ta:['D phrygian dominant (D Eb F# G A Bb C) for Eastern color.','Outside playing — try Ebmaj7 arpeggio over Dm.','Pedal point improvisations on D.']
+        tb:['Dirty Dozen Brass Band tune. Concert Dm, multi-section form.','D dorian (D E F G A B C) is the primary mode.','Solo 1 is the "Funky Bridge!" section with A7.'],
+        ti:['A7 provides the harmonic-minor moment — C# leading tone.','Solo 1 on A7 (V7 of Dm): use D harmonic minor.','Solo 2 on F7 (dominantized I): use F mixolydian.'],
+        ta:['D phrygian dominant (D Eb F# G A Bb C) for Eastern color.','Form order: AB CB DEFG, ABD A — 12 sections!','Listen to Dirty Dozen\'s original for the funky bridge feel.']
       }),
-      mkProg({id:'which-side', t:'Which Side Are You On', cp:'Florence Reece', k:'Dm', bpm:105, sec:'active',
-        m:['Dm','Dm','Dm','A7','Dm','Dm','Gm','A7','Dm','Dm','Dm','A7','Dm','Gm','A7','Dm'],
-        tb:['Union anthem. Play with conviction and gravitas.','D natural minor scale — mournful and resolute.','Folk-protest phrasing — singable, simple.'],
-        ti:['The A7 (V) brings the tension — resolve strong to D.','Long tones with vibrato — this is a declaration.','Call-and-response with the imagined crowd.'],
-        ta:['Harmonic minor on the A7 for the C#.','Gradual build — start solemn, end defiant.','Listen to Pete Seeger and Natalie Merchant versions.']
+      // Verified trumpet PDF — concert Dm, ♩=185 (was 105 — big miss).
+      // Form: A (low brass riff, 4 bars), B (verse: Dm-C alternation with
+      // A7), C (chorus: Dm-A7 with Bb-F turnaround). Progression written
+      // Em-D-B7-C-G transposes to concert Dm-C-A7-Bb-F.
+      mkProg({id:'which-side', t:'Which Side Are You On', cp:'Florence Reece', k:'Dm', bpm:185, sec:'active',
+        m:['Dm','C','Dm','C','Dm','A7','Dm','A7','Dm','A7','Dm','Bb','F','A7','Dm','A7'],
+        tb:['Union anthem at ♩=185. Concert Dm, driving 4/4.','Form: A (low brass riff) → B (verse, Dm-C) → C (chorus, Dm-A7).','Play with conviction — this is a protest song.'],
+        ti:['The A7 (V) brings the tension — resolve strong to Dm.','The Bb-F-A7-Dm chord move (bVI-bIII-V-i) is the signature turnaround.','Long tones with vibrato — this is a declaration.'],
+        ta:['D harmonic minor on the A7 for the C#.','Gradual build — start solemn, end defiant.','Listen to Pete Seeger and Natalie Merchant versions.']
       }),
-      mkProg({id:'yo-no-se', t:'Yo No Se', cp:'Rob Espino Y Sus Amigos De Nueva Orleans', k:'F', bpm:105, sec:'active',
-        m:['F','F','Bb','Bb','F','C7','F','F'],
-        tb:['Latin-NOLA fusion in F.','F major scale + F mixolydian.','Clave feel with second line influence.'],
-        ti:['Target chord tones on clave hits (1, 2+, 4).','Cuban-style repeated rhythmic cells.','Guide tones on C7: E (3rd) and Bb (b7).'],
-        ta:['Mixolydian b2 (F Gb A Bb C D Eb) for exotic flavor.','Polyrhythms — 3 against 4 figures.','Listen to Rob Espino\'s band for the aesthetic.']
+      // Verified trumpet PDF — Roy Espino y Sus Amigos de Nuevo Orleans.
+      // Concert F, cut-time feel. Simple I-V (F-C) progression — no Bb/IV.
+      // Book had "Rob Espino" — score spells it "Roy Espino".
+      mkProg({id:'yo-no-se', t:'Yo No Se', cp:'Roy Espino y Sus Amigos de Nuevo Orleans', k:'F', bpm:105, sec:'active',
+        m:['F','F','C','C','F','F','C','F'],
+        tb:['Latin-NOLA fusion in F. Simple I-V (F-C) alternation.','Cut-time feel — play the changes on 2 and 4.','F major scale + F mixolydian for mode mixture.'],
+        ti:['Target chord tones on clave hits (1, 2+, 4).','Cuban-style repeated rhythmic cells.','Guide tones on C: E (3rd) and G (5th).'],
+        ta:['F mixolydian (F G A Bb C D Eb) adds the b7 over F.','Polyrhythms — 3 against 4 figures.','Listen to Roy Espino\'s band for the aesthetic.']
       }),
 
       // ---------- DEVELOPING ----------
