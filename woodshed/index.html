@@ -1709,11 +1709,14 @@
         ti:['Paraphrase the melody with grace notes and approach tones.','Bb major pentatonic sounds pure and hymn-like.','Tailgate trombone: glide smears into target notes.'],
         ta:['Play the melody "out" — displaced rhythms, octave shifts.','Bb blues scale works on any bar — lean into Db for grit.','Louis Armstrong\'s version is the Rosetta Stone.']
       }),
+      // Verified against band's 9/11/24 tuba score — Eb concert, ♩=100.
+      // Only 2 chords: Eb7 and Ab7 (I7-IV7). Form: Intro / sing / 3 choruses /
+      // Solos with BU on 2nd 8 / out-choruses. No V7 (Bb7) in this arrangement.
       mkProg({id:'feel-like-funkin', t:'Feel Like Funkin\' It Up', cp:'Rebirth Brass Band', k:'Eb', bpm:100, sec:'core',
-        m:['Eb7','Eb7','Ab7','Eb7','Eb7','Ab7','Bb7','Eb7'],
-        tb:['Rebirth anthem. I7 - IV7 - V7 funk groove.','Eb minor pentatonic (Eb, Gb, Ab, Bb, Db) is home.','Keep it in the pocket — short, punchy phrases with space.'],
-        ti:['Second line snare on the "and" of 2 is the key to the feel.','Major 3rd (G) over Eb7 gives the sweet/sour NOLA blues sound.','Trade 4 bars with another horn if you can.'],
-        ta:['Chromatic approaches into the 3rd of each chord.','Build to the Bb7 (bar 7) — then release on the Eb turnaround.','Quote Rebirth phrases or "Iko Iko" — tradition loves references.']
+        m:['Eb7','Eb7','Ab7','Ab7','Eb7','Eb7','Ab7','Ab7'],
+        tb:['Rebirth anthem. Just I7-IV7 in Eb — two chords, all groove.','Eb blues scale (Eb Gb Ab A Bb Db) covers everything.','Keep it in the pocket — short, punchy phrases with space.'],
+        ti:['Second line snare on the "and" of 2 is the key to the feel.','Major 3rd (G) + minor 3rd (Gb) over Eb7 = NOLA blues tension.','Trade 4 bars with another horn — the "Solos" section builds up on the 2nd 8.'],
+        ta:['Over Ab7, target C (3rd) and Gb (b7) on strong beats.','Build intensity across each 8-bar chorus — BU on 2nd 8.','Quote Rebirth phrases or "Iko Iko" — tradition loves references.']
       }),
       mkProg({id:'later-than-you-think', t:'Later Than You Think (Enjoy Yourself)', cp:'Carr/Magidson, arr. Rebirth', k:'Bb', bpm:120, sec:'core',
         m:['Bb7','Bb7','F7','F7','F7','F7','Bb7','Bb7','Eb7','Eb7','Bb7','Bb7','F7','F7','Bb7','Bb7'],
@@ -1721,11 +1724,16 @@
         ti:['Second line OR medium swing feel both work. Try both.','Guide tones on F7: A (3rd) and Eb (b7).','Trade 4s — this tune loves conversational phrasing.'],
         ta:['Three-chorus arc: melody, paraphrase, double-time.','Bb bebop dominant adds chromatic motion everywhere.','Quote other NOLA party tunes for wink-wink moments.']
       }),
-      mkProg({id:'gospel-medley', t:'Gospel Medley (Closer Walk / I\'ll Fly Away / Lord Lord Lord)', cp:'Traditional', k:'Bb', bpm:100, sec:'core',
-        m:['Bb7','Bb7','Eb7','Eb7','Bb7','F7','Bb7','Bb7','Bb7','Bb7','Eb7','Bb7','Bb7','F7','Bb7','Bb7'],
-        tb:['Three gospel standards stitched together. Start reverent, build to joy.','Just a Closer Walk → I\'ll Fly Away → Lord Lord Lord.','Bb major pentatonic sounds like church.'],
-        ti:['Add grace notes above the melody — gospel singers do this naturally.','The 6th (G) over Bb is sweet gospel flavor.','Each tune is a lift — go up an octave when the next one starts.'],
-        ta:['Gospel lick library: bluesy descending riffs from Bb down.','Build three choruses: melody, paraphrase, wail with vibrato.','Quote Amazing Grace or Just a Closer Walk across the medley.']
+      // Verified against band's 4/8/26 tuba score — Bb concert, traditional.
+      // Full form: CW Dirge ♩=60 (solo tpt) → CW Dirge whole band → CW
+      // uptempo ♩=200 → Bridge → CW → IFA → Sing IFA → IFA → LLL → Sing
+      // LLL → LLL → Amen (Ab7 Fm7 F7 Bb | Eb Bb cadence). We capture the
+      // 8-bar I'll Fly Away up-tempo section as the looping form.
+      mkProg({id:'gospel-medley', t:'Gospel Medley (Closer Walk / I\'ll Fly Away / Lord Lord Lord)', cp:'Traditional', k:'Bb', bpm:200, sec:'core',
+        m:['Bb','Bb7','Eb','Bb','Bb','F7','Bb','Bb'],
+        tb:['Three gospel standards: Closer Walk → I\'ll Fly Away → Lord Lord Lord → Amen.','Starts as a Dirge ♩=60, then uptempo ♩=200 for the celebration.','Major triads (not 7ths) on I — Bb is pure major church sound.'],
+        ti:['Bb7 → Eb is V7-of-IV — classic gospel lift.','The Amen cadence: Ab7 → Fm7 → F7 → Bb | Eb → Bb (plagal amen).','Each tune steps up a notch in energy — go up an octave on the repeat.'],
+        ta:['Bridge has "Drums only" measures — you can tag the band back in with a hit.','Gospel lick: bluesy descending riffs from Bb down through the blues scale.','Quote Amazing Grace or other hymns — the tradition loves family references.']
       }),
       mkProg({id:'new-orleans-music', t:'New Orleans Music', cp:'Rebirth Brass Band', k:'Bb', bpm:100, sec:'core',
         m:['Bb7','Bb7','Eb7','Eb7','Bb7','F7','Bb7','Bb7'],
@@ -1751,11 +1759,15 @@
         ti:['The A7 into Dm (bar 8) is the emotional peak. Lean into the F# (3rd of A7).','Target the 3rd of each chord for singing melody lines.','Slow vibrato on held notes — vocal inspired.'],
         ta:['Dm harmonic minor over A7 (the V7 of Dm) sounds classical/flamenco.','Chromatic motion C-Bb-A into the final F — classic Latin cadence.','Listen to Silvio Rodriguez vocals for phrasing.']
       }),
-      mkProg({id:'never-gonna-let-you-go', t:'Never Gonna Let You Go', cp:'24:43', k:'Gm', bpm:100, sec:'core',
-        m:['Gm7','Gm7','Cm7','Cm7','Gm7','Gm7','D7','Gm7'],
-        tb:['Minor-key funk in Gm. Moody and driving.','Gm pentatonic (G Bb C D F) is the core vocabulary.','Keep phrases short and percussive.'],
-        ti:['Over D7 (bar 7), use G harmonic minor (G A Bb C D Eb F#) for the V7 tension.','Target the 3rd of each chord: Bb on Gm, Eb on Cm, F# on D7.','Ghost notes add funk-rhythm without changing the pitch.'],
-        ta:['Chromatic walk-up from Gm to Cm: G Ab A Bb → C.','D7alt (D Eb F F# G# B) for outside tension into Gm.','Build intensity with double-time over the D7 turnaround.']
+      // Verified against band's 9/11/24 tuba score — Cm concert (3 flats),
+      // ♩=85, "Swing 16ths" feel. Chord progression is C7 - F7 - Dø7 -
+      // G7b9, a minor-blues color with dominant tonic. (Book listed Gm but
+      // the actual chart is in Cm.)
+      mkProg({id:'never-gonna-let-you-go', t:'Never Gonna Let You Go', cp:'24:43', k:'Cm', bpm:85, sec:'core',
+        m:['C7','F7','Dm7','G7','C7','F7','Dm7','G7'],
+        tb:['Swing-16ths groove in Cm. C7 as bluesy dominant tonic.','C blues scale (C Eb F Gb G Bb) works over the whole form.','Pace yourself — 85 BPM with swung 16ths feels busy. Leave space.'],
+        ti:['The Dm7(b5) → G7(b9) → C7 is a classic minor ii-V-i cadence.','Target guide tones: 3rd and b7 of each chord on strong beats.','C harmonic minor (C D Eb F G Ab B) resolves beautifully over G7b9.'],
+        ta:['Over Dm7b5-G7b9, play C harmonic minor or altered-scale lines.','Chromatic approaches into the 3rd of F7 (A natural).','Tuba PU (pickup) entries between sections — land your phrases with the pickup.']
       }),
       mkProg({id:'you-move-ya-lose', t:'You Move Ya Lose', cp:'Rebirth Brass Band', k:'Fm', bpm:105, sec:'core',
         m:['Fm7','Fm7','Bbm7','Bbm7','Fm7','Fm7','C7','Fm7'],
