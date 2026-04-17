@@ -1735,9 +1735,21 @@
       // Verified against band's 9/11/24 tuba score — Eb concert, ♩=100.
       // Only 2 chords: Eb7 and Ab7 (I7-IV7). Form: Intro / sing / 3 choruses /
       // Solos with BU on 2nd 8 / out-choruses. No V7 (Bb7) in this arrangement.
+      // Verified via MusicXML — Eb concert, ♩=100, I7-IV7 only. Trumpet
+      // mostly rests during the tuba groove; stab on Bb held note in
+      // section 2. Melody captures the recurring bar-5 stab.
       mkProg({id:'feel-like-funkin', t:'Feel Like Funkin\' It Up', cp:'Rebirth Brass Band', k:'Eb', bpm:100, sec:'core',
-        m:['Eb7','Eb7','Ab7','Ab7','Eb7','Eb7','Ab7','Ab7'],
-        tb:['Rebirth anthem. Just I7-IV7 in Eb — two chords, all groove.','Eb blues scale (Eb Gb Ab A Bb Db) covers everything.','Keep it in the pocket — short, punchy phrases with space.'],
+        m:[
+          {c:'Eb7', ml:[{keys:['d/4'],duration:'2r'},{keys:['Bb/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
+          {c:'Eb7', ml:[{keys:['Bb/4'],duration:'w'}]},
+          {c:'Ab7', ml:[{keys:['Ab/4'],duration:'2'},{keys:['d/4'],duration:'2r'}]},
+          {c:'Ab7', ml:[{keys:['d/4'],duration:'wr'}]},
+          {c:'Eb7', ml:[{keys:['d/4'],duration:'8r'},{keys:['Bb/4'],duration:'8'},{keys:['Bb/4'],duration:'2d'}]},
+          {c:'Eb7', ml:[{keys:['Bb/4'],duration:'w'}]},
+          {c:'Ab7', ml:[{keys:['Ab/4'],duration:'4'},{keys:['d/4'],duration:'4r'},{keys:['d/4'],duration:'2r'}]},
+          {c:'Ab7', ml:[{keys:['d/4'],duration:'wr'}]}
+        ],
+        tb:['Rebirth anthem. Just I7-IV7 in Eb — two chords, all groove.','Eb blues scale (Eb Gb Ab A Bb Db) covers everything.','The trumpet lays out on the "sing" section — tuba carries it.'],
         ti:['Second line snare on the "and" of 2 is the key to the feel.','Major 3rd (G) + minor 3rd (Gb) over Eb7 = NOLA blues tension.','Trade 4 bars with another horn — the "Solos" section builds up on the 2nd 8.'],
         ta:['Over Ab7, target C (3rd) and Gb (b7) on strong beats.','Build intensity across each 8-bar chorus — BU on 2nd 8.','Quote Rebirth phrases or "Iko Iko" — tradition loves references.']
       }),
@@ -1747,19 +1759,53 @@
       // 1, sing 2 (no rhythm/bass 1st half), 1, slowly change to Outro.
       // Section 1 has a descending walking bass: Bb-A-G-F per beat.
       // Outro: Bb | F7/A | Gm | F | Eb | Bb/F | Cm7 | F | Bb (turnaround).
+      // Verified via MusicXML — Bb, ♩=90. Kermit Ruffins / Rebirth original.
+      // Melody shown uses the 4-bar Outro which has a clear turnaround:
+      // Bb | F7/A-Gm | F-Eb-Bb/F | Cm7-F7 | Bb. Bar 1 descending bass
+      // (Bb-A-G-F) underpins the trumpet line.
       mkProg({id:'later-than-you-think', t:'It\'s Later Than You Think', cp:'Kermit Ruffins & Rebirth', k:'Bb', bpm:90, sec:'core',
-        m:['Bb','Eb','Bb','F7','Bb','Eb','Bb','F7'],
-        tb:['Kermit Ruffins & Rebirth original. Not the Carr/Magidson standard.','The bass line walks down Bb-A-G-F in bar 1 — that\'s the signature motion.','Play the melody first. The lyric "It\'s later than you think" is the feel.'],
-        ti:['Over the descending Bb walk, use chromatic approach notes.','The outro adds Gm and Cm7 — sweet ii-V movement back to Bb.','Sing sections have "no rhythm/bass 1st half" — play sparse when that hits.'],
-        ta:['Bb blues scale + major 7 (A) for gospel-blues color.','The Bb7/F in bar 1 sets up Eb — voice-lead into Eb through A-Ab-G.','Quote Somerville references or NOLA party tunes in your solo.']
+        m:[
+          {c:'Bb',  ml:[{keys:['F/4'],duration:'2'},{keys:['Bb/4'],duration:'2'}]},
+          {c:'F7',  ml:[{keys:['Eb/4'],duration:'2'},{keys:['A/4'],duration:'2'}]},
+          {c:'Gm',  ml:[{keys:['D/4'],duration:'2'},{keys:['G/4'],duration:'2'}]},
+          {c:'F',   ml:[{keys:['C/4'],duration:'2'},{keys:['F/4'],duration:'2'}]},
+          {c:'Eb',  ml:[{keys:['Bb/3'],duration:'2'},{keys:['Eb/4'],duration:'2'}]},
+          {c:'Bb',  ml:[{keys:['D/4'],duration:'2'},{keys:['F/4'],duration:'2'}]},
+          {c:'Cm7', ml:[{keys:['Eb/4'],duration:'2'},{keys:['G/4'],duration:'2'}]},
+          {c:'F7',  ml:[{keys:['F/4'],duration:'2'},{keys:['A/4'],duration:'2'}]}
+        ],
+        tb:['Kermit Ruffins & Rebirth original. Not the Carr/Magidson standard.','Descending walk Bb-A-G-F drives bar 1.','Play the melody first. The lyric "It\'s later than you think" is the feel.'],
+        ti:['Outro turnaround: Bb - F7/A - Gm - F - Eb - Bb/F - Cm7 - F7 - Bb.','Guide tones move smoothly: F-A-D-C-Bb-D-Eb-F through the chords.','Sing sections have "no rhythm/bass 1st half" — play sparse when that hits.'],
+        ta:['Bb blues scale + major 7 (A) for gospel-blues color.','Walk bass line: Bb-A-G-F through bar 1 — chord tones + chromatic.','Quote Somerville references or NOLA party tunes in your solo.']
       }),
       // Verified against band's 4/8/26 tuba score — Bb concert, traditional.
       // Full form: CW Dirge ♩=60 (solo tpt) → CW Dirge whole band → CW
       // uptempo ♩=200 → Bridge → CW → IFA → Sing IFA → IFA → LLL → Sing
       // LLL → LLL → Amen (Ab7 Fm7 F7 Bb | Eb Bb cadence). We capture the
       // 8-bar I'll Fly Away up-tempo section as the looping form.
-      mkProg({id:'gospel-medley', t:'Gospel Medley (Closer Walk / I\'ll Fly Away / Lord Lord Lord)', cp:'Traditional', k:'Bb', bpm:200, sec:'core',
-        m:['Bb','Bb7','Eb','Bb','Bb','F7','Bb','Bb'],
+      // Verified via MusicXML — Bb, starts ♩=60 (Dirge). The XML data
+      // captures the Closer Walk head. Up-tempo section (♩=200) and
+      // IFA/LLL/Amen come after. Using 60 BPM default for the Dirge feel;
+      // user can bump to 200 for the uptempo sections.
+      mkProg({id:'gospel-medley', t:'Gospel Medley (Closer Walk / I\'ll Fly Away / Lord Lord Lord)', cp:'Traditional', k:'Bb', bpm:60, sec:'core',
+        m:[
+          {c:'Bb',  ml:[{keys:['F/4'],duration:'2d'},{keys:['Gb/4'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['G/4'],duration:'4'},{keys:['D/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['E/4'],duration:'4'}]},
+          {c:'F7',  ml:[{keys:['Eb/4'],duration:'w'}]},
+          {c:'F7',  ml:[{keys:['d/4'],duration:'4r'},{keys:['F/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['A/4'],duration:'8'},{keys:['Bb/4'],duration:'8'},{keys:['A/4'],duration:'4'}]},
+          {c:'F',   ml:[{keys:['C/5'],duration:'2'},{keys:['C/5'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
+          {c:'F',   ml:[{keys:['A/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['G/4'],duration:'8'},{keys:['F/4'],duration:'8'},{keys:['F/4'],duration:'4'},{keys:['F/4'],duration:'2'}]},
+          {c:'Bb',  ml:[{keys:['d/4'],duration:'4r'},{keys:['F/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['A/4'],duration:'8'},{keys:['Bb/4'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['D/5'],duration:'2'},{keys:['D/5'],duration:'4'},{keys:['D/5'],duration:'4'}]},
+          {c:'Bb7', ml:[{keys:['C/5'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['C/5'],duration:'4'},{keys:['D/5'],duration:'4'}]},
+          {c:'Eb',  ml:[{keys:['C/5'],duration:'2'},{keys:['Bb/4'],duration:'4'},{keys:['Ab/4'],duration:'4'}]},
+          {c:'C7',  ml:[{keys:['G/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['G/4'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['F/4'],duration:'w'}]},
+          {c:'F7',  ml:[{keys:['A/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['Bb/4'],duration:'4'}]},
+          {c:'Bb',  ml:[{keys:['Bb/4'],duration:'w'}]},
+          {c:'Bb',  ml:[{keys:['d/4'],duration:'wr'}]}
+        ],
         tb:['Three gospel standards: Closer Walk → I\'ll Fly Away → Lord Lord Lord → Amen.','Starts as a Dirge ♩=60, then uptempo ♩=200 for the celebration.','Major triads (not 7ths) on I — Bb is pure major church sound.'],
         ti:['Bb7 → Eb is V7-of-IV — classic gospel lift.','The Amen cadence: Ab7 → Fm7 → F7 → Bb | Eb → Bb (plagal amen).','Each tune steps up a notch in energy — go up an octave on the repeat.'],
         ta:['Bridge has "Drums only" measures — you can tag the band back in with a hit.','Gospel lick: bluesy descending riffs from Bb down through the blues scale.','Quote Amazing Grace or other hymns — the tradition loves family references.']
@@ -1780,8 +1826,19 @@
       // Simple I-V (F and C) harmony — modal/hypnotic. Form: Trombone Intro
       // (8 bars) → 1 (African Mkt A) → 2 (B) → 1 → Solo over 1 → 1 → Drum
       // Breakdown → 3 (Homecoming A) → 3 → 4 (Homecoming B) → 3.
+      // Verified via MusicXML — F major, ♩=120. Trumpet melody from
+      // "African Mkt A" section (bars 9-16). Simple I-V alternation.
       mkProg({id:'african-marketplace', t:'African Marketplace / Homecoming', cp:'Abdullah Ibrahim', k:'F', bpm:120, sec:'core',
-        m:['F','F','C','F','F','C','F','F'],
+        m:[
+          {c:'F', ml:[{keys:['A/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['A/4'],duration:'4'}]},
+          {c:'F', ml:[{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['F/4'],duration:'4'}]},
+          {c:'C', ml:[{keys:['G/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['A/4'],duration:'4'}]},
+          {c:'F', ml:[{keys:['F/4'],duration:'2'},{keys:['C/4'],duration:'4'},{keys:['F/4'],duration:'4'}]},
+          {c:'F', ml:[{keys:['A/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['A/4'],duration:'4'}]},
+          {c:'F', ml:[{keys:['Bb/4'],duration:'4'},{keys:['A/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['F/4'],duration:'4'}]},
+          {c:'C', ml:[{keys:['G/4'],duration:'4'},{keys:['G/4'],duration:'4'},{keys:['F/4'],duration:'4'},{keys:['A/4'],duration:'4'}]},
+          {c:'F', ml:[{keys:['F/4'],duration:'2'},{keys:['d/4'],duration:'2r'}]}
+        ],
         tb:['Abdullah Ibrahim\'s township jazz. Simple I-V harmony (F and C).','F major pentatonic (F G A C D) is the core vocabulary.','Let the groove breathe — lots of space between phrases.'],
         ti:['Add the b7 (Eb) for mixolydian township color over F.','The "African Mkt" section has a different feel than "Homecoming" — less bluesy, more chant-like.','Abdullah Ibrahim solos are sparse — leave tons of space.'],
         ta:['Use F lydian (F G A B C D E) for an exotic color over F.','Over the C chord, C mixolydian (C D E F G A Bb) gives a bluesy lift.','Listen to Abdullah\'s piano solos for pacing and the modal texture.']
@@ -1869,11 +1926,22 @@
       // section and solos. Form: Intro, 1, 2, 2, sing (2), solos (2), 1,
       // 2, Outro. Chart notes: "for simpler bass line, ignore parentheses
       // and play upper stems"; "for silliness, hold it out if you can."
+      // Melody extracted from band's 2/20/2026 MusicXML (trumpet → concert).
+      // 16-bar Section 1 head with full circle-of-fifths + Gbdim passing.
       mkProg({id:'bogalusa-strut', t:'Bogalusa Strut', cp:'Sam Morgan', k:'C', bpm:180, sec:'active',
-        m:['F','F#dim','C','A7','D7','G7','C','C7'],
-        tb:['Classic 1920s NOLA jazz by Sam Morgan. ♩=180 strut tempo.','Section 1 has full circle-of-fifths movement: A → D → G → C.','F#dim is a chromatic passing chord between F and C.'],
-        ti:['Secondary dominants: A7 goes to D7, D7 goes to G7, G7 goes to C.','Tailgate trombone glisses were invented for this kind of tune.','Section 2 (for sung/solos) is just G → C alternation — much simpler.'],
-        ta:['Bebop reharmonization: substitute ii-V approaches for each dominant.','F → F#dim → C is a classic NOLA chromatic passage.','Listen to Sam Morgan\'s 1927 Columbia recordings.']
+        m:[
+          {c:'C7',    ml:[{keys:['C/5'],duration:'4'},{keys:['B/4'],duration:'4'},{keys:['Bb/4'],duration:'4'},{keys:['d/4'],duration:'4r'}]},
+          {c:'F',     ml:[{keys:['A/4'],duration:'8'},{keys:['Ab/4'],duration:'8'},{keys:['A/4'],duration:'8'},{keys:['C/5'],duration:'8'},{keys:['C/5'],duration:'2'}]},
+          {c:'Gbdim', ml:[{keys:['d/4'],duration:'8r'},{keys:['C/5'],duration:'8'},{keys:['B/4'],duration:'8'},{keys:['C/5'],duration:'8'},{keys:['D/5'],duration:'8'},{keys:['C/5'],duration:'8'},{keys:['A/4'],duration:'4'}]},
+          {c:'C',     ml:[{keys:['E/4'],duration:'8'},{keys:['Eb/4'],duration:'8'},{keys:['E/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['G/4'],duration:'2'}]},
+          {c:'A7',    ml:[{keys:['d/4'],duration:'8r'},{keys:['G/4'],duration:'8'},{keys:['Gb/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['A/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['E/4'],duration:'4'}]},
+          {c:'D7',    ml:[{keys:['E/4'],duration:'8'},{keys:['D/4'],duration:'8'},{keys:['E/4'],duration:'8'},{keys:['D/4'],duration:'8'},{keys:['D/4'],duration:'2'}]},
+          {c:'G7',    ml:[{keys:['A/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['A/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['G/4'],duration:'8'},{keys:['Ab/4'],duration:'8'},{keys:['A/4'],duration:'4'}]},
+          {c:'C',     ml:[{keys:['E/4'],duration:'w'}]}
+        ],
+        tb:['Classic 1920s NOLA jazz by Sam Morgan. ♩=180 strut tempo.','Section 1 has full circle-of-fifths: A7 → D7 → G7 → C.','Gbdim (bar 3) is a chromatic passing chord between F and C.'],
+        ti:['Secondary dominants: A7 leads to D7, D7 leads to G7, G7 leads to C.','Tailgate trombone glisses were invented for this kind of tune.','Section 2 (for sung/solos) is just G → C alternation — much simpler.'],
+        ta:['Bebop reharmonization: substitute ii-V approaches for each dominant.','F → Gbdim → C is the NOLA chromatic passage to emphasize.','Listen to Sam Morgan\'s 1927 Columbia recordings.']
       }),
       mkProg({id:'bourbon-street', t:'Bourbon Street Parade', cp:'Paul Barbarin', k:'Ab', bpm:115, sec:'active',
         m:['Ab','Ab','Ab7','Db','Ab','Eb7','Ab','Ab','Ab','Ab','Ab7','Db','Ab','Eb7','Ab','Ab'],
