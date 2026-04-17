@@ -2756,6 +2756,21 @@
       console.log('[Woodshed] Merged MusicXML parts into ' + window.BAND_TUNES_CORE.length + ' existing tunes');
     }
 
+    // Does this tune have VERIFIED melody/parts data, or only chord
+    // progression? Only tunes with MusicXML-derived per-instrument parts
+    // count as verified — hand-transcribed melodies were stripped out
+    // because we couldn't trust their accuracy.
+    function tuneHasVerifiedMelody(prog) {
+      if (!prog) return false;
+      if ((prog.dataSources || []).includes('musicxml-parts')) return true;
+      // Fallback: also accept tunes where at least one measure has `parts`
+      // defined (e.g. future hand-verified entries) or a non-empty `melody`.
+      return (prog.measures || []).some(m =>
+        (m.parts && Object.keys(m.parts).length > 0) ||
+        (m.melody && m.melody.length > 0)
+      );
+    }
+
     // ======================================================================
     // LEGACY PROGRESSIONS — kept for backwards compat. Rebuilt below.
     // ======================================================================
@@ -6475,6 +6490,7 @@
           }
           tempoSlider.value = prog.defaultTempo;
           tempoBpm.textContent = prog.defaultTempo + ' BPM';
+          updateMelodyAvailability();
           renderTips();
           renderNotation();
         }
@@ -6555,6 +6571,27 @@
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(renderNotation, 200);
       });
+    }
+
+    // Hide the Melody tab (and auto-exit melody mode) when the current tune
+    // has no verified melody data. Chord progression still shows in Licks /
+    // Symbols / Tones modes as expected.
+    function updateMelodyAvailability() {
+      const hasMelody = tuneHasVerifiedMelody(currentProgression);
+      const melodyBtn = document.querySelector('.mode-btn[data-mode="melody"]');
+      if (melodyBtn) {
+        melodyBtn.style.display = hasMelody ? '' : 'none';
+      }
+      // If user was in melody mode and the new tune has no melody, bounce
+      // to Licks (the main chord-progression practice mode).
+      if (!hasMelody && currentMode === 'melody') {
+        currentMode = 'licks';
+        document.querySelectorAll('.mode-btn').forEach(b =>
+          b.classList.toggle('active', b.dataset.mode === 'licks'));
+        document.getElementById('levelBar').style.display = 'flex';
+        const hearLabel = document.getElementById('hearLickLabel');
+        if (hearLabel) hearLabel.textContent = 'Hear Lick';
+      }
     }
 
     function renderTips() {
@@ -6667,6 +6704,7 @@
       hearRow.style.display = (currentMode === 'licks' || currentMode === 'melody') ? 'flex' : 'none';
       if (hearLabel) hearLabel.textContent = currentMode === 'melody' ? 'Hear Melody' : 'Hear Lick';
       updateSlideToggleVisibility();
+      updateMelodyAvailability();
 
       gamification.init();
       setupUI();
