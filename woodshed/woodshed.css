@@ -533,6 +533,34 @@ body {
 .legend-dot.chord { background: var(--chord-tone); }
 .legend-dot.scale { background: var(--scale-tone); }
 
+/* Lick concept banner — shows what the user is learning this chorus. */
+.lick-concept {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 2px 0 8px;
+  padding: 6px 12px;
+  background: linear-gradient(90deg, rgba(232, 74, 39, 0.08), rgba(200, 80, 192, 0.08));
+  border: 1px solid rgba(200, 80, 192, 0.22);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.lick-concept-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.lick-concept-name {
+  font-weight: 700;
+  color: var(--accent2);
+  letter-spacing: 0.2px;
+}
+
 /* Loading */
 .loading-overlay {
   position: fixed;
@@ -697,6 +725,137 @@ body {
   color: var(--accent2);
   border-color: var(--accent2);
   box-shadow: 0 2px 6px rgba(200, 80, 192, 0.12);
+}
+
+/* Practice row — count-in + tempo trainer toggles. One row, split evenly. */
+.practice-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+  padding: 6px 4px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.practice-toggle {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.practice-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.practice-toggle select {
+  flex: 1;
+  padding: 4px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Keyboard-shortcuts help overlay — shown via "?" key, dismissed on click. */
+.kb-help {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: kbFade 0.18s ease-out;
+}
+
+.kb-help-panel {
+  min-width: 320px;
+  max-width: 420px;
+  padding: 22px 26px;
+  background: var(--bg-card);
+  border: 1px solid rgba(200, 80, 192, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  color: var(--text-primary);
+}
+
+.kb-help-title {
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 14px;
+  color: var(--accent2);
+  letter-spacing: 0.3px;
+}
+
+.kb-help-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.kb-help-row span {
+  flex: 1;
+  color: var(--text-secondary);
+}
+
+.kb-help-row kbd {
+  display: inline-block;
+  min-width: 26px;
+  padding: 3px 8px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.kb-help-close {
+  margin-top: 14px;
+  font-size: 11px;
+  color: var(--text-tertiary, rgba(255,255,255,0.4));
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+@keyframes kbFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Count-in flash — chorusNum shows 1, 2, 3, 4 briefly before loop starts */
+#chorusNum.count-in {
+  display: inline-block;
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 1.35em;
+  animation: countIn 0.55s ease-out;
+}
+
+@keyframes countIn {
+  0%   { transform: scale(1.6); opacity: 0.2; }
+  40%  { transform: scale(1);   opacity: 1; }
+  100% { transform: scale(1);   opacity: 1; }
 }
 
 /* ===== GAMIFICATION ===== */

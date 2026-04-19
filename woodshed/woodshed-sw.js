@@ -1,4 +1,4 @@
-const CACHE_NAME = 'woodshed-v10-beaming-harmonymute';
+const CACHE_NAME = 'woodshed-v11-countin-trainer-shortcuts';
 const ASSETS = [
   './index.html',
   './woodshed.css',

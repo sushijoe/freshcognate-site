@@ -141,6 +141,13 @@
 
   <!-- Notation -->
   <div class="notation-area">
+    <!-- Current-lick concept label — shows what the user is practicing this
+         chorus (e.g. "1. Root only", "6. Bebop scale up"). Hidden outside
+         Licks mode. -->
+    <div class="lick-concept" id="lickConcept" style="display:none">
+      <span class="lick-concept-label">This chorus</span>
+      <span class="lick-concept-name" id="lickConceptName"></span>
+    </div>
     <div id="notation">
       <div class="measure-highlight" id="highlight"></div>
     </div>
@@ -284,6 +291,21 @@
         <button class="swing-btn" data-swing="2">Hard Swing</button>
         <button class="swing-btn active" data-swing="3">Second Line</button>
       </div>
+    </div>
+    <div class="practice-row">
+      <label class="practice-toggle" title="4-beat count-in before the loop starts">
+        <input type="checkbox" id="countInToggle" checked>
+        <span>Count-in</span>
+      </label>
+      <label class="practice-toggle" title="Automatically speed up each chorus to build facility">
+        <span>Tempo trainer</span>
+        <select id="tempoTrainerSelect">
+          <option value="0">Off</option>
+          <option value="2">+2 BPM/chorus</option>
+          <option value="5">+5 BPM/chorus</option>
+          <option value="10">+10 BPM/chorus</option>
+        </select>
+      </label>
     </div>
   </div>
 
@@ -3145,6 +3167,8 @@
     let audioReady = false;
     let isMuted = false; // Start UNMUTED — user hits play, they hear the band
     let isHarmonyMuted = false; // Solo-over-rhythm-section mode: mute comping, keep bass+drums
+    let countInEnabled = true;  // 4-beat stick-click count-in before loop begins
+    let tempoAutoIncrement = 0; // BPM added per chorus (0 = off)
     let masterVol = null;
     let piano, bass, hihat, kick;
     let lickSynth = null;
@@ -3890,6 +3914,7 @@
       container.innerHTML = '';
       container.appendChild(highlightEl); // Re-attach after clearing
       measureBounds = [];
+      updateLickConcept();
 
       const prog = currentProgression;
       const containerWidth = container.clientWidth || 600;
@@ -4033,6 +4058,26 @@
       return [0,1,2,3].map(() =>
         new VF.StaveNote({ clef, keys: [slashKey], duration: '4', type: 's' })
       );
+    }
+
+    // Show the current chorus's lick concept name above the notation — e.g.
+    // "1. Root only", "6. Bebop scale up". This tells the user WHY they're
+    // playing what they're playing. Hidden in non-Licks modes.
+    function updateLickConcept() {
+      const el = document.getElementById('lickConcept');
+      const nameEl = document.getElementById('lickConceptName');
+      if (!el || !nameEl) return;
+      if (currentMode !== 'licks') { el.style.display = 'none'; return; }
+      const levelLicks = LICKS[currentLevel];
+      if (!levelLicks) { el.style.display = 'none'; return; }
+      // Use the first measure's chord as the representative lick for this chorus
+      // (all measures of the same chord in a chorus get the same lick anyway).
+      const firstChord = currentProgression.measures[0]?.chord;
+      const licks = levelLicks[firstChord];
+      if (!licks || !licks.length) { el.style.display = 'none'; return; }
+      const lick = licks[(chorusCount - 1) % licks.length];
+      nameEl.textContent = lick.name;
+      el.style.display = 'flex';
     }
 
     function makeLickNotes(chordName, measureIdx) {
@@ -5027,7 +5072,43 @@
 
       const prog = currentProgression;
       const totalBeats = prog.measures.reduce((s, m) => s + m.beats, 0);
-      let beatOffset = 0;
+
+      // Count-in: 4 stick clicks before the loop begins. The loop region
+      // itself starts at beat 4 (loopStart), so when Transport wraps it
+      // skips the count and jumps straight into the form.
+      const countInBeats = countInEnabled ? 4 : 0;
+      if (countInBeats > 0) {
+        for (let i = 0; i < 4; i++) {
+          const beat = i;
+          const isDownbeat = (i === 0);
+          Tone.Transport.schedule(time => {
+            // Use hihat for the clicks, kick accent on beat 1 for a "1-2-3-4" feel
+            hihat.triggerAttackRelease('16n', time, isDownbeat ? 0.9 : 0.6);
+            if (isDownbeat) kick.triggerAttackRelease('C1', '16n', time, 0.5);
+            // Visual flash: show the current count in the chorus counter
+            Tone.Draw.schedule(() => {
+              const el = document.getElementById('chorusNum');
+              if (el && el._origText === undefined) el._origText = el.textContent;
+              if (el) {
+                el.textContent = String(i + 1);
+                el.classList.add('count-in');
+              }
+              // Restore normal state on the final count
+              if (i === 3) {
+                setTimeout(() => {
+                  if (el) {
+                    el.classList.remove('count-in');
+                    el.textContent = String(chorusCount);
+                    el._origText = undefined;
+                  }
+                }, 450);
+              }
+            }, time);
+          }, `0:${beat}:0`);
+        }
+      }
+
+      let beatOffset = countInBeats;
 
       prog.measures.forEach((measure, mi) => {
         const voicing = prog.audio.voicings[measure.chord];
@@ -5118,20 +5199,31 @@
       });
 
       // Chorus end — schedule on the last beat of the form so it fires before loopEnd
-      // (Events at exactly loopEnd get skipped when Transport loops)
-      const chorusDuration = `0:${totalBeats}:0`;
-      const lastBeat = `0:${totalBeats - 1}:0`;
+      // (Events at exactly loopEnd get skipped when Transport loops). With count-in,
+      // the loop region starts at beat countInBeats and runs for totalBeats.
+      const loopStartPos = `0:${countInBeats}:0`;
+      const loopEndPos = `0:${countInBeats + totalBeats}:0`;
+      const lastBeat = `0:${countInBeats + totalBeats - 1}:0`;
       Tone.Transport.schedule(time => {
         const doUpdate = () => {
           chorusCount++;
           document.getElementById('chorusNum').textContent = chorusCount;
+          // Tempo trainer: bump BPM at end of every chorus
+          if (tempoAutoIncrement > 0) {
+            const slider = document.getElementById('tempoSlider');
+            const newBpm = Math.min(parseInt(slider.max), parseInt(slider.value) + tempoAutoIncrement);
+            slider.value = newBpm;
+            document.getElementById('tempoBpm').textContent = newBpm + ' BPM';
+            Tone.Transport.bpm.value = newBpm;
+          }
           if (currentMode === 'licks') renderNotation();
           gamification.onChorusComplete(currentProgression.id, currentMode, currentLevel);
         };
         setTimeout(doUpdate, 0);
       }, lastBeat);
 
-      Tone.Transport.loopEnd = chorusDuration;
+      Tone.Transport.loopStart = loopStartPos;
+      Tone.Transport.loopEnd = loopEndPos;
       Tone.Transport.loop = isLooping;
     }
 
@@ -5179,7 +5271,9 @@
       isPlaying = false;
       currentMeasure = -1;
       chorusCount = 1;
-      document.getElementById('chorusNum').textContent = '1';
+      const chorusEl = document.getElementById('chorusNum');
+      chorusEl.textContent = '1';
+      chorusEl.classList.remove('count-in');  // Clear any lingering count-in flash
       document.getElementById('playIcon').className = 'bi bi-play-fill';
       updateHighlight();
       if (currentMode === 'licks') renderNotation();
@@ -5222,6 +5316,14 @@
         // piano may not be instantiated yet (user hasn't hit play) — initAudio
         // reads isHarmonyMuted at setup time, so this toggle works either way.
         if (piano) piano.volume.value = isHarmonyMuted ? -Infinity : -16;
+      });
+
+      // Count-in and tempo-trainer toggles — read on next play()
+      document.getElementById('countInToggle').addEventListener('change', e => {
+        countInEnabled = e.target.checked;
+      });
+      document.getElementById('tempoTrainerSelect').addEventListener('change', e => {
+        tempoAutoIncrement = parseInt(e.target.value) || 0;
       });
 
       const tempoSlider = document.getElementById('tempoSlider');
@@ -5639,6 +5741,7 @@
       gamification.init();
       setupUI();
       renderTips();
+      setupKeyboardShortcuts();
 
       requestAnimationFrame(() => {
         try {
@@ -5648,6 +5751,96 @@
         }
         document.getElementById('loading').classList.add('hidden');
       });
+    }
+
+    // Keyboard shortcuts — classic practice-tool bindings. Skips keypresses
+    // while typing in inputs/selects so form interaction isn't hijacked.
+    function setupKeyboardShortcuts() {
+      document.addEventListener('keydown', e => {
+        // Ignore if user is typing in an input, textarea, select, or editable
+        const tag = (e.target.tagName || '').toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable) return;
+        // Ignore if modifier keys (let browser shortcuts through)
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+        const k = e.key.toLowerCase();
+        const slider = document.getElementById('tempoSlider');
+
+        switch (k) {
+          case ' ':
+          case 'k':
+            e.preventDefault();
+            if (isPlaying) pause(); else play();
+            break;
+          case 's':
+            e.preventDefault();
+            stop();
+            break;
+          case 'l':
+            e.preventDefault();
+            document.getElementById('loopBtn').click();
+            break;
+          case 'm':
+            e.preventDefault();
+            document.getElementById('muteBtn').click();
+            break;
+          case 'h':
+            e.preventDefault();
+            document.getElementById('harmonyMuteBtn').click();
+            break;
+          case 'arrowup':
+            e.preventDefault();
+            slider.value = Math.min(parseInt(slider.max), parseInt(slider.value) + 5);
+            slider.dispatchEvent(new Event('input'));
+            break;
+          case 'arrowdown':
+            e.preventDefault();
+            slider.value = Math.max(parseInt(slider.min), parseInt(slider.value) - 5);
+            slider.dispatchEvent(new Event('input'));
+            break;
+          case '1':
+            e.preventDefault();
+            document.querySelector('.level-btn[data-level="beginner"]')?.click();
+            break;
+          case '2':
+            e.preventDefault();
+            document.querySelector('.level-btn[data-level="intermediate"]')?.click();
+            break;
+          case '3':
+            e.preventDefault();
+            document.querySelector('.level-btn[data-level="advanced"]')?.click();
+            break;
+          case '?':
+            e.preventDefault();
+            showKeyboardHelp();
+            break;
+        }
+      });
+    }
+
+    // Brief overlay listing the keyboard shortcuts — triggered by "?" key.
+    function showKeyboardHelp() {
+      let el = document.getElementById('kbHelpOverlay');
+      if (el) { el.remove(); return; }
+      el = document.createElement('div');
+      el.id = 'kbHelpOverlay';
+      el.className = 'kb-help';
+      el.innerHTML = `
+        <div class="kb-help-panel">
+          <div class="kb-help-title">Keyboard shortcuts</div>
+          <div class="kb-help-row"><kbd>Space</kbd> <kbd>K</kbd><span>Play / Pause</span></div>
+          <div class="kb-help-row"><kbd>S</kbd><span>Stop</span></div>
+          <div class="kb-help-row"><kbd>L</kbd><span>Loop toggle</span></div>
+          <div class="kb-help-row"><kbd>M</kbd><span>Mute all</span></div>
+          <div class="kb-help-row"><kbd>H</kbd><span>Mute harmony</span></div>
+          <div class="kb-help-row"><kbd>↑</kbd> <kbd>↓</kbd><span>Tempo ±5 BPM</span></div>
+          <div class="kb-help-row"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd><span>Level: beginner / int / adv</span></div>
+          <div class="kb-help-row"><kbd>?</kbd><span>This menu</span></div>
+          <div class="kb-help-close">Click anywhere to close</div>
+        </div>
+      `;
+      el.addEventListener('click', () => el.remove());
+      document.body.appendChild(el);
     }
 
     if (document.readyState === 'loading') {
