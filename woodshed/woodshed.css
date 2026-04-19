@@ -194,15 +194,19 @@ body {
   fill: #ffffff !important;
   stroke: #ffffff !important;
 }
-/* Notes, stems, flags, accidentals — full white for maximum contrast */
-#notation svg .vf-stavenote path,
-#notation svg .vf-notehead path,
-#notation svg .vf-stem path,
-#notation svg .vf-flag path,
-#notation svg .vf-beam path,
-#notation svg .vf-stavenote line {
-  fill: #ffffff !important;
-  stroke: #ffffff !important;
+/* Notes, stems, flags, accidentals — default white for dark-mode contrast.
+   Scoped to .vf-stavenote:not([fill]) so when VexFlow's setStyle() sets a
+   fill attribute on the group (Tones mode coloring chord vs. scale tones),
+   the child paths inherit the group's fill instead of being overridden white. */
+#notation svg .vf-stavenote:not([fill]) path,
+#notation svg .vf-stavenote:not([fill]) line {
+  fill: #ffffff;
+  stroke: #ffffff;
+}
+/* Beam paths (which live outside stavenote groups) always default white. */
+#notation svg .vf-beam path {
+  fill: #ffffff;
+  stroke: #ffffff;
 }
 /* Ledger lines — VexFlow draws these as #444 stroke paths inside stavenote.
    On dark background they disappear; force bright white + thicker stroke. */

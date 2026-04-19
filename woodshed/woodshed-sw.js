@@ -1,4 +1,4 @@
-const CACHE_NAME = 'woodshed-v9-badges-favorites';
+const CACHE_NAME = 'woodshed-v10-beaming-harmonymute';
 const ASSETS = [
   './index.html',
   './woodshed.css',

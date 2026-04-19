@@ -257,6 +257,9 @@
       <button class="transport-btn" id="muteBtn" title="Mute backing track">
         <i class="bi bi-volume-up-fill" id="muteIcon"></i>
       </button>
+      <button class="transport-btn" id="harmonyMuteBtn" title="Mute harmony (keep bass + drums) — solo over the rhythm section">
+        <i class="bi bi-music-note-list" id="harmonyMuteIcon"></i>
+      </button>
       <button class="transport-btn" id="micBtn" title="Microphone">
         <i class="bi bi-mic" id="micIcon"></i>
       </button>
@@ -607,11 +610,17 @@
       const errs = validateTune(tune);
       if (errs.length) {
         console.error('Tune "' + (tune.id || '?') + '" rejected:\n  ' + errs.join('\n  '));
+        if (tune.id === 'gospel-medley') {
+          window.__DBG_gospel = window.__DBG_gospel || [];
+          window.__DBG_gospel.push({ measures: tune.measures, stack: new Error().stack });
+        }
         _REJECTED_TUNES.push({ id: tune.id, errors: errs });
         return;
       }
       PROGRESSIONS[tune.id] = tune;
     }
+    window._REJECTED_TUNES = _REJECTED_TUNES;
+    window.PROGRESSIONS = PROGRESSIONS;
 
     // ======================================================================
     // GOOD TROUBLE BRASS BAND REPERTOIRE
@@ -3135,6 +3144,7 @@
     let measureBounds = [];
     let audioReady = false;
     let isMuted = false; // Start UNMUTED — user hits play, they hear the band
+    let isHarmonyMuted = false; // Solo-over-rhythm-section mode: mute comping, keep bass+drums
     let masterVol = null;
     let piano, bass, hihat, kick;
     let lickSynth = null;
@@ -3990,7 +4000,30 @@
         .joinVoices([textVoice])
         .format([noteVoice, textVoice], formatWidth);
 
+      // Auto-beam 8th notes and shorter. generateBeams reads each note's
+      // duration and groups flagged notes, breaking groups across rests and
+      // at beat boundaries. Only run when at least one beamable note exists
+      // (whole/half/quarter are never beamed).
+      const hasBeamable = notes.some(n => {
+        const d = n.duration;
+        return d === '8' || d === '16' || d === '32' || d === '64' ||
+               d === '8d' || d === '16d' || d === '32d';
+      });
+      let beams = [];
+      if (hasBeamable && currentMode !== 'symbols') {
+        try {
+          beams = VF.Beam.generateBeams(notes, {
+            groups: [new VF.Fraction(2, 8), new VF.Fraction(2, 8), new VF.Fraction(2, 8), new VF.Fraction(2, 8)],
+            beam_rests: false,
+            maintain_stem_directions: false
+          });
+        } catch (e) {
+          beams = [];
+        }
+      }
+
       noteVoice.draw(context, stave);
+      beams.forEach(b => b.setContext(context).draw());
       textVoice.draw(context, stave);
     }
 
@@ -4129,8 +4162,11 @@
         const dur = durationMap[durations[i]] || '8';
         const transKey = transposeVexKey(n.key);
         const note = new VF.StaveNote({ clef, keys: [transKey], duration: dur });
-        // Color: orange for chord tones, purple for scale tones
-        const color = n.isChord ? 'var(--accent, #e84a27)' : 'var(--accent2, #c850c0)';
+        // Color: orange for chord tones, purple for scale tones. Must be
+        // resolved colors (not CSS vars) because SVG fill attributes don't
+        // interpret var(...) — the CSS override on note paths is no longer
+        // !important, so these inline colors now win.
+        const color = n.isChord ? '#e84a27' : '#c850c0';
         note.setStyle({ fillStyle: color, strokeStyle: color });
         addAccidentals(note, [transKey]);
         // Add dot for dotted durations
@@ -4711,7 +4747,8 @@
         roomSize: 0.45, dampening: 3500, wet: 0.14
       }).connect(masterVol);
 
-      // Rhodes-like electric piano (FM synthesis)
+      // Rhodes-like electric piano (FM synthesis). If the user pre-muted
+      // harmony (solo-over-rhythm-section mode), start silent.
       piano = new Tone.PolySynth(Tone.FMSynth, {
         harmonicity: 3.01,
         modulationIndex: 1.2,
@@ -4719,7 +4756,7 @@
         envelope: { attack: 0.005, decay: 0.6, sustain: 0.15, release: 0.9 },
         modulation: { type: 'square' },
         modulationEnvelope: { attack: 0.01, decay: 0.25, sustain: 0, release: 0.5 },
-        volume: -16
+        volume: isHarmonyMuted ? -Infinity : -16
       }).connect(reverb);
 
       // Tuba bass — warm, round brass tone with breathy attack
@@ -5174,6 +5211,17 @@
         document.getElementById('muteBtn').classList.toggle('active', isMuted);
         document.getElementById('muteIcon').className = isMuted ? 'bi bi-volume-mute-fill' : 'bi bi-volume-up-fill';
         if (masterVol) masterVol.volume.value = isMuted ? -Infinity : 0;
+      });
+
+      // Harmony mute — silences comping piano so you can solo over just bass+drums
+      // (the classic "play with the rhythm section" practice mode).
+      document.getElementById('harmonyMuteBtn').addEventListener('click', () => {
+        isHarmonyMuted = !isHarmonyMuted;
+        document.getElementById('harmonyMuteBtn').classList.toggle('active', isHarmonyMuted);
+        document.getElementById('harmonyMuteIcon').className = isHarmonyMuted ? 'bi bi-music-note-list opacity-50' : 'bi bi-music-note-list';
+        // piano may not be instantiated yet (user hasn't hit play) — initAudio
+        // reads isHarmonyMuted at setup time, so this toggle works either way.
+        if (piano) piano.volume.value = isHarmonyMuted ? -Infinity : -16;
       });
 
       const tempoSlider = document.getElementById('tempoSlider');
