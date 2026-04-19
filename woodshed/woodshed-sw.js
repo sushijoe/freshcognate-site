@@ -1,4 +1,4 @@
-const CACHE_NAME = 'woodshed-v12-sections-favorites-stats-looprange';
+const CACHE_NAME = 'woodshed-v13-pride-design-refresh';
 const ASSETS = [
   './index.html',
   './woodshed.css',

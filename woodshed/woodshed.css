@@ -3,18 +3,82 @@
   --bg-dark: #0a1628;
   --bg-surface: #13294b;
   --bg-card: #1b3a6b;
+  --bg-card-elevated: #1f447a;  /* hover / selected surface */
   --accent: #e84a27;          /* Illini Orange */
   --accent-dim: #c43d1f;
   --accent2: #c850c0;         /* Fuscia/purple accent */
   --accent2-dim: #a040a0;
   --text-primary: #f0f2f7;
-  --text-secondary: #a0b5d0;  /* Brighter for better contrast */
+  --text-secondary: #b8cadb;  /* WCAG AA on dark surfaces */
+  --text-muted: #8ea4bf;      /* tertiary labels */
   --highlight: rgba(232, 74, 39, 0.18);
   --highlight-border: rgba(232, 74, 39, 0.65);
   --chord-tone: #e84a27;      /* Orange for chord tones */
   --scale-tone: #c850c0;      /* Purple for scale tones */
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --section-border: rgba(255,255,255,0.06);
+
+  /* ================================================================
+     Pride palette — the band is queer and proud. Red-orange + purple
+     are already our brand endpoints; this extends them into the full
+     spectrum so rainbow flourishes feel native, not tacked on.
+     ================================================================ */
+  --pride-red: #e84a27;       /* == --accent, anchors the left end */
+  --pride-orange: #f39336;
+  --pride-yellow: #f5c84b;
+  --pride-green: #4fbf6a;
+  --pride-blue: #3b8fe6;
+  --pride-purple: #c850c0;    /* == --accent2, anchors the right end */
+
+  --pride-gradient: linear-gradient(90deg,
+    var(--pride-red) 0%,
+    var(--pride-orange) 20%,
+    var(--pride-yellow) 40%,
+    var(--pride-green) 60%,
+    var(--pride-blue) 80%,
+    var(--pride-purple) 100%);
+
+  --pride-gradient-soft: linear-gradient(90deg,
+    rgba(232, 74, 39, 0.18),
+    rgba(243, 147, 54, 0.15),
+    rgba(245, 200, 75, 0.14),
+    rgba(79, 191, 106, 0.15),
+    rgba(59, 143, 230, 0.16),
+    rgba(200, 80, 192, 0.18));
+
+  --pride-gradient-ghost: linear-gradient(90deg,
+    rgba(232, 74, 39, 0.07),
+    rgba(243, 147, 54, 0.06),
+    rgba(245, 200, 75, 0.05),
+    rgba(79, 191, 106, 0.06),
+    rgba(59, 143, 230, 0.07),
+    rgba(200, 80, 192, 0.08));
+
+  /* Motion + elevation tokens */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.25);
+  --shadow-md: 0 2px 6px rgba(0,0,0,0.25), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.2);
+  --shadow-inset-hi: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* Subtle rainbow shimmer — used on favorited items, achievement borders,
+   and celebratory moments. Kept slow + soft so it breathes rather than
+   flashes. */
+@keyframes pride-shimmer {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+@keyframes pride-glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(232, 74, 39, 0.35), 0 0 12px rgba(200, 80, 192, 0.25); }
+  50%      { box-shadow: 0 0 0 3px rgba(245, 200, 75, 0.18), 0 0 20px rgba(79, 191, 106, 0.25); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important; }
 }
 
 * { box-sizing: border-box; }
@@ -46,11 +110,25 @@ body {
 .app-title {
   font-size: 18px;
   font-weight: 800;
+  /* Fallback solid orange for browsers that don't support background-clip;
+     gradient takes over when supported. */
   color: var(--accent);
   letter-spacing: 1.5px;
   text-transform: uppercase;
   white-space: nowrap;
   flex-shrink: 0;
+  background: var(--pride-gradient);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: pride-shimmer 14s linear infinite;
+  /* Tiny inner shadow gives the glyphs weight on dark backgrounds */
+  text-shadow: 0 0 1px rgba(255,255,255,0.05);
+}
+/* Fallback for no gradient text support */
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .app-title { background: none; -webkit-text-fill-color: initial; color: var(--accent); }
 }
 
 .progression-select {
@@ -81,6 +159,7 @@ body {
 }
 
 .mode-btn {
+  position: relative;
   flex: 1;
   padding: 9px 4px;
   font-size: 12px;
@@ -90,18 +169,37 @@ body {
   color: var(--text-secondary);
   border: 1px solid rgba(255,255,255,0.08);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s var(--ease-out), color 0.2s var(--ease-out),
+              border-color 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
   letter-spacing: 0.3px;
+  box-shadow: var(--shadow-inset-hi);
 }
 
 .mode-btn:first-child { border-radius: 8px 0 0 8px; }
 .mode-btn:last-child { border-radius: 0 8px 8px 0; }
 
+.mode-btn:hover:not(.active) {
+  background: var(--bg-card-elevated);
+  color: var(--text-primary);
+}
+
 .mode-btn.active {
   background: var(--accent);
   color: #fff;
   border-color: var(--accent);
-  box-shadow: 0 2px 8px rgba(232, 74, 39, 0.25);
+  box-shadow: 0 2px 8px rgba(232, 74, 39, 0.25), var(--shadow-inset-hi);
+}
+/* Pride underline on the active mode — subtle celebratory accent */
+.mode-btn.active::after {
+  content: '';
+  position: absolute;
+  left: 8px; right: 8px; bottom: -1px;
+  height: 2px;
+  background: var(--pride-gradient);
+  background-size: 200% 100%;
+  animation: pride-shimmer 10s linear infinite;
+  border-radius: 2px;
+  opacity: 0.9;
 }
 
 /* Level bar */
@@ -115,6 +213,7 @@ body {
 }
 
 .level-btn {
+  position: relative;
   flex: 1;
   padding: 6px 4px;
   font-size: 11px;
@@ -125,16 +224,34 @@ body {
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s var(--ease-out), color 0.2s var(--ease-out),
+              border-color 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
 }
 
 .level-btn i { margin-right: 3px; }
+
+.level-btn:hover:not(.active) {
+  background: rgba(255,255,255,0.07);
+  color: var(--text-primary);
+}
 
 .level-btn.active {
   background: rgba(200, 80, 192, 0.18);
   color: var(--accent2);
   border-color: var(--accent2);
-  box-shadow: 0 2px 8px rgba(200, 80, 192, 0.15);
+  box-shadow: 0 2px 8px rgba(200, 80, 192, 0.15), var(--shadow-inset-hi);
+}
+/* Pride underline on active level — matches mode-btn treatment */
+.level-btn.active::after {
+  content: '';
+  position: absolute;
+  left: 10px; right: 10px; bottom: 2px;
+  height: 2px;
+  background: var(--pride-gradient);
+  background-size: 200% 100%;
+  animation: pride-shimmer 10s linear infinite;
+  border-radius: 2px;
+  opacity: 0.85;
 }
 
 /* Notation area */
@@ -263,13 +380,16 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(232, 74, 39, 0.15);
-  border: 1px solid rgba(232, 74, 39, 0.4);
-  color: #ffb09a;
+  background: var(--pride-gradient-soft);
+  background-size: 200% 100%;
+  animation: pride-shimmer 14s linear infinite;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #ffe3d5;
   padding: 3px 10px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
+  box-shadow: var(--shadow-inset-hi);
 }
 .loop-range-clear {
   background: none;
@@ -393,19 +513,34 @@ body {
   border-color: rgba(220,100,140,0.25);
 }
 .tune-meta-badge.difficulty.difficulty-varied {
-  background: rgba(180,160,220,0.08);
-  color: #b5a4d9;
-  border-color: rgba(180,160,220,0.22);
+  background: var(--pride-gradient-soft);
+  background-size: 200% 100%;
+  animation: pride-shimmer 18s linear infinite;
+  color: #ffffff;
+  border-color: rgba(255,255,255,0.18);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
 }
 
 /* Persistent tune metadata strip — under the header, above stats panel */
 .tune-strip {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 8px 16px 10px;
   background: var(--bg-surface);
   border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+/* Hairline pride stripe between the header and the tune strip —
+   a proud, quiet seam. 1px, low opacity, no motion so it doesn't distract. */
+.tune-strip::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 0; right: 0;
+  height: 1px;
+  background: var(--pride-gradient);
+  opacity: 0.55;
+  pointer-events: none;
 }
 .tune-strip-meta {
   flex: 1;
@@ -450,6 +585,11 @@ body {
   background: rgba(255,200,80,0.15);
   border-color: rgba(255,200,80,0.40);
   color: #f5c46b;
+  transition: transform 0.25s var(--ease-spring), box-shadow 0.25s var(--ease-out);
+}
+.tune-fav-btn.is-fav:hover {
+  transform: scale(1.08) rotate(-4deg);
+  box-shadow: 0 0 0 2px rgba(245,200,75,0.25), 0 0 18px rgba(200,80,192,0.35);
 }
 .tune-ref-btn {
   flex-shrink: 0;
@@ -487,17 +627,38 @@ body {
 
 .chorus-counter span {
   color: var(--accent);
-  font-weight: 600;
+  font-weight: 700;
+  background: var(--pride-gradient);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: pride-shimmer 12s linear infinite;
+}
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .chorus-counter span { background: none; -webkit-text-fill-color: initial; color: var(--accent); }
 }
 
 /* Transport bar */
 .transport-bar {
+  position: relative;
   flex-shrink: 0;
   background: var(--bg-surface);
   border-top: 1px solid rgba(255,255,255,0.10);
   padding: 10px 16px;
   padding-bottom: calc(10px + var(--safe-bottom));
   z-index: 100;
+  box-shadow: 0 -1px 0 rgba(255,255,255,0.03), 0 -8px 20px rgba(0,0,0,0.25);
+}
+/* Matching pride seam above the transport bar — bookend to the tune-strip one */
+.transport-bar::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 0; right: 0;
+  height: 1px;
+  background: var(--pride-gradient);
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .transport-controls {
@@ -527,13 +688,25 @@ body {
 .transport-btn:active { background: var(--accent-dim); color: #fff; }
 
 .transport-btn.play-btn {
+  position: relative;
   width: 56px;
   height: 56px;
   background: var(--accent);
   color: #fff;
   font-size: 24px;
   border: none;
-  box-shadow: 0 3px 12px rgba(232, 74, 39, 0.35);
+  box-shadow:
+    0 3px 12px rgba(232, 74, 39, 0.35),
+    0 0 0 1px rgba(255,255,255,0.08) inset,
+    inset 0 1px 0 rgba(255,255,255,0.18);
+  transition: transform 0.18s var(--ease-spring), box-shadow 0.25s var(--ease-out);
+}
+.transport-btn.play-btn:hover {
+  transform: scale(1.04);
+  box-shadow:
+    0 4px 16px rgba(232, 74, 39, 0.45),
+    0 0 22px rgba(200, 80, 192, 0.35),
+    inset 0 1px 0 rgba(255,255,255,0.22);
 }
 
 .transport-btn.play-btn:active { background: var(--accent-dim); }
@@ -616,7 +789,9 @@ body {
   gap: 10px;
   margin: 2px 0 8px;
   padding: 6px 12px;
-  background: linear-gradient(90deg, rgba(232, 74, 39, 0.08), rgba(200, 80, 192, 0.08));
+  background: var(--pride-gradient-ghost);
+  background-size: 200% 100%;
+  animation: pride-shimmer 24s linear infinite;
   border: 1px solid rgba(200, 80, 192, 0.22);
   border-radius: 8px;
   font-size: 13px;
@@ -655,6 +830,12 @@ body {
 }
 .lick-fav-btn.is-favorited {
   color: #ffc857;
+  transition: transform 0.25s var(--ease-spring), filter 0.25s var(--ease-out);
+}
+.lick-fav-btn.is-favorited:hover {
+  transform: scale(1.15) rotate(6deg);
+  filter: drop-shadow(0 0 6px rgba(245,200,75,0.5))
+          drop-shadow(0 0 12px rgba(200,80,192,0.4));
 }
 
 .favorites-count {
@@ -886,14 +1067,28 @@ body {
 }
 
 .kb-help-panel {
+  position: relative;
   min-width: 320px;
   max-width: 420px;
   padding: 22px 26px;
-  background: var(--bg-card);
-  border: 1px solid rgba(200, 80, 192, 0.3);
-  border-radius: 12px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  background: rgba(27, 58, 107, 0.85);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg), var(--shadow-inset-hi);
   color: var(--text-primary);
+  overflow: hidden;
+}
+/* Rainbow top edge on the help panel — a celebratory frame */
+.kb-help-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--pride-gradient);
+  background-size: 200% 100%;
+  animation: pride-shimmer 10s linear infinite;
 }
 
 .kb-help-title {
@@ -1000,9 +1195,11 @@ body {
 
 .xp-micro-fill {
   height: 100%;
-  background: var(--accent);
+  background: var(--pride-gradient);
+  background-size: 200% 100%;
   border-radius: 3px;
-  transition: width 0.4s ease;
+  transition: width 0.4s var(--ease-out);
+  animation: pride-shimmer 20s linear infinite;
 }
 
 .streak-badge {
@@ -1081,9 +1278,13 @@ body {
 
 .xp-bar-full-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  background: var(--pride-gradient);
+  background-size: 200% 100%;
   border-radius: 4px;
-  transition: width 0.5s ease;
+  transition: width 0.5s var(--ease-out);
+  animation: pride-shimmer 18s linear infinite;
+  /* Subtle inner highlight to lift it off the track */
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
 }
 
 /* Quick stats row */
@@ -1096,15 +1297,30 @@ body {
 .stat-card {
   flex: 1;
   background: var(--bg-card);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 10px 8px;
   text-align: center;
+  box-shadow: var(--shadow-sm), var(--shadow-inset-hi);
+  border: 1px solid rgba(255,255,255,0.04);
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+}
+.stat-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md), var(--shadow-inset-hi);
 }
 
 .stat-card-num {
   font-size: 20px;
   font-weight: 700;
-  color: var(--accent);
+  background: var(--pride-gradient);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: pride-shimmer 16s linear infinite;
+}
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .stat-card-num { background: none; -webkit-text-fill-color: initial; color: var(--accent); }
 }
 
 .stat-card-label {
@@ -1231,8 +1447,17 @@ body {
 
 .achievement-icon.unlocked {
   color: var(--accent);
-  border-color: var(--accent);
-  background: rgba(232, 74, 39, 0.12);
+  border-color: transparent;
+  background:
+    linear-gradient(var(--bg-card), var(--bg-card)) padding-box,
+    var(--pride-gradient) border-box;
+  background-size: auto, 200% 100%;
+  border: 1.5px solid transparent;
+  animation: pride-shimmer 12s linear infinite;
+  box-shadow: 0 0 12px rgba(232, 74, 39, 0.15), var(--shadow-inset-hi);
+}
+.achievement-icon.unlocked:hover {
+  animation: pride-shimmer 4s linear infinite, pride-glow-pulse 2.5s ease-in-out infinite;
 }
 
 .achievement-icon:active { transform: scale(0.92); }
@@ -1362,18 +1587,33 @@ body {
 }
 
 .toast {
-  background: var(--bg-card);
+  position: relative;
+  background: rgba(27, 58, 107, 0.88);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
   border-left: 3px solid var(--accent);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 10px 14px;
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 13px;
   color: var(--text-primary);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-  animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+  box-shadow: var(--shadow-lg), var(--shadow-inset-hi);
+  animation: toastIn 0.3s var(--ease-out), toastOut 0.3s var(--ease-out) 2.7s forwards;
   pointer-events: auto;
+  overflow: hidden;
+}
+/* Thin rainbow stripe along the bottom edge of toasts — whispers celebration */
+.toast::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--pride-gradient);
+  background-size: 200% 100%;
+  animation: pride-shimmer 8s linear infinite;
+  opacity: 0.65;
 }
 
 .toast.purple { border-left-color: var(--accent2); }
@@ -1711,4 +1951,39 @@ body {
 @media (min-width: 480px) {
   .inst-btn { padding: 6px 13px; font-size: 12px; }
   .instrument-row { gap: 6px; padding: 8px 12px; }
+}
+
+/* =========================================================================
+   Global polish — focus rings, selection, text rendering
+   ========================================================================= */
+
+/* Keyboard users get a pride-hued focus halo. Mouse users don't see it,
+   so there's no visual noise during normal play. Rendered outside the
+   element so it doesn't shift layout. */
+:where(button, select, input, textarea, [tabindex]):focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 2px var(--bg-dark),
+    0 0 0 4px var(--accent2),
+    0 0 14px 2px rgba(200, 80, 192, 0.45),
+    0 0 18px 4px rgba(232, 74, 39, 0.25);
+  border-radius: inherit;
+}
+
+/* Selection + caret in the brand palette */
+::selection {
+  background: rgba(200, 80, 192, 0.35);
+  color: #fff;
+}
+::-moz-selection {
+  background: rgba(200, 80, 192, 0.35);
+  color: #fff;
+}
+
+/* Subtle crispness on the whole doc */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
