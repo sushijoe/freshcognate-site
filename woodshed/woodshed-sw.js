@@ -1,4 +1,4 @@
-const CACHE_NAME = 'woodshed-v11-countin-trainer-shortcuts';
+const CACHE_NAME = 'woodshed-v12-sections-favorites-stats-looprange';
 const ASSETS = [
   './index.html',
   './woodshed.css',

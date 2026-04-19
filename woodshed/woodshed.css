@@ -220,6 +220,81 @@ body {
   stroke-width: 1.4px !important;
 }
 
+/* Section / rehearsal label badges — small pills sitting above the staff
+   at the start of each marked section. Orange brand color + white text.
+   drop-shadow keeps the rest against busy notation. */
+#notation svg .section-label rect {
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+}
+#notation svg .section-label text {
+  pointer-events: none;
+  letter-spacing: 0.5px;
+}
+
+/* Loop-range overlays — dim out-of-range measures; accent bars mark the
+   selected boundaries so the eye finds them fast. */
+#notation svg .loop-range-overlay {
+  pointer-events: none;
+}
+#notation svg .loop-range-marker {
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px rgba(232, 74, 39, 0.6));
+}
+
+/* Loop-range hint + badge — sits below notation. Tip is subtle until a
+   range is set; then the badge takes over with the active range. */
+.loop-range-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 4px 0 6px;
+  font-size: 11px;
+  min-height: 22px;
+  color: var(--text-secondary);
+}
+.loop-range-tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.6;
+}
+.loop-range-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(232, 74, 39, 0.15);
+  border: 1px solid rgba(232, 74, 39, 0.4);
+  color: #ffb09a;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.loop-range-clear {
+  background: none;
+  border: none;
+  color: #ffb09a;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 2px;
+  margin-left: 2px;
+}
+.loop-range-clear:hover {
+  color: #ffffff;
+}
+
+/* Make measures feel clickable when hovered — cursor hint only, no visual
+   disruption to the notation itself. */
+#notation {
+  cursor: default;
+}
+#notation svg .vf-stavenote,
+#notation svg .vf-stave {
+  cursor: pointer;
+}
+
 .measure-highlight {
   position: absolute;
   background: var(--highlight);
@@ -559,6 +634,34 @@ body {
   font-weight: 700;
   color: var(--accent2);
   letter-spacing: 0.2px;
+}
+
+.lick-fav-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 15px;
+  line-height: 1;
+  transition: color 0.15s, transform 0.15s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.lick-fav-btn:hover {
+  color: #ffc857;
+  transform: scale(1.1);
+}
+.lick-fav-btn.is-favorited {
+  color: #ffc857;
+}
+
+.favorites-count {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-left: 2px;
 }
 
 /* Loading */
@@ -1008,6 +1111,68 @@ body {
   font-size: 10px;
   color: var(--text-secondary);
   margin-top: 2px;
+}
+
+/* Tempo range row — one stat, full width, inline icon + label + value */
+.tempo-range-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.tempo-range-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tempo-range-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.3px;
+}
+
+/* Instrument pills — compact grid of every instrument the student
+   has practiced on, sorted by usage. Used = brand color; unused = dim. */
+.instruments-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.instrument-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-card);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  border: 1px solid transparent;
+}
+.instrument-pill.used {
+  border-color: rgba(232, 74, 39, 0.35);
+}
+.instrument-pill.used .instrument-pill-count {
+  color: var(--accent);
+  font-weight: 700;
+}
+.instrument-pill.unused {
+  opacity: 0.45;
+}
+.instrument-pill-name {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.instrument-pill-count {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  min-width: 1.5em;
+  text-align: right;
 }
 
 /* Streak calendar */

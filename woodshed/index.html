@@ -79,6 +79,12 @@
         <div class="stat-card-label"><i class="bi bi-fire"></i> Streak</div>
       </div>
     </div>
+    <div class="stats-section-label">Tempo &amp; Instruments</div>
+    <div class="tempo-range-row">
+      <div class="tempo-range-label"><i class="bi bi-speedometer2"></i> Tempo range</div>
+      <div class="tempo-range-value" id="statsTempoRange">—</div>
+    </div>
+    <div class="instruments-grid" id="statsInstruments"></div>
     <div class="stats-section-label">Last 4 Weeks</div>
     <div class="streak-cal" id="streakCal"></div>
     <div class="stats-section-label">Achievements <span id="achieveCount">0/20</span></div>
@@ -147,9 +153,26 @@
     <div class="lick-concept" id="lickConcept" style="display:none">
       <span class="lick-concept-label">This chorus</span>
       <span class="lick-concept-name" id="lickConceptName"></span>
+      <!-- Star the current concept so favorites-only mode rotates only
+           the starred licks. Hidden class toggles on filled/empty star. -->
+      <button class="lick-fav-btn" id="lickFavBtn" type="button" title="Favorite this lick (only rotate through starred licks when favorites-only is on)">
+        <i class="bi bi-star" id="lickFavIcon"></i>
+      </button>
     </div>
     <div id="notation">
       <div class="measure-highlight" id="highlight"></div>
+    </div>
+    <!-- Loop range selection tip + active range badge -->
+    <div class="loop-range-hint" id="loopRangeHint">
+      <span class="loop-range-tip">
+        <i class="bi bi-info-circle"></i>
+        Shift-click a measure to loop just that section
+      </span>
+      <span class="loop-range-badge" id="loopRangeBadge" style="display:none">
+        <i class="bi bi-repeat"></i>
+        <span id="loopRangeText">Loop 1</span>
+        <button class="loop-range-clear" id="loopRangeClear" title="Clear loop range" type="button">&times;</button>
+      </span>
     </div>
 
     <div class="note-legend" id="noteLegend" style="display:none">
@@ -305,6 +328,14 @@
           <option value="5">+5 BPM/chorus</option>
           <option value="10">+10 BPM/chorus</option>
         </select>
+      </label>
+      <!-- Favorites-only rotates through only the starred licks at the
+           current level. Hidden outside Licks mode. Silently disables
+           itself if the student has zero favorites at this level. -->
+      <label class="practice-toggle" id="favoritesOnlyRow" title="Only rotate through licks you've starred at this level" style="display:none">
+        <input type="checkbox" id="favoritesOnlyToggle">
+        <span>Favorites only</span>
+        <span class="favorites-count" id="favoritesCount"></span>
       </label>
     </div>
   </div>
@@ -520,6 +551,9 @@
           // Per-instrument parts — { tuba: [...], trombone: [...], ... }
           // Each part is in concert pitch. Renderer handles transposition.
           if (mm.parts) out.parts = mm.parts;
+          // Rehearsal / section label. Rendered as a badge on the first
+          // measure of each section (e.g. 'A', 'B', 'Bridge', 'Solos').
+          if (mm.s) out.section = mm.s;
           return out;
         }),
         layout: { measuresPerLine: def.mpl || 4, clef: def.cl || 'bass' },
@@ -693,11 +727,11 @@
       mkProg({id:'feel-like-funkin', t:'Feel Like Funkin\' It Up', cp:'Rebirth Brass Band', k:'Eb', bpm:100, sec:'core',
         form:'solo-form', tempoSource:'xml',
         m:[
-          'Eb7',
+          {c:'Eb7', s:'1'},
           'Eb7',
           'Ab7',
           'Ab7',
-          'Eb7',
+          {c:'Eb7', s:'2'},
           'Eb7',
           'Ab7',
           'Ab7'
@@ -755,10 +789,10 @@
         form:'solo-form', tempoSource:'recording',
         m:[
           // I'll Fly Away — solo section (16 bars in Bb)
-          'Bb','Bb','F7','F7',
-          'Bb','Bb','Bb7','Bb7',
-          'Eb','Eb','Bb','Bb',
-          'F7','F7','Bb','Bb'
+          {c:'Bb', s:'A'},'Bb','F7','F7',
+          {c:'Bb', s:'B'},'Bb','Bb7','Bb7',
+          {c:'Eb', s:'C'},'Eb','Bb','Bb',
+          {c:'F7', s:'D'},'F7','Bb','Bb'
         ],
         tb:['Three gospel standards: Closer Walk (dirge) -> I\'ll Fly Away (uptempo) -> Lord Lord Lord -> Amen.','Solo section is I\'ll Fly Away\'s 16-bar form in Bb: I-V7-I-I7-IV-I-V7-I.','Bb major / Bb blues scale work throughout.'],
         ti:['The Bb7 in bar 7 is V7 of IV (Eb) — lean into the b7 (Ab).','Gospel lick: bluesy descending riffs from Bb down through the blues scale.','The IV (Eb) on bars 9-10 is the "lift" — target G (3rd of Eb) on beat 1.'],
@@ -1150,11 +1184,11 @@
       // (Dm7-Em7-Am7 = Cm7-Dm7-Gm7 turnaround). Head 2x, solos over AB.
       mkProg({id:'mercy-mercy-mercy', t:'Mercy, Mercy, Mercy', cp:'Joe Zawinul, arr. Rebirth', k:'Bb', bpm:100, sec:'active',
         m:[
-          'Bb7',
+          {c:'Bb7', s:'A'},
           'Eb7',
           'Bb7',
           'Eb7',
-          'Bb',
+          {c:'Bb', s:'B'},
           'Db',
           'Bb',
           'Db'
@@ -1168,7 +1202,7 @@
       // Form: ABC AD, Solos BA. Half-time feel on section D.
       // Progression: A=Fm7 vamp, B=Bbm7-Eb7-Gb-Db (4x), D=same half-time.
       mkProg({id:'planet-gibbous', t:'Planet Gibbous', cp:'Hypnotic Brass Ensemble, arr. Rebirth', k:'Bbm', bpm:140, sec:'active',
-        m:['Fm7','Fm7','Bbm7','Eb7','Gb','Db','Bbm7','Fm7'],
+        m:[{c:'Fm7', s:'A'},'Fm7',{c:'Bbm7', s:'B'},'Eb7','Gb','Db','Bbm7','Fm7'],
         tb:['Hypnotic Brass Ensemble tune. Concert Bbm, ♩=140.','Form: A (Fm7 vamp) → B (Bbm7-Eb7-Gb-Db) → C (rest) → D (half-time).','Section D has half-time feel — layered and spacey.'],
         ti:['B progression: Bbm7-Eb7-Gb-Db is i-IV7-bVI-bIII — modal and mysterious.','Target chord tones: F-Ab on Fm7, Db-F on Bbm7, G-Bb on Eb7.','Long phrases that weave through the changes.'],
         ta:['Over the Eb7, use Eb mixolydian for the brighter color.','Half-time D section: every note counts, use texture and dynamics.','Listen to Hypnotic Brass Ensemble for the ensemble sound.']
@@ -1261,7 +1295,7 @@
       // section form: A B C D E (Funky Bridge!) F (Solo 1 on A7/G7 concert)
       // G (Solo 2 on G7/F7 concert). Form order: AB CB DEFG, ABD A.
       mkProg({id:'unclean-waters', t:'Unclean Waters', cp:'Dirty Dozen Brass Band', k:'Dm', bpm:95, sec:'active',
-        m:['Dm7','Dm7','Gm7','Gm7','Dm7','A7','Dm7','Dm7'],
+        m:[{c:'Dm7', s:'A'},'Dm7',{c:'Gm7', s:'B'},'Gm7',{c:'Dm7', s:'Bridge'},'A7','Dm7','Dm7'],
         tb:['Dirty Dozen Brass Band tune. Concert Dm, multi-section form.','D dorian (D E F G A B C) is the primary mode.','Solo 1 is the "Funky Bridge!" section with A7.'],
         ti:['A7 provides the harmonic-minor moment — C# leading tone.','Solo 1 on A7 (V7 of Dm): use D harmonic minor.','Solo 2 on F7 (dominantized I): use F mixolydian.'],
         ta:['D phrygian dominant (D Eb F# G A Bb C) for Eastern color.','Form order: AB CB DEFG, ABD A — 12 sections!','Listen to Dirty Dozen\'s original for the funky bridge feel.']
@@ -1271,7 +1305,7 @@
       // A7), C (chorus: Dm-A7 with Bb-F turnaround). Progression written
       // Em-D-B7-C-G transposes to concert Dm-C-A7-Bb-F.
       mkProg({id:'which-side', t:'Which Side Are You On', cp:'Florence Reece', k:'Dm', bpm:185, sec:'active',
-        m:['Dm','C','Dm','C','Dm','A7','Dm','A7','Dm','A7','Dm','Bb','F','A7','Dm','A7'],
+        m:[{c:'Dm', s:'A'},'C','Dm','C',{c:'Dm', s:'B'},'A7','Dm','A7','Dm','A7','Dm','Bb',{c:'F', s:'Turn'},'A7','Dm','A7'],
         tb:['Union anthem at ♩=185. Concert Dm, driving 4/4.','Form: A (low brass riff) → B (verse, Dm-C) → C (chorus, Dm-A7).','Play with conviction — this is a protest song.'],
         ti:['The A7 (V) brings the tension — resolve strong to Dm.','The Bb-F-A7-Dm chord move (bVI-bIII-V-i) is the signature turnaround.','Long tones with vibrato — this is a declaration.'],
         ta:['D harmonic minor on the A7 for the C#.','Gradual build — start solemn, end defiant.','Listen to Pete Seeger and Natalie Merchant versions.']
@@ -3169,6 +3203,56 @@
     let isHarmonyMuted = false; // Solo-over-rhythm-section mode: mute comping, keep bass+drums
     let countInEnabled = true;  // 4-beat stick-click count-in before loop begins
     let tempoAutoIncrement = 0; // BPM added per chorus (0 = off)
+    // Loop-range selection — null means loop the full progression. Both are
+    // measure indices (0-based, inclusive). Shift-click on a measure sets the
+    // range. Plain click or ✕ badge clears it.
+    let loopRangeStart = null;
+    let loopRangeEnd = null;
+    // Lick favorites — persisted to localStorage as a Set of "${level}:${conceptNum}".
+    // Concepts 1-10 are consistent across all chords at a given level (every chord
+    // has a "1. Root only" etc.), so favoriting by concept number means one click
+    // stars that concept for all 12 chord types at once.
+    const LICK_FAV_KEY = 'woodshed.lickFavorites.v1';
+    let lickFavorites = new Set();
+    try {
+      const stored = JSON.parse(localStorage.getItem(LICK_FAV_KEY) || '[]');
+      if (Array.isArray(stored)) lickFavorites = new Set(stored);
+    } catch (e) { /* ignore corrupted state */ }
+    let favoritesOnly = false;
+
+    function saveLickFavorites() {
+      try { localStorage.setItem(LICK_FAV_KEY, JSON.stringify([...lickFavorites])); }
+      catch (e) { /* quota or private-mode; non-fatal */ }
+    }
+
+    // Extract the leading concept number from a lick name like "1. Root only".
+    function lickConceptNum(lick) {
+      const m = /^(\d+)\./.exec(lick?.name || '');
+      return m ? parseInt(m[1], 10) : null;
+    }
+    function lickFavKey(level, conceptNum) {
+      return level + ':' + conceptNum;
+    }
+    function isLickFavorited(level, conceptNum) {
+      return lickFavorites.has(lickFavKey(level, conceptNum));
+    }
+    function favoritesCountAtLevel(level) {
+      let n = 0;
+      lickFavorites.forEach(k => { if (k.startsWith(level + ':')) n++; });
+      return n;
+    }
+    // Return the licks array to rotate through for a given level + chord,
+    // filtered to favorites if favoritesOnly is on and the student has any.
+    function getActiveLicks(level, chord) {
+      const all = LICKS[level]?.[chord];
+      if (!all || !all.length) return null;
+      if (!favoritesOnly || favoritesCountAtLevel(level) === 0) return all;
+      const filtered = all.filter(l => {
+        const n = lickConceptNum(l);
+        return n !== null && isLickFavorited(level, n);
+      });
+      return filtered.length ? filtered : all; // safety fallback
+    }
     let masterVol = null;
     let piano, bass, hihat, kick;
     let lickSynth = null;
@@ -3305,6 +3389,13 @@
             progressions: progs,
             modes: { symbols: { choruses: 0 }, licks: { choruses: 0 }, tones: { choruses: 0 } },
             levels: { beginner: { choruses: 0 }, intermediate: { choruses: 0 }, advanced: { choruses: 0 } },
+            // Per-instrument choruses — one entry per INSTRUMENT_LIST member.
+            // Populated on demand in onChorusComplete so new instruments added
+            // later don't need a schema migration.
+            instruments: {},
+            // Tempo range seen across all practice. minBpm / maxBpm let the
+            // dashboard show "practiced between 90-180 BPM" as facility signal.
+            tempos: { minBpm: null, maxBpm: null },
             combos: [],
             _nightOwl: false,
             _earlyBird: false,
@@ -3329,6 +3420,8 @@
               }
             });
             if (!data.stats.combos) data.stats.combos = [];
+            if (!data.stats.instruments) data.stats.instruments = {};
+            if (!data.stats.tempos) data.stats.tempos = { minBpm: null, maxBpm: null };
             if (data.stats._nightOwl === undefined) data.stats._nightOwl = false;
             if (data.stats._earlyBird === undefined) data.stats._earlyBird = false;
             if (data.stats._marathon === undefined) data.stats._marathon = false;
@@ -3527,6 +3620,27 @@
         if (data.stats.modes[mode]) data.stats.modes[mode].choruses++;
         if (data.stats.levels[level]) data.stats.levels[level].choruses++;
 
+        // Track per-instrument practice. currentInstrumentName is module-scoped
+        // and reliably reflects what just played. Created lazily so adding a
+        // new instrument later doesn't require a schema migration.
+        const instName = currentInstrumentName;
+        if (instName) {
+          if (!data.stats.instruments[instName]) {
+            data.stats.instruments[instName] = { choruses: 0 };
+          }
+          data.stats.instruments[instName].choruses++;
+        }
+
+        // Track tempo range — pulled from the live BPM slider at the moment
+        // the chorus finishes. Gives us "practiced 90-180 BPM" for the display.
+        const slider = document.getElementById('tempoSlider');
+        const bpm = slider ? parseInt(slider.value) : null;
+        if (bpm && !isNaN(bpm)) {
+          const t = data.stats.tempos;
+          if (t.minBpm === null || bpm < t.minBpm) t.minBpm = bpm;
+          if (t.maxBpm === null || bpm > t.maxBpm) t.maxBpm = bpm;
+        }
+
         // Track combo for Renaissance Player
         const combo = progId + '|' + mode + '|' + level;
         if (!data.stats.combos.includes(combo)) {
@@ -3650,6 +3764,41 @@
         el('statsChoruses').textContent = data.stats.totalChoruses;
         el('statsTime').textContent = formatTime(data.stats.totalPracticeSec);
         el('statsStreak').textContent = data.streak.current;
+
+        // Tempo range — only show if there's any data
+        const t = data.stats.tempos || {};
+        const trEl = el('statsTempoRange');
+        if (trEl) {
+          if (t.minBpm && t.maxBpm) {
+            trEl.textContent = t.minBpm === t.maxBpm
+              ? t.minBpm + ' BPM'
+              : t.minBpm + ' – ' + t.maxBpm + ' BPM';
+          } else {
+            trEl.textContent = 'No practice yet';
+          }
+        }
+
+        // Instruments — one pill per instrument with chorus count.
+        // Ordered by usage (most practiced first). Unused instruments dimmed
+        // so the student can see which ones they've ignored at a glance.
+        const instEl = el('statsInstruments');
+        if (instEl) {
+          instEl.innerHTML = '';
+          const instStats = data.stats.instruments || {};
+          const entries = INSTRUMENT_LIST.map(inst => ({
+            name: inst.name,
+            label: inst.label,
+            choruses: (instStats[inst.name] || {}).choruses || 0
+          }));
+          entries.sort((a, b) => b.choruses - a.choruses);
+          entries.forEach(e => {
+            const pill = document.createElement('div');
+            pill.className = 'instrument-pill' + (e.choruses > 0 ? ' used' : ' unused');
+            pill.innerHTML = '<span class="instrument-pill-name">' + e.label + '</span>' +
+                             '<span class="instrument-pill-count">' + e.choruses + '</span>';
+            instEl.appendChild(pill);
+          });
+        }
 
         // Streak calendar (last 28 days)
         const cal = el('streakCal');
@@ -3988,7 +4137,108 @@
         measureBounds.push({ x, y, width: w, height: lineHeight - 20 });
       }
 
+      // Draw loop-range overlays if a range is active: dim out-of-range
+      // measures and mark the boundaries with accent bars.
+      if (loopRangeStart !== null && loopRangeEnd !== null) {
+        drawLoopRangeOverlay();
+      }
+
       updateHighlight();
+      updateLoopRangeBadge();
+    }
+
+    // Overlay non-destructive SVG rects over measures outside the current
+    // loop range so they appear dimmed. Draws accent markers on the left
+    // edge of the first in-range measure and right edge of the last.
+    function drawLoopRangeOverlay() {
+      const svg = document.querySelector('#notation svg');
+      if (!svg) return;
+      const ns = 'http://www.w3.org/2000/svg';
+      // Remove any previously drawn overlays first (safety — renderNotation
+      // clears innerHTML before calling us, but guards against double-calls).
+      [...svg.querySelectorAll('.loop-range-overlay, .loop-range-marker')]
+        .forEach(el => el.remove());
+      measureBounds.forEach((b, i) => {
+        const inRange = i >= loopRangeStart && i <= loopRangeEnd;
+        if (!inRange) {
+          const rect = document.createElementNS(ns, 'rect');
+          rect.setAttribute('class', 'loop-range-overlay');
+          rect.setAttribute('x', b.x);
+          rect.setAttribute('y', b.y);
+          rect.setAttribute('width', b.width);
+          rect.setAttribute('height', b.height + 20);
+          rect.setAttribute('fill', 'rgba(10, 12, 22, 0.55)');
+          svg.appendChild(rect);
+        }
+        // Accent bar on the left edge of the first in-range measure
+        if (i === loopRangeStart) {
+          const bar = document.createElementNS(ns, 'rect');
+          bar.setAttribute('class', 'loop-range-marker');
+          bar.setAttribute('x', b.x);
+          bar.setAttribute('y', b.y - 4);
+          bar.setAttribute('width', 4);
+          bar.setAttribute('height', b.height + 28);
+          bar.setAttribute('fill', '#e84a27');
+          svg.appendChild(bar);
+        }
+        if (i === loopRangeEnd) {
+          const bar = document.createElementNS(ns, 'rect');
+          bar.setAttribute('class', 'loop-range-marker');
+          bar.setAttribute('x', b.x + b.width - 4);
+          bar.setAttribute('y', b.y - 4);
+          bar.setAttribute('width', 4);
+          bar.setAttribute('height', b.height + 28);
+          bar.setAttribute('fill', '#e84a27');
+          svg.appendChild(bar);
+        }
+      });
+    }
+
+    // Small badge showing the current loop range. Updated by renderNotation.
+    function updateLoopRangeBadge() {
+      const badge = document.getElementById('loopRangeBadge');
+      if (!badge) return;
+      if (loopRangeStart === null || loopRangeEnd === null) {
+        badge.style.display = 'none';
+        return;
+      }
+      badge.style.display = 'inline-flex';
+      document.getElementById('loopRangeText').textContent =
+        'Loop ' + (loopRangeStart + 1) + (loopRangeEnd === loopRangeStart ? '' : '-' + (loopRangeEnd + 1));
+    }
+
+    // Convert a click inside #notation into a measure index using measureBounds.
+    function measureIndexFromPoint(clientX, clientY) {
+      const container = document.getElementById('notation');
+      const rect = container.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+      for (let i = 0; i < measureBounds.length; i++) {
+        const b = measureBounds[i];
+        if (x >= b.x && x <= b.x + b.width && y >= b.y - 4 && y <= b.y + b.height + 20) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
+    function setLoopRange(start, end) {
+      if (start === null || end === null) {
+        loopRangeStart = null;
+        loopRangeEnd = null;
+      } else {
+        loopRangeStart = Math.min(start, end);
+        loopRangeEnd = Math.max(start, end);
+      }
+      renderNotation();
+      if (isPlaying) {
+        // Reschedule with new bounds; Transport will pick up new loop markers.
+        const wasPlaying = isPlaying;
+        scheduleProgression();
+        // Seek to loop start so next tick lands in the new range.
+        const countInBeats = countInEnabled ? 4 : 0;
+        Tone.Transport.position = `0:${countInBeats}:0`;
+      }
     }
 
     function renderMeasure(context, stave, measure, measureIdx, staveWidth, hasClef, hasTimeSig) {
@@ -4050,6 +4300,47 @@
       noteVoice.draw(context, stave);
       beams.forEach(b => b.setContext(context).draw());
       textVoice.draw(context, stave);
+
+      // Section / rehearsal label — small rounded badge above measure start.
+      // Tells the student which part of the form they're in (A, B, Bridge,
+      // Solos, Head, Out, etc.). Only drawn when a measure carries a section
+      // field, so it naturally marks only the FIRST measure of each section.
+      if (measure.section) {
+        // VexFlow's SVGContext exposes the root <svg> element as `svg`; fall
+        // back to querying the notation container if the API differs.
+        const svg = context.svg || document.querySelector('#notation svg');
+        if (!svg) return;
+        const ns = 'http://www.w3.org/2000/svg';
+        const g = document.createElementNS(ns, 'g');
+        g.setAttribute('class', 'section-label');
+        const staveX = stave.getX();
+        const staveY = stave.getY();
+        // Measure label text first so we can size the badge to fit.
+        const text = document.createElementNS(ns, 'text');
+        text.setAttribute('x', staveX + (hasClef ? 40 : 6) + 14);
+        text.setAttribute('y', staveY - 6);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('font-family', 'Arial, sans-serif');
+        text.setAttribute('font-size', '11');
+        text.setAttribute('font-weight', '700');
+        text.setAttribute('fill', '#ffffff');
+        text.textContent = measure.section;
+        // Approximate text width: ~7px per char + padding
+        const charCount = measure.section.length;
+        const badgeW = Math.max(22, charCount * 7 + 12);
+        const badgeX = staveX + (hasClef ? 40 : 6) + 14 - badgeW / 2;
+        const rect = document.createElementNS(ns, 'rect');
+        rect.setAttribute('x', badgeX);
+        rect.setAttribute('y', staveY - 18);
+        rect.setAttribute('width', badgeW);
+        rect.setAttribute('height', 16);
+        rect.setAttribute('rx', 4);
+        rect.setAttribute('ry', 4);
+        rect.setAttribute('fill', '#e84a27');
+        g.appendChild(rect);
+        g.appendChild(text);
+        svg.appendChild(g);
+      }
     }
 
     function makeSlashNotes() {
@@ -4066,24 +4357,47 @@
     function updateLickConcept() {
       const el = document.getElementById('lickConcept');
       const nameEl = document.getElementById('lickConceptName');
+      const favBtn = document.getElementById('lickFavBtn');
+      const favIcon = document.getElementById('lickFavIcon');
+      const favRow = document.getElementById('favoritesOnlyRow');
+      const favCount = document.getElementById('favoritesCount');
       if (!el || !nameEl) return;
-      if (currentMode !== 'licks') { el.style.display = 'none'; return; }
-      const levelLicks = LICKS[currentLevel];
-      if (!levelLicks) { el.style.display = 'none'; return; }
+      if (currentMode !== 'licks') {
+        el.style.display = 'none';
+        if (favRow) favRow.style.display = 'none';
+        return;
+      }
       // Use the first measure's chord as the representative lick for this chorus
       // (all measures of the same chord in a chorus get the same lick anyway).
       const firstChord = currentProgression.measures[0]?.chord;
-      const licks = levelLicks[firstChord];
+      const licks = getActiveLicks(currentLevel, firstChord);
       if (!licks || !licks.length) { el.style.display = 'none'; return; }
       const lick = licks[(chorusCount - 1) % licks.length];
       nameEl.textContent = lick.name;
       el.style.display = 'flex';
+      // Update star state for the current concept
+      const conceptNum = lickConceptNum(lick);
+      if (favIcon && conceptNum !== null) {
+        const starred = isLickFavorited(currentLevel, conceptNum);
+        favIcon.classList.toggle('bi-star-fill', starred);
+        favIcon.classList.toggle('bi-star', !starred);
+        favBtn.classList.toggle('is-favorited', starred);
+        favBtn.dataset.conceptNum = String(conceptNum);
+      }
+      // Show favorites-only row + live count
+      if (favRow) {
+        favRow.style.display = 'flex';
+        const count = favoritesCountAtLevel(currentLevel);
+        if (favCount) favCount.textContent = count > 0 ? '(' + count + ')' : '';
+      }
     }
 
     function makeLickNotes(chordName, measureIdx) {
-      const levelLicks = LICKS[currentLevel];
-      if (!levelLicks) return makeSlashNotes();
-      const licks = levelLicks[chordName];
+      // getActiveLicks returns the favorites-filtered list when favorites-only
+      // is enabled (and the student has at least 1 favorite at this level);
+      // otherwise it returns all 10 licks. This keeps rotation logic identical
+      // to before — just operating on a different subset.
+      const licks = getActiveLicks(currentLevel, chordName);
       if (!licks || !licks.length) return makeSlashNotes();
 
       const clef = currentInstrument.clef;
@@ -5071,7 +5385,12 @@
       Tone.Transport.swingSubdivision = '8n';
 
       const prog = currentProgression;
-      const totalBeats = prog.measures.reduce((s, m) => s + m.beats, 0);
+      // If the user set a loop range via shift-click, only play those measures
+      // (but still schedule highlights / audio at correct measure indices).
+      const rangeStartIdx = (loopRangeStart !== null) ? loopRangeStart : 0;
+      const rangeEndIdx = (loopRangeEnd !== null) ? loopRangeEnd : prog.measures.length - 1;
+      const totalBeats = prog.measures.slice(rangeStartIdx, rangeEndIdx + 1)
+        .reduce((s, m) => s + m.beats, 0);
 
       // Count-in: 4 stick clicks before the loop begins. The loop region
       // itself starts at beat 4 (loopStart), so when Transport wraps it
@@ -5111,6 +5430,10 @@
       let beatOffset = countInBeats;
 
       prog.measures.forEach((measure, mi) => {
+        // Skip measures outside the selected loop range — no audio, no
+        // highlight. Transport then jumps to loopStart on wrap, cycling only
+        // the selected range.
+        if (mi < rangeStartIdx || mi > rangeEndIdx) return;
         const voicing = prog.audio.voicings[measure.chord];
         const bassLine = prog.audio.bassNotes[measure.chord];
 
@@ -5326,6 +5649,64 @@
         tempoAutoIncrement = parseInt(e.target.value) || 0;
       });
 
+      // Favorite-lick star button — toggles the CURRENT chorus's concept number.
+      // Because concepts 1-10 are consistent across all chords within a level,
+      // one click stars that concept for every chord type at this level.
+      document.getElementById('lickFavBtn').addEventListener('click', () => {
+        const conceptNum = parseInt(document.getElementById('lickFavBtn').dataset.conceptNum);
+        if (!conceptNum) return;
+        const key = lickFavKey(currentLevel, conceptNum);
+        if (lickFavorites.has(key)) lickFavorites.delete(key);
+        else lickFavorites.add(key);
+        saveLickFavorites();
+        updateLickConcept();
+        // If favorites-only is on, the rotation pool just changed — re-render.
+        if (favoritesOnly && currentMode === 'licks') renderNotation();
+      });
+
+      // Favorites-only toggle — limits rotation to starred licks.
+      document.getElementById('favoritesOnlyToggle').addEventListener('change', e => {
+        favoritesOnly = e.target.checked;
+        if (currentMode === 'licks') {
+          updateLickConcept();
+          renderNotation();
+        }
+      });
+
+      // Loop range selection — shift+click a measure to set/extend, plain
+      // click clears (only when a range is already set, so normal play-
+      // position clicking isn't broken). The clear button on the badge also
+      // resets to full-progression looping.
+      const notation = document.getElementById('notation');
+      notation.addEventListener('click', e => {
+        const mi = measureIndexFromPoint(e.clientX, e.clientY);
+        if (mi < 0) return;
+        if (e.shiftKey) {
+          // Shift-click. If no range, start a 1-measure range on that bar.
+          // If a range exists, extend it to cover the clicked measure.
+          if (loopRangeStart === null) {
+            setLoopRange(mi, mi);
+          } else {
+            // Extend towards the clicked measure (keep the other endpoint).
+            // If click is within existing range, contract to [click..current-end-or-start].
+            const distToStart = Math.abs(mi - loopRangeStart);
+            const distToEnd = Math.abs(mi - loopRangeEnd);
+            if (distToStart <= distToEnd) {
+              setLoopRange(mi, loopRangeEnd);
+            } else {
+              setLoopRange(loopRangeStart, mi);
+            }
+          }
+        } else if (loopRangeStart !== null) {
+          // Plain click with a range active — clear it back to full progression.
+          setLoopRange(null, null);
+        }
+      });
+      document.getElementById('loopRangeClear').addEventListener('click', e => {
+        e.stopPropagation();
+        setLoopRange(null, null);
+      });
+
       const tempoSlider = document.getElementById('tempoSlider');
       const tempoBpm = document.getElementById('tempoBpm');
       tempoSlider.addEventListener('input', () => {
@@ -5409,6 +5790,10 @@
         if (prog) {
           currentProgression = prog;
           stop();
+          // Clear any loop-range bounds — they index the previous tune's
+          // measures and would either miss or overrun the new tune.
+          loopRangeStart = null;
+          loopRangeEnd = null;
           // Apply per-progression tempo range
           if (prog.tempoRange) {
             tempoSlider.min = prog.tempoRange[0];
@@ -5788,6 +6173,11 @@
             e.preventDefault();
             document.getElementById('harmonyMuteBtn').click();
             break;
+          case 'f':
+            // Favorite the current lick concept. Silently no-ops outside Licks mode.
+            e.preventDefault();
+            if (currentMode === 'licks') document.getElementById('lickFavBtn')?.click();
+            break;
           case 'arrowup':
             e.preventDefault();
             slider.value = Math.min(parseInt(slider.max), parseInt(slider.value) + 5);
@@ -5833,6 +6223,7 @@
           <div class="kb-help-row"><kbd>L</kbd><span>Loop toggle</span></div>
           <div class="kb-help-row"><kbd>M</kbd><span>Mute all</span></div>
           <div class="kb-help-row"><kbd>H</kbd><span>Mute harmony</span></div>
+          <div class="kb-help-row"><kbd>F</kbd><span>Favorite current lick</span></div>
           <div class="kb-help-row"><kbd>↑</kbd> <kbd>↓</kbd><span>Tempo ±5 BPM</span></div>
           <div class="kb-help-row"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd><span>Level: beginner / int / adv</span></div>
           <div class="kb-help-row"><kbd>?</kbd><span>This menu</span></div>
