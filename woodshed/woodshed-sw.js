@@ -1,4 +1,4 @@
-const CACHE_NAME = 'woodshed-v7-xml';
+const CACHE_NAME = 'woodshed-v8-licks-curriculum';
 const ASSETS = [
   './index.html',
   './woodshed-tunes-core.js',

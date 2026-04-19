@@ -3629,40 +3629,44 @@
         ],
 
         // Minor chords for the band's minor-key tunes.
+        // (Cm7 and Fm7 already defined above with full 10-item curriculum —
+        //  adding them here would silently shadow those. Keep this block to
+        //  Gm7/Dm7/Bbm7 only.)
         'Gm7': [
-          { name: '1. Root', notes: [{ keys: ['G/3'], duration: 'w' }]},
-          { name: '2. Root and 5', notes: [{ keys: ['G/3'], duration: '2' }, { keys: ['D/4'], duration: '2' }]},
-          { name: '3. Minor triad', notes: [{ keys: ['G/3'], duration: '4' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['D/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
-          { name: '4. Arpeggio', notes: [{ keys: ['G/3'], duration: '4' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['D/4'], duration: '4' }, { keys: ['F/4'], duration: '4' }]},
-          { name: '5. Arp down + land', notes: [{ keys: ['F/4'], duration: '4' }, { keys: ['D/4'], duration: '4' }, { keys: ['G/3'], duration: '2' }]}
+          { name: '1. Root only', notes: [{ keys: ['G/3'], duration: 'w' }]},
+          { name: '2. Root + space', notes: [{ keys: ['G/3'], duration: '2' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '3. Root and 5th', notes: [{ keys: ['G/3'], duration: '2' }, { keys: ['D/4'], duration: '2' }]},
+          { name: '4. Minor triad up', notes: [{ keys: ['G/3'], duration: '4' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['D/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Full arpeggio up', notes: [{ keys: ['G/3'], duration: '4' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['D/4'], duration: '4' }, { keys: ['F/4'], duration: '4' }]},
+          { name: '6. Full arpeggio down', notes: [{ keys: ['F/4'], duration: '4' }, { keys: ['D/4'], duration: '4' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['G/3'], duration: '4' }]},
+          { name: '7. Guide tones', notes: [{ keys: ['Bb/3'], duration: '2' }, { keys: ['F/4'], duration: '2' }]},
+          { name: '8. Pickup into root', notes: [{ keys: ['d/4'], duration: '2r' }, { keys: ['F#/3'], duration: '4' }, { keys: ['G/3'], duration: '4' }]},
+          { name: '9. Call and response', notes: [{ keys: ['G/3'], duration: '4' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '10. Arpeggio + landing', notes: [{ keys: ['G/3'], duration: '4' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['D/4'], duration: '2' }]}
         ],
         'Dm7': [
-          { name: '1. Root', notes: [{ keys: ['D/3'], duration: 'w' }]},
-          { name: '2. Root and 5', notes: [{ keys: ['D/3'], duration: '2' }, { keys: ['A/3'], duration: '2' }]},
-          { name: '3. Minor triad', notes: [{ keys: ['D/3'], duration: '4' }, { keys: ['F/3'], duration: '4' }, { keys: ['A/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
-          { name: '4. Arpeggio', notes: [{ keys: ['D/3'], duration: '4' }, { keys: ['F/3'], duration: '4' }, { keys: ['A/3'], duration: '4' }, { keys: ['C/4'], duration: '4' }]},
-          { name: '5. Arp down', notes: [{ keys: ['C/4'], duration: '4' }, { keys: ['A/3'], duration: '4' }, { keys: ['D/3'], duration: '2' }]}
-        ],
-        'Fm7': [
-          { name: '1. Root', notes: [{ keys: ['F/3'], duration: 'w' }]},
-          { name: '2. Root and 5', notes: [{ keys: ['F/3'], duration: '2' }, { keys: ['C/4'], duration: '2' }]},
-          { name: '3. Minor triad', notes: [{ keys: ['F/3'], duration: '4' }, { keys: ['Ab/3'], duration: '4' }, { keys: ['C/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
-          { name: '4. Arpeggio', notes: [{ keys: ['F/3'], duration: '4' }, { keys: ['Ab/3'], duration: '4' }, { keys: ['C/4'], duration: '4' }, { keys: ['Eb/4'], duration: '4' }]},
-          { name: '5. Arp down', notes: [{ keys: ['Eb/4'], duration: '4' }, { keys: ['C/4'], duration: '4' }, { keys: ['F/3'], duration: '2' }]}
-        ],
-        'Cm7': [
-          { name: '1. Root', notes: [{ keys: ['C/3'], duration: 'w' }]},
-          { name: '2. Root and 5', notes: [{ keys: ['C/3'], duration: '2' }, { keys: ['G/3'], duration: '2' }]},
-          { name: '3. Minor triad', notes: [{ keys: ['C/3'], duration: '4' }, { keys: ['Eb/3'], duration: '4' }, { keys: ['G/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
-          { name: '4. Arpeggio', notes: [{ keys: ['C/3'], duration: '4' }, { keys: ['Eb/3'], duration: '4' }, { keys: ['G/3'], duration: '4' }, { keys: ['Bb/3'], duration: '4' }]},
-          { name: '5. Arp down', notes: [{ keys: ['Bb/3'], duration: '4' }, { keys: ['G/3'], duration: '4' }, { keys: ['C/3'], duration: '2' }]}
+          { name: '1. Root only', notes: [{ keys: ['D/3'], duration: 'w' }]},
+          { name: '2. Root + space', notes: [{ keys: ['D/3'], duration: '2' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '3. Root and 5th', notes: [{ keys: ['D/3'], duration: '2' }, { keys: ['A/3'], duration: '2' }]},
+          { name: '4. Minor triad up', notes: [{ keys: ['D/3'], duration: '4' }, { keys: ['F/3'], duration: '4' }, { keys: ['A/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Full arpeggio up', notes: [{ keys: ['D/3'], duration: '4' }, { keys: ['F/3'], duration: '4' }, { keys: ['A/3'], duration: '4' }, { keys: ['C/4'], duration: '4' }]},
+          { name: '6. Full arpeggio down', notes: [{ keys: ['C/4'], duration: '4' }, { keys: ['A/3'], duration: '4' }, { keys: ['F/3'], duration: '4' }, { keys: ['D/3'], duration: '4' }]},
+          { name: '7. Guide tones', notes: [{ keys: ['F/3'], duration: '2' }, { keys: ['C/4'], duration: '2' }]},
+          { name: '8. Pickup into root', notes: [{ keys: ['d/4'], duration: '2r' }, { keys: ['C#/3'], duration: '4' }, { keys: ['D/3'], duration: '4' }]},
+          { name: '9. Call and response', notes: [{ keys: ['D/3'], duration: '4' }, { keys: ['F/3'], duration: '4' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '10. Arpeggio + landing', notes: [{ keys: ['D/3'], duration: '4' }, { keys: ['F/3'], duration: '4' }, { keys: ['A/3'], duration: '2' }]}
         ],
         'Bbm7': [
-          { name: '1. Root', notes: [{ keys: ['Bb/3'], duration: 'w' }]},
-          { name: '2. Root and 5', notes: [{ keys: ['Bb/3'], duration: '2' }, { keys: ['F/4'], duration: '2' }]},
-          { name: '3. Minor triad', notes: [{ keys: ['Bb/3'], duration: '4' }, { keys: ['Db/4'], duration: '4' }, { keys: ['F/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
-          { name: '4. Arpeggio', notes: [{ keys: ['Bb/3'], duration: '4' }, { keys: ['Db/4'], duration: '4' }, { keys: ['F/4'], duration: '4' }, { keys: ['Ab/4'], duration: '4' }]},
-          { name: '5. Arp down', notes: [{ keys: ['Ab/4'], duration: '4' }, { keys: ['F/4'], duration: '4' }, { keys: ['Bb/3'], duration: '2' }]}
+          { name: '1. Root only', notes: [{ keys: ['Bb/3'], duration: 'w' }]},
+          { name: '2. Root + space', notes: [{ keys: ['Bb/3'], duration: '2' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '3. Root and 5th', notes: [{ keys: ['Bb/3'], duration: '2' }, { keys: ['F/4'], duration: '2' }]},
+          { name: '4. Minor triad up', notes: [{ keys: ['Bb/3'], duration: '4' }, { keys: ['Db/4'], duration: '4' }, { keys: ['F/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Full arpeggio up', notes: [{ keys: ['Bb/3'], duration: '4' }, { keys: ['Db/4'], duration: '4' }, { keys: ['F/4'], duration: '4' }, { keys: ['Ab/4'], duration: '4' }]},
+          { name: '6. Full arpeggio down', notes: [{ keys: ['Ab/4'], duration: '4' }, { keys: ['F/4'], duration: '4' }, { keys: ['Db/4'], duration: '4' }, { keys: ['Bb/3'], duration: '4' }]},
+          { name: '7. Guide tones', notes: [{ keys: ['Db/4'], duration: '2' }, { keys: ['Ab/4'], duration: '2' }]},
+          { name: '8. Pickup into root', notes: [{ keys: ['d/4'], duration: '2r' }, { keys: ['A/3'], duration: '4' }, { keys: ['Bb/3'], duration: '4' }]},
+          { name: '9. Call and response', notes: [{ keys: ['Bb/3'], duration: '4' }, { keys: ['Db/4'], duration: '4' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '10. Arpeggio + landing', notes: [{ keys: ['Bb/3'], duration: '4' }, { keys: ['Db/4'], duration: '4' }, { keys: ['F/4'], duration: '2' }]}
         ]
       },
 
@@ -3899,41 +3903,45 @@
           ]}
         ],
 
-        // Minor chord intermediate vocabulary — Dorian, pentatonic, blues
+        // Minor chord intermediate vocabulary — Dorian, pentatonic, blues.
+        // (Cm7 and Fm7 defined above in the main block — don't re-add here
+        //  or JS object key reassignment will silently shadow the 10-item
+        //  curriculum with a shorter one.)
         'Gm7': [
-          { name: '1. Dorian run', notes: [{ keys: ['G/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['D/4'], duration: '8' },{ keys: ['F/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
-          { name: '2. Minor pent', notes: [{ keys: ['G/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['D/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['D/4'], duration: '4' },{ keys: ['Bb/3'], duration: '4' }]},
-          { name: '3. Blues scale', notes: [{ keys: ['G/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['D/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
-          { name: '4. Motif and answer', notes: [{ keys: ['D/4'], duration: '4' },{ keys: ['Bb/3'], duration: '4' },{ keys: ['G/3'], duration: '4' },{ keys: ['F/3'], duration: '4' }]},
-          { name: '5. Descending Dorian', notes: [{ keys: ['F/4'], duration: '8' },{ keys: ['D/4'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['G/3'], duration: '2' }]}
+          { name: '1. Smooth arpeggio', notes: [{ keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['D/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '2. Scale approach', notes: [{ keys: ['F#/3'], duration: '8' }, { keys: ['G/3'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '3. Enclosure to root', notes: [{ keys: ['Ab/3'], duration: '8' }, { keys: ['F#/3'], duration: '8' }, { keys: ['G/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '4. Minor pentatonic', notes: [{ keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Guide tone melody', notes: [{ keys: ['Bb/3'], duration: '4' }, { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['F/4'], duration: '2' }]},
+          { name: '6. Enclosure to b3', notes: [{ keys: ['B/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '7. Dorian descent', notes: [{ keys: ['F/4'], duration: '8' }, { keys: ['E/4'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '8. Pickup line', notes: [{ keys: ['d/4'], duration: '8r' }, { keys: ['F#/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['D/4'], duration: '4' }, { keys: ['Bb/3'], duration: '4' }]},
+          { name: '9. Mixed rhythm', notes: [{ keys: ['G/3'], duration: '4' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['d/4'], duration: '4r' }, { keys: ['G/3'], duration: '4' }]},
+          { name: '10. Approach + arpeggio', notes: [{ keys: ['F#/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['D/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['D/4'], duration: '4' }]}
         ],
         'Dm7': [
-          { name: '1. Dorian run', notes: [{ keys: ['D/3'], duration: '8' },{ keys: ['E/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['C/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
-          { name: '2. Minor pent', notes: [{ keys: ['D/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['A/3'], duration: '4' },{ keys: ['F/3'], duration: '4' }]},
-          { name: '3. Blues scale', notes: [{ keys: ['D/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['Ab/3'], duration: '8' },{ keys: ['A/3'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
-          { name: '4. Call and response', notes: [{ keys: ['A/3'], duration: '4' },{ keys: ['F/3'], duration: '4' },{ keys: ['D/3'], duration: '4' },{ keys: ['C/3'], duration: '4' }]},
-          { name: '5. Descending', notes: [{ keys: ['C/4'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['E/3'], duration: '8' },{ keys: ['D/3'], duration: '2' }]}
-        ],
-        'Fm7': [
-          { name: '1. Dorian run', notes: [{ keys: ['F/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['Ab/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['Eb/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
-          { name: '2. Minor pent', notes: [{ keys: ['F/3'], duration: '8' },{ keys: ['Ab/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['Eb/4'], duration: '8' },{ keys: ['C/4'], duration: '4' },{ keys: ['Ab/3'], duration: '4' }]},
-          { name: '3. Blues scale', notes: [{ keys: ['F/3'], duration: '8' },{ keys: ['Ab/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['B/3'], duration: '8' },{ keys: ['C/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
-          { name: '4. Motif', notes: [{ keys: ['C/4'], duration: '4' },{ keys: ['Ab/3'], duration: '4' },{ keys: ['F/3'], duration: '4' },{ keys: ['Eb/3'], duration: '4' }]},
-          { name: '5. Descending', notes: [{ keys: ['Eb/4'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['Ab/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['F/3'], duration: '2' }]}
-        ],
-        'Cm7': [
-          { name: '1. Dorian run', notes: [{ keys: ['C/3'], duration: '8' },{ keys: ['D/3'], duration: '8' },{ keys: ['Eb/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['Bb/3'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
-          { name: '2. Minor pent', notes: [{ keys: ['C/3'], duration: '8' },{ keys: ['Eb/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['G/3'], duration: '4' },{ keys: ['Eb/3'], duration: '4' }]},
-          { name: '3. Blues scale', notes: [{ keys: ['C/3'], duration: '8' },{ keys: ['Eb/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['Gb/3'], duration: '8' },{ keys: ['G/3'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
-          { name: '4. Motif', notes: [{ keys: ['G/3'], duration: '4' },{ keys: ['Eb/3'], duration: '4' },{ keys: ['C/3'], duration: '4' },{ keys: ['Bb/2'], duration: '4' }]},
-          { name: '5. Descending', notes: [{ keys: ['Bb/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['Eb/3'], duration: '8' },{ keys: ['D/3'], duration: '8' },{ keys: ['C/3'], duration: '2' }]}
+          { name: '1. Smooth arpeggio', notes: [{ keys: ['D/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['A/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '2. Scale approach', notes: [{ keys: ['C#/3'], duration: '8' }, { keys: ['D/3'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '3. Enclosure to root', notes: [{ keys: ['Eb/3'], duration: '8' }, { keys: ['C#/3'], duration: '8' }, { keys: ['D/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '4. Minor pentatonic', notes: [{ keys: ['D/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['C/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Guide tone melody', notes: [{ keys: ['F/3'], duration: '4' }, { keys: ['E/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['C/4'], duration: '2' }]},
+          { name: '6. Enclosure to b3', notes: [{ keys: ['Gb/3'], duration: '8' }, { keys: ['Eb/3'], duration: '8' }, { keys: ['F/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '7. Dorian descent', notes: [{ keys: ['C/4'], duration: '8' }, { keys: ['B/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['G/3'], duration: '8' }, { keys: ['F/3'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '8. Pickup line', notes: [{ keys: ['d/4'], duration: '8r' }, { keys: ['C#/3'], duration: '8' }, { keys: ['D/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['A/3'], duration: '4' }, { keys: ['F/3'], duration: '4' }]},
+          { name: '9. Mixed rhythm', notes: [{ keys: ['D/3'], duration: '4' }, { keys: ['F/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['d/4'], duration: '4r' }, { keys: ['D/3'], duration: '4' }]},
+          { name: '10. Approach + arpeggio', notes: [{ keys: ['C#/3'], duration: '8' }, { keys: ['D/3'], duration: '8' }, { keys: ['F/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['C/4'], duration: '4' }, { keys: ['A/3'], duration: '4' }]}
         ],
         'Bbm7': [
-          { name: '1. Dorian run', notes: [{ keys: ['Bb/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['Ab/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
-          { name: '2. Minor pent', notes: [{ keys: ['Bb/3'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['Ab/4'], duration: '8' },{ keys: ['F/4'], duration: '4' },{ keys: ['Db/4'], duration: '4' }]},
-          { name: '3. Blues scale', notes: [{ keys: ['Bb/3'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['Eb/4'], duration: '8' },{ keys: ['E/4'], duration: '8' },{ keys: ['F/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
-          { name: '4. Motif', notes: [{ keys: ['F/4'], duration: '4' },{ keys: ['Db/4'], duration: '4' },{ keys: ['Bb/3'], duration: '4' },{ keys: ['Ab/3'], duration: '4' }]},
-          { name: '5. Descending', notes: [{ keys: ['Ab/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['Bb/3'], duration: '2' }]}
+          { name: '1. Smooth arpeggio', notes: [{ keys: ['Bb/3'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['Ab/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '2. Scale approach', notes: [{ keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '4' }, { keys: ['d/4'], duration: '8r' }, { keys: ['d/4'], duration: '2r' }]},
+          { name: '3. Enclosure to root', notes: [{ keys: ['B/3'], duration: '8' }, { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '2' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '4. Minor pentatonic', notes: [{ keys: ['Bb/3'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['Ab/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Guide tone melody', notes: [{ keys: ['Db/4'], duration: '4' }, { keys: ['C/4'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['Ab/4'], duration: '2' }]},
+          { name: '6. Enclosure to b3', notes: [{ keys: ['D/4'], duration: '8' }, { keys: ['C/4'], duration: '8' }, { keys: ['Db/4'], duration: '2' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '7. Dorian descent', notes: [{ keys: ['Ab/4'], duration: '8' }, { keys: ['G/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['Eb/4'], duration: '8' }, { keys: ['Db/4'], duration: '4' }, { keys: ['d/4'], duration: '4r' }]},
+          { name: '8. Pickup line', notes: [{ keys: ['d/4'], duration: '8r' }, { keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['F/4'], duration: '4' }, { keys: ['Db/4'], duration: '4' }]},
+          { name: '9. Mixed rhythm', notes: [{ keys: ['Bb/3'], duration: '4' }, { keys: ['Db/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['d/4'], duration: '4r' }, { keys: ['Bb/3'], duration: '4' }]},
+          { name: '10. Approach + arpeggio', notes: [{ keys: ['A/3'], duration: '8' }, { keys: ['Bb/3'], duration: '8' }, { keys: ['Db/4'], duration: '8' }, { keys: ['F/4'], duration: '8' }, { keys: ['Ab/4'], duration: '4' }, { keys: ['F/4'], duration: '4' }]}
         ]
       },
 
@@ -4170,41 +4178,43 @@
           ]}
         ],
 
-        // Minor chord advanced vocabulary — bebop minor, chromatic enclosures
+        // Minor chord advanced vocabulary — bebop minor, chromatic enclosures.
+        // (Cm7 and Fm7 defined above in the main block — don't re-add here.)
         'Gm7': [
           { name: '1. Bebop minor down', notes: [{ keys: ['G/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['Eb/4'], duration: '8' },{ keys: ['D/4'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['G/3'], duration: '8' }]},
-          { name: '2. Chromatic enclosure', notes: [{ keys: ['A/3'], duration: '8' },{ keys: ['G#/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['D/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
-          { name: '3. Digital 1-2-b3-5', notes: [{ keys: ['G/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['D/4'], duration: '8' },{ keys: ['F/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
-          { name: '4. Bebop up + landing', notes: [{ keys: ['G/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['D/4'], duration: '8' },{ keys: ['C#/4'], duration: '8' },{ keys: ['D/4'], duration: '4' }]},
-          { name: '5. Altered resolution', notes: [{ keys: ['Ab/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['F#/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['Bb/3'], duration: '4' },{ keys: ['D/4'], duration: '4' }]}
+          { name: '2. Chromatic to b3', notes: [{ keys: ['G/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['B/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['D/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
+          { name: '3. Double enclosure to 5th', notes: [{ keys: ['Eb/4'], duration: '8' },{ keys: ['C#/4'], duration: '8' },{ keys: ['D/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' },{ keys: ['d/4'], duration: '4r' }]},
+          { name: '4. 1-2-b3-5 digital', notes: [{ keys: ['G/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['D/4'], duration: '8' },{ keys: ['F/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Wide intervals', notes: [{ keys: ['G/3'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['D/4'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['G/3'], duration: '2' }]},
+          { name: '6. Dorian ascending', notes: [{ keys: ['G/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['D/4'], duration: '8' },{ keys: ['E/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['G/4'], duration: '8' }]},
+          { name: '7. Pickup bebop', notes: [{ keys: ['d/4'], duration: '8r' },{ keys: ['F#/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['D/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['D/4'], duration: '4' }]},
+          { name: '8. BbMaj7 superimposition', notes: [{ keys: ['Bb/3'], duration: '8' },{ keys: ['D/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['A/4'], duration: '8' },{ keys: ['F/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
+          { name: '9. Syncopated landing', notes: [{ keys: ['Bb/3'], duration: '8' },{ keys: ['D/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['D/4'], duration: '4' },{ keys: ['d/4'], duration: '8r' },{ keys: ['G/3'], duration: '4' }]},
+          { name: '10. Chromatic enclosure', notes: [{ keys: ['Ab/3'], duration: '8' },{ keys: ['F#/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['D/4'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['G/3'], duration: '4' }]}
         ],
         'Dm7': [
           { name: '1. Bebop minor down', notes: [{ keys: ['D/4'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['E/3'], duration: '8' },{ keys: ['D/3'], duration: '8' }]},
-          { name: '2. Chromatic enclosure', notes: [{ keys: ['E/3'], duration: '8' },{ keys: ['Eb/3'], duration: '8' },{ keys: ['D/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['A/3'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
-          { name: '3. Digital 1-2-b3-5', notes: [{ keys: ['D/3'], duration: '8' },{ keys: ['E/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['C/4'], duration: '4' },{ keys: ['B/3'], duration: '4' }]},
-          { name: '4. Bebop asc', notes: [{ keys: ['D/3'], duration: '8' },{ keys: ['E/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['G#/3'], duration: '8' },{ keys: ['A/3'], duration: '4' }]},
-          { name: '5. Tritone sub hint', notes: [{ keys: ['Eb/3'], duration: '8' },{ keys: ['C/3'], duration: '8' },{ keys: ['Db/3'], duration: '8' },{ keys: ['D/3'], duration: '8' },{ keys: ['F/3'], duration: '4' },{ keys: ['A/3'], duration: '4' }]}
-        ],
-        'Fm7': [
-          { name: '1. Bebop minor down', notes: [{ keys: ['F/4'], duration: '8' },{ keys: ['Eb/4'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['B/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['Ab/3'], duration: '8' },{ keys: ['F/3'], duration: '8' }]},
-          { name: '2. Chromatic enclosure', notes: [{ keys: ['G/3'], duration: '8' },{ keys: ['Gb/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['Ab/3'], duration: '8' },{ keys: ['C/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
-          { name: '3. Digital 1-2-b3-5', notes: [{ keys: ['F/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['Ab/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['Eb/4'], duration: '4' },{ keys: ['Db/4'], duration: '4' }]},
-          { name: '4. Bebop asc', notes: [{ keys: ['F/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['Ab/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['B/3'], duration: '8' },{ keys: ['C/4'], duration: '4' }]},
-          { name: '5. Syncopated', notes: [{ keys: ['Ab/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['Eb/4'], duration: '8' },{ keys: ['C/4'], duration: '4' },{ keys: ['d/4'], duration: '8r' },{ keys: ['F/3'], duration: '4' }]}
-        ],
-        'Cm7': [
-          { name: '1. Bebop minor down', notes: [{ keys: ['C/4'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['Ab/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['Gb/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['Eb/3'], duration: '8' },{ keys: ['D/3'], duration: '8' }]},
-          { name: '2. Chromatic enclosure', notes: [{ keys: ['D/3'], duration: '8' },{ keys: ['Db/3'], duration: '8' },{ keys: ['C/3'], duration: '8' },{ keys: ['Eb/3'], duration: '8' },{ keys: ['G/3'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
-          { name: '3. Digital 1-2-b3-5', notes: [{ keys: ['C/3'], duration: '8' },{ keys: ['D/3'], duration: '8' },{ keys: ['Eb/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['Bb/3'], duration: '4' },{ keys: ['A/3'], duration: '4' }]},
-          { name: '4. Approach and land', notes: [{ keys: ['B/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['Eb/4'], duration: '8' },{ keys: ['G/4'], duration: '8' },{ keys: ['F/4'], duration: '4' },{ keys: ['Eb/4'], duration: '4' }]},
-          { name: '5. Syncopated', notes: [{ keys: ['Eb/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['G/3'], duration: '4' },{ keys: ['d/4'], duration: '8r' },{ keys: ['C/3'], duration: '4' }]}
+          { name: '2. Chromatic to b3', notes: [{ keys: ['D/3'], duration: '8' },{ keys: ['E/3'], duration: '8' },{ keys: ['Gb/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['A/3'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
+          { name: '3. Double enclosure to 5th', notes: [{ keys: ['Bb/3'], duration: '8' },{ keys: ['Ab/3'], duration: '8' },{ keys: ['A/3'], duration: '4' },{ keys: ['d/4'], duration: '4r' },{ keys: ['d/4'], duration: '4r' }]},
+          { name: '4. 1-2-b3-5 digital', notes: [{ keys: ['D/3'], duration: '8' },{ keys: ['E/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['C/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Wide intervals', notes: [{ keys: ['D/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['D/3'], duration: '2' }]},
+          { name: '6. Dorian ascending', notes: [{ keys: ['D/3'], duration: '8' },{ keys: ['E/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['G/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['B/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['D/4'], duration: '8' }]},
+          { name: '7. Pickup bebop', notes: [{ keys: ['d/4'], duration: '8r' },{ keys: ['C#/3'], duration: '8' },{ keys: ['D/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['A/3'], duration: '4' }]},
+          { name: '8. FMaj7 superimposition', notes: [{ keys: ['F/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['E/4'], duration: '8' },{ keys: ['C/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
+          { name: '9. Syncopated landing', notes: [{ keys: ['F/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['A/3'], duration: '4' },{ keys: ['d/4'], duration: '8r' },{ keys: ['D/3'], duration: '4' }]},
+          { name: '10. Chromatic enclosure', notes: [{ keys: ['Eb/3'], duration: '8' },{ keys: ['C#/3'], duration: '8' },{ keys: ['D/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['F/3'], duration: '8' },{ keys: ['D/3'], duration: '4' }]}
         ],
         'Bbm7': [
           { name: '1. Bebop minor down', notes: [{ keys: ['Bb/4'], duration: '8' },{ keys: ['Ab/4'], duration: '8' },{ keys: ['Gb/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['E/4'], duration: '8' },{ keys: ['Eb/4'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['Bb/3'], duration: '8' }]},
-          { name: '2. Chromatic enclosure', notes: [{ keys: ['C/4'], duration: '8' },{ keys: ['B/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['F/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
-          { name: '3. Digital 1-2-b3-5', notes: [{ keys: ['Bb/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['Ab/4'], duration: '4' },{ keys: ['Gb/4'], duration: '4' }]},
-          { name: '4. Bebop up + land', notes: [{ keys: ['Bb/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['Eb/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['E/4'], duration: '8' },{ keys: ['F/4'], duration: '4' }]},
-          { name: '5. Syncopated', notes: [{ keys: ['Db/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['Ab/4'], duration: '8' },{ keys: ['F/4'], duration: '4' },{ keys: ['d/4'], duration: '8r' },{ keys: ['Bb/3'], duration: '4' }]}
+          { name: '2. Chromatic to b3', notes: [{ keys: ['Bb/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['D/4'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['F/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
+          { name: '3. Double enclosure to 5th', notes: [{ keys: ['Gb/4'], duration: '8' },{ keys: ['E/4'], duration: '8' },{ keys: ['F/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' },{ keys: ['d/4'], duration: '4r' }]},
+          { name: '4. 1-2-b3-5 digital', notes: [{ keys: ['Bb/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['Ab/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
+          { name: '5. Wide intervals', notes: [{ keys: ['Bb/3'], duration: '8' },{ keys: ['Ab/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['Bb/3'], duration: '2' }]},
+          { name: '6. Dorian ascending', notes: [{ keys: ['Bb/3'], duration: '8' },{ keys: ['C/4'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['Eb/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['G/4'], duration: '8' },{ keys: ['Ab/4'], duration: '8' },{ keys: ['Bb/4'], duration: '8' }]},
+          { name: '7. Pickup bebop', notes: [{ keys: ['d/4'], duration: '8r' },{ keys: ['A/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['Ab/4'], duration: '8' },{ keys: ['F/4'], duration: '4' }]},
+          { name: '8. DbMaj7 superimposition', notes: [{ keys: ['Db/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['Ab/4'], duration: '8' },{ keys: ['C/5'], duration: '8' },{ keys: ['Ab/4'], duration: '4' },{ keys: ['d/4'], duration: '4r' }]},
+          { name: '9. Syncopated landing', notes: [{ keys: ['Db/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['Ab/4'], duration: '8' },{ keys: ['F/4'], duration: '4' },{ keys: ['d/4'], duration: '8r' },{ keys: ['Bb/3'], duration: '4' }]},
+          { name: '10. Chromatic enclosure', notes: [{ keys: ['B/3'], duration: '8' },{ keys: ['A/3'], duration: '8' },{ keys: ['Bb/3'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['F/4'], duration: '8' },{ keys: ['Db/4'], duration: '8' },{ keys: ['Bb/3'], duration: '4' }]}
         ]
       }
 
