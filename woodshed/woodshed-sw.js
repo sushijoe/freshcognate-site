@@ -1,6 +1,7 @@
-const CACHE_NAME = 'woodshed-v8-licks-curriculum';
+const CACHE_NAME = 'woodshed-v9-badges-favorites';
 const ASSETS = [
   './index.html',
+  './woodshed.css',
   './woodshed-tunes-core.js',
   './woodshed-manifest.json',
   './woodshed-icon-192.svg',

@@ -10,1294 +10,7 @@
   <link rel="manifest" href="woodshed-manifest.json">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-  <style>
-    :root {
-      /* University of Illinois: Illini Blue + Illini Orange */
-      --bg-dark: #0a1628;
-      --bg-surface: #13294b;
-      --bg-card: #1b3a6b;
-      --accent: #e84a27;          /* Illini Orange */
-      --accent-dim: #c43d1f;
-      --accent2: #c850c0;         /* Fuscia/purple accent */
-      --accent2-dim: #a040a0;
-      --text-primary: #f0f2f7;
-      --text-secondary: #a0b5d0;  /* Brighter for better contrast */
-      --highlight: rgba(232, 74, 39, 0.18);
-      --highlight-border: rgba(232, 74, 39, 0.65);
-      --chord-tone: #e84a27;      /* Orange for chord tones */
-      --scale-tone: #c850c0;      /* Purple for scale tones */
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --section-border: rgba(255,255,255,0.06);
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      background: var(--bg-dark);
-      color: var(--text-primary);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      overflow: hidden;
-      -webkit-tap-highlight-color: transparent;
-      height: 100dvh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Header */
-    .app-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
-      background: var(--bg-surface);
-      border-bottom: 1px solid var(--section-border);
-      min-height: 50px;
-      flex-shrink: 0;
-    }
-
-    .app-title {
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--accent);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .progression-select {
-      background: var(--bg-card);
-      color: var(--text-primary);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 8px;
-      padding: 7px 12px;
-      font-size: 13px;
-      max-width: 200px;
-      cursor: pointer;
-    }
-
-    .progression-select:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(232, 74, 39, 0.2);
-    }
-
-    /* Mode toggle */
-    .mode-bar {
-      display: flex;
-      padding: 8px 16px;
-      gap: 0;
-      background: var(--bg-surface);
-      border-bottom: 1px solid var(--section-border);
-      flex-shrink: 0;
-    }
-
-    .mode-btn {
-      flex: 1;
-      padding: 9px 4px;
-      font-size: 12px;
-      font-weight: 600;
-      text-align: center;
-      background: var(--bg-card);
-      color: var(--text-secondary);
-      border: 1px solid rgba(255,255,255,0.08);
-      cursor: pointer;
-      transition: all 0.2s;
-      letter-spacing: 0.3px;
-    }
-
-    .mode-btn:first-child { border-radius: 8px 0 0 8px; }
-    .mode-btn:last-child { border-radius: 0 8px 8px 0; }
-
-    .mode-btn.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-      box-shadow: 0 2px 8px rgba(232, 74, 39, 0.25);
-    }
-
-    /* Level bar */
-    .level-bar {
-      display: flex;
-      padding: 6px 16px 8px;
-      gap: 8px;
-      background: var(--bg-surface);
-      border-bottom: 1px solid var(--section-border);
-      flex-shrink: 0;
-    }
-
-    .level-btn {
-      flex: 1;
-      padding: 6px 4px;
-      font-size: 11px;
-      font-weight: 600;
-      text-align: center;
-      background: rgba(255,255,255,0.03);
-      color: var(--text-secondary);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .level-btn i { margin-right: 3px; }
-
-    .level-btn.active {
-      background: rgba(200, 80, 192, 0.18);
-      color: var(--accent2);
-      border-color: var(--accent2);
-      box-shadow: 0 2px 8px rgba(200, 80, 192, 0.15);
-    }
-
-    /* Notation area */
-    .notation-area {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 8px 10px;
-      padding-bottom: 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: var(--bg-dark);
-    }
-
-    #notation {
-      width: 100%;
-      max-width: 800px;
-      position: relative;
-      overflow: visible;
-    }
-
-    #notation svg {
-      width: 100%;
-      height: auto;
-    }
-
-    /* Make notation visible on dark background */
-    /* Chord symbol text — bright */
-    #notation svg text {
-      fill: var(--text-primary) !important;
-    }
-    /* Staff lines — visible enough to read note positions clearly */
-    #notation svg .vf-stave > path,
-    #notation svg .vf-stave > line,
-    #notation svg .vf-stave > rect {
-      stroke: rgba(255,255,255,0.45) !important;
-      stroke-width: 1px !important;
-      fill: none !important;
-    }
-    /* Barlines — prominent, clearly separate measures */
-    #notation svg .vf-stavebarline path,
-    #notation svg .vf-stavebarline line {
-      stroke: rgba(255,255,255,0.75) !important;
-      stroke-width: 1.5px !important;
-    }
-    /* Clef, key signature, time signature — white and bold */
-    #notation svg .vf-clef path {
-      fill: #ffffff !important;
-      stroke: #ffffff !important;
-    }
-    #notation svg .vf-keysignature path {
-      fill: #ffffff !important;
-      stroke: #ffffff !important;
-    }
-    #notation svg .vf-timesignature path {
-      fill: #ffffff !important;
-      stroke: #ffffff !important;
-    }
-    /* Notes, stems, flags, accidentals — full white for maximum contrast */
-    #notation svg .vf-stavenote path,
-    #notation svg .vf-notehead path,
-    #notation svg .vf-stem path,
-    #notation svg .vf-flag path,
-    #notation svg .vf-beam path,
-    #notation svg .vf-stavenote line {
-      fill: #ffffff !important;
-      stroke: #ffffff !important;
-    }
-    /* Ledger lines — VexFlow draws these as #444 stroke paths inside stavenote.
-       On dark background they disappear; force bright white + thicker stroke. */
-    #notation svg path[stroke="#444"] {
-      stroke: #ffffff !important;
-      stroke-width: 1.6px !important;
-    }
-    #notation svg .vf-ledger line,
-    #notation svg line.vf-ledger {
-      stroke: rgba(255,255,255,0.9) !important;
-      stroke-width: 1.4px !important;
-    }
-
-    .measure-highlight {
-      position: absolute;
-      background: var(--highlight);
-      border: 2px solid var(--highlight-border);
-      border-radius: 4px;
-      pointer-events: none;
-      transition: left 0.08s, top 0.08s;
-      display: none;
-    }
-
-    /* Tips */
-    .tips-panel {
-      max-width: 800px;
-      width: 100%;
-      margin: 8px auto 0;
-      padding: 0 8px;
-    }
-
-    .tips-toggle {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 13px;
-      cursor: pointer;
-      padding: 6px 0;
-    }
-
-    .tips-content {
-      display: none;
-      padding: 8px 0;
-    }
-
-    .tips-content.show { display: block; }
-
-    .tip-item {
-      font-size: 13px;
-      color: var(--text-secondary);
-      padding: 4px 0;
-      line-height: 1.4;
-    }
-
-    .tip-item::before {
-      content: '\25B8 ';
-      color: var(--accent);
-    }
-
-    /* Form + tempo provenance badges — show at top of tips */
-    .tune-meta-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      padding: 0 0 10px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      margin-bottom: 8px;
-    }
-    .tune-meta-badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 10px;
-      font-size: 11px;
-      font-weight: 500;
-      background: rgba(255,255,255,0.05);
-      color: var(--text-secondary);
-      border: 1px solid rgba(255,255,255,0.08);
-      letter-spacing: 0.2px;
-    }
-    .tune-meta-badge.tempo-source.tempo-xml,
-    .tune-meta-badge.tempo-source.tempo-pdf,
-    .tune-meta-badge.tempo-source.tempo-recording {
-      background: rgba(50,200,120,0.10);
-      color: #7fd9a6;
-      border-color: rgba(50,200,120,0.25);
-    }
-    .tune-meta-badge.tempo-source.tempo-estimate {
-      background: rgba(255,180,60,0.08);
-      color: #d9a86a;
-      border-color: rgba(255,180,60,0.22);
-    }
-
-    /* Chorus counter */
-    .chorus-counter {
-      text-align: center;
-      font-size: 13px;
-      color: var(--text-secondary);
-      padding: 4px 0 0;
-    }
-
-    .chorus-counter span {
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    /* Transport bar */
-    .transport-bar {
-      flex-shrink: 0;
-      background: var(--bg-surface);
-      border-top: 1px solid rgba(255,255,255,0.10);
-      padding: 10px 16px;
-      padding-bottom: calc(10px + var(--safe-bottom));
-      z-index: 100;
-    }
-
-    .transport-controls {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 10px;
-    }
-
-    .transport-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: var(--bg-card);
-      color: var(--text-secondary);
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .transport-btn:hover { border-color: rgba(255,255,255,0.15); color: var(--text-primary); }
-    .transport-btn:active { background: var(--accent-dim); color: #fff; }
-
-    .transport-btn.play-btn {
-      width: 56px;
-      height: 56px;
-      background: var(--accent);
-      color: #fff;
-      font-size: 24px;
-      border: none;
-      box-shadow: 0 3px 12px rgba(232, 74, 39, 0.35);
-    }
-
-    .transport-btn.play-btn:active { background: var(--accent-dim); }
-
-    .transport-btn.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-
-    .tempo-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .tempo-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      min-width: 50px;
-      text-align: right;
-      letter-spacing: 0.3px;
-    }
-
-    .tempo-slider {
-      flex: 1;
-      -webkit-appearance: none;
-      appearance: none;
-      height: 4px;
-      background: var(--bg-card);
-      border-radius: 2px;
-      outline: none;
-    }
-
-    .tempo-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: var(--accent);
-      cursor: pointer;
-    }
-
-    .tempo-bpm {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--accent);
-      min-width: 60px;
-      letter-spacing: 0.5px;
-    }
-
-    /* Legend for Mode 2 */
-    .note-legend {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      font-size: 12px;
-      color: var(--text-secondary);
-      padding: 4px 0;
-    }
-
-    .legend-dot {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      margin-right: 4px;
-      vertical-align: middle;
-    }
-
-    .legend-dot.chord { background: var(--chord-tone); }
-    .legend-dot.scale { background: var(--scale-tone); }
-
-    /* Loading */
-    .loading-overlay {
-      position: fixed;
-      inset: 0;
-      background: var(--bg-dark);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 16px;
-      z-index: 1000;
-      transition: opacity 0.3s;
-    }
-
-    .loading-overlay.hidden {
-      display: none;
-    }
-
-    .loading-text {
-      color: var(--accent);
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: 2px;
-    }
-
-    .loading-sub {
-      color: var(--text-secondary);
-      font-size: 14px;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.4; }
-      50% { opacity: 1; }
-    }
-
-    .loading-sub { animation: pulse 1.5s infinite; }
-
-    /* ===== INSTRUMENT SELECTOR ===== */
-    .instrument-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 5px;
-      padding: 7px 10px;
-      background: var(--bg-surface);
-      border-bottom: 1px solid var(--section-border);
-      flex-shrink: 0;
-    }
-
-    .inst-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 5px 11px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      white-space: nowrap;
-      letter-spacing: 0.2px;
-    }
-
-    .inst-btn:hover {
-      background: rgba(255,255,255,0.08);
-      border-color: rgba(255,255,255,0.15);
-      color: var(--text-primary);
-    }
-
-    .inst-btn.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-      box-shadow: 0 2px 8px rgba(232, 74, 39, 0.3);
-    }
-
-    .instrument-select { display: none; }
-
-    /* ===== HEAR LICK ===== */
-    .hear-lick-row {
-      display: flex;
-      justify-content: center;
-      padding: 8px 16px 4px;
-      background: var(--bg-surface);
-      flex-shrink: 0;
-    }
-
-    .hear-lick-btn {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 20px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-primary);
-      background: var(--bg-card);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.2s;
-      letter-spacing: 0.3px;
-    }
-
-    .hear-lick-btn:hover { border-color: rgba(255,255,255,0.2); }
-    .hear-lick-btn:active { background: var(--accent-dim); }
-
-    .hear-lick-btn.playing {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-      box-shadow: 0 2px 8px rgba(232, 74, 39, 0.25);
-    }
-
-    .hear-lick-btn i { font-size: 15px; }
-
-    /* ===== SWING TOGGLE ===== */
-    .swing-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 8px;
-    }
-
-    .swing-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      min-width: 50px;
-      text-align: right;
-      letter-spacing: 0.3px;
-    }
-
-    .swing-options {
-      display: flex;
-      gap: 0;
-      flex: 1;
-    }
-
-    .swing-btn {
-      flex: 1;
-      padding: 6px 4px;
-      font-size: 11px;
-      font-weight: 600;
-      text-align: center;
-      background: var(--bg-card);
-      color: var(--text-secondary);
-      border: 1px solid rgba(255,255,255,0.08);
-      cursor: pointer;
-      transition: all 0.2s;
-      letter-spacing: 0.2px;
-    }
-
-    .swing-btn:first-child { border-radius: 6px 0 0 6px; }
-    .swing-btn:last-child { border-radius: 0 6px 6px 0; }
-
-    .swing-btn.active {
-      background: rgba(200, 80, 192, 0.20);
-      color: var(--accent2);
-      border-color: var(--accent2);
-      box-shadow: 0 2px 6px rgba(200, 80, 192, 0.12);
-    }
-
-    /* ===== GAMIFICATION ===== */
-
-    /* Header XP bar + streak */
-    .header-stats {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex: 1;
-      justify-content: center;
-      min-width: 0;
-    }
-
-    .xp-micro {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      min-width: 60px;
-    }
-
-    .xp-micro-label {
-      font-size: 9px;
-      color: var(--text-secondary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100px;
-    }
-
-    .xp-micro-bar {
-      width: 80px;
-      height: 5px;
-      background: var(--bg-card);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-
-    .xp-micro-fill {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 3px;
-      transition: width 0.4s ease;
-    }
-
-    .streak-badge {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-secondary);
-      white-space: nowrap;
-    }
-
-    .streak-badge.hot { color: var(--accent); }
-
-    .stats-toggle-btn {
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 18px;
-      cursor: pointer;
-      padding: 4px;
-      line-height: 1;
-    }
-
-    .stats-toggle-btn:active { color: var(--accent); }
-
-    /* Stats dashboard panel */
-    .stats-panel {
-      display: none;
-      background: var(--bg-surface);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      max-height: 60vh;
-      overflow-y: auto;
-      padding: 12px 16px 16px;
-      flex-shrink: 0;
-    }
-
-    .stats-panel.open { display: block; }
-
-    .stats-section-label {
-      font-size: 10px;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      margin: 12px 0 6px;
-    }
-
-    .stats-section-label:first-child { margin-top: 0; }
-
-    /* Profile header */
-    .stats-profile {
-      text-align: center;
-      padding-bottom: 10px;
-    }
-
-    .stats-level-name {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--accent);
-    }
-
-    .stats-xp-label {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin: 4px 0;
-    }
-
-    .xp-bar-full {
-      width: 100%;
-      height: 8px;
-      background: var(--bg-card);
-      border-radius: 4px;
-      overflow: hidden;
-      margin-top: 4px;
-    }
-
-    .xp-bar-full-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      border-radius: 4px;
-      transition: width 0.5s ease;
-    }
-
-    /* Quick stats row */
-    .quick-stats {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    .stat-card {
-      flex: 1;
-      background: var(--bg-card);
-      border-radius: 8px;
-      padding: 10px 8px;
-      text-align: center;
-    }
-
-    .stat-card-num {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--accent);
-    }
-
-    .stat-card-label {
-      font-size: 10px;
-      color: var(--text-secondary);
-      margin-top: 2px;
-    }
-
-    /* Streak calendar */
-    .streak-cal {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 3px;
-      margin-top: 4px;
-    }
-
-    .streak-cal-day-label {
-      font-size: 9px;
-      color: var(--text-secondary);
-      text-align: center;
-    }
-
-    .streak-cal-cell {
-      aspect-ratio: 1;
-      border-radius: 3px;
-      background: var(--bg-card);
-      max-width: 28px;
-    }
-
-    .streak-cal-cell.practiced {
-      background: var(--accent);
-    }
-
-    .streak-cal-cell.light { opacity: 0.4; }
-    .streak-cal-cell.medium { opacity: 0.7; }
-    .streak-cal-cell.heavy { opacity: 1.0; }
-
-    /* Achievements grid */
-    .achievements-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
-      margin-top: 6px;
-    }
-
-    .achievement-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      background: var(--bg-card);
-      color: var(--text-secondary);
-      cursor: pointer;
-      position: relative;
-      margin: 0 auto;
-      transition: transform 0.15s;
-      border: 2px solid transparent;
-    }
-
-    .achievement-icon.unlocked {
-      color: var(--accent);
-      border-color: var(--accent);
-      background: rgba(232, 74, 39, 0.12);
-    }
-
-    .achievement-icon:active { transform: scale(0.92); }
-
-    .achievement-tooltip {
-      position: absolute;
-      bottom: calc(100% + 6px);
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--bg-card);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 6px;
-      padding: 6px 10px;
-      font-size: 11px;
-      color: var(--text-primary);
-      white-space: nowrap;
-      z-index: 10;
-      pointer-events: none;
-      display: none;
-    }
-
-    .achievement-icon.show-tip .achievement-tooltip { display: block; }
-
-    /* Progression breakdown */
-    .prog-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 4px 0;
-    }
-
-    .prog-row-name {
-      font-size: 12px;
-      color: var(--text-primary);
-      width: 90px;
-      flex-shrink: 0;
-    }
-
-    .prog-row-bar {
-      flex: 1;
-      height: 6px;
-      background: var(--bg-card);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-
-    .prog-row-fill {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 3px;
-    }
-
-    .prog-row-num {
-      font-size: 12px;
-      color: var(--accent);
-      font-weight: 600;
-      width: 35px;
-      text-align: right;
-    }
-
-    /* Session history */
-    .session-list {
-      max-height: 200px;
-      overflow-y: auto;
-      margin-top: 6px;
-    }
-
-    .session-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      font-size: 12px;
-    }
-
-    .session-item:last-child { border-bottom: none; }
-
-    .session-date {
-      color: var(--text-secondary);
-      min-width: 70px;
-      font-size: 11px;
-    }
-
-    .session-prog {
-      color: var(--text-primary);
-      flex: 1;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .session-meta {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      color: var(--text-secondary);
-      font-size: 11px;
-      flex-shrink: 0;
-    }
-
-    .session-meta .choruses { color: var(--accent); font-weight: 600; }
-    .session-meta .duration { color: var(--text-secondary); }
-
-    .no-sessions {
-      text-align: center;
-      color: var(--text-secondary);
-      font-size: 12px;
-      padding: 12px 0;
-      font-style: italic;
-    }
-
-    /* Toast notifications */
-    .toast-container {
-      position: fixed;
-      top: 56px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 200;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      pointer-events: none;
-      width: 90%;
-      max-width: 320px;
-    }
-
-    .toast {
-      background: var(--bg-card);
-      border-left: 3px solid var(--accent);
-      border-radius: 8px;
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      color: var(--text-primary);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-      animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
-      pointer-events: auto;
-    }
-
-    .toast.purple { border-left-color: var(--accent2); }
-    .toast .toast-icon { font-size: 18px; color: var(--accent); }
-    .toast.purple .toast-icon { color: var(--accent2); }
-
-    @keyframes toastIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes toastOut {
-      from { opacity: 1; }
-      to { opacity: 0; transform: translateY(-10px); }
-    }
-
-    /* Mic / Pitch Detection */
-    .mic-btn.active { background: rgba(232,74,39,0.2); color: var(--accent); border-color: rgba(232,74,39,0.5); }
-
-    .pitch-display {
-      display: none; align-items: center; gap: 12px;
-      padding: 8px 16px;
-      background: var(--bg-surface);
-      border-top: 1px solid rgba(255,255,255,0.06);
-    }
-    .pitch-display.active { display: flex; }
-
-    .pitch-note-name {
-      font-size: 26px; font-weight: 800; min-width: 52px;
-      text-align: center; font-family: 'Courier New', monospace;
-      color: var(--text-secondary); transition: color 0.15s;
-    }
-    .pitch-cents-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-    .pitch-cents-bar {
-      position: relative; width: 100%; height: 8px;
-      background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden;
-    }
-    .pitch-cents-center {
-      position: absolute; left: 50%; top: 0; bottom: 0;
-      width: 2px; background: rgba(255,255,255,0.25); transform: translateX(-50%);
-    }
-    .pitch-cents-marker {
-      position: absolute; top: -1px; width: 10px; height: 10px;
-      border-radius: 50%; background: var(--accent);
-      transform: translateX(-50%); transition: left 0.08s ease-out; left: 50%;
-    }
-    .pitch-cents-label { font-size: 10px; color: var(--text-secondary); font-family: monospace; }
-    .pitch-match { font-size: 12px; display: flex; align-items: center; gap: 4px; min-width: 90px; }
-    .pitch-match small { white-space: nowrap; }
-
-    /* Ear Training */
-    .ear-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 7px 16px; font-size: 13px; font-weight: 600;
-      color: var(--text-primary); background: var(--bg-card);
-      border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; cursor: pointer;
-    }
-    .ear-btn:hover { border-color: rgba(200,80,192,0.4); }
-
-    .ear-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.7); z-index: 1000;
-      align-items: center; justify-content: center; padding: 20px;
-    }
-    .ear-overlay.open { display: flex; }
-
-    .ear-panel {
-      background: var(--bg-surface); border-radius: 16px;
-      width: 100%; max-width: 400px;
-      border: 1px solid rgba(255,255,255,0.1); overflow: hidden;
-    }
-    .ear-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
-    .ear-title { font-size: 16px; font-weight: 700; }
-    .ear-close {
-      background: none; border: none; color: var(--text-secondary);
-      font-size: 18px; cursor: pointer; padding: 4px;
-    }
-    .ear-tabs { display: flex; padding: 10px 16px 0; gap: 4px; }
-    .ear-tab {
-      flex: 1; padding: 8px; font-size: 13px; font-weight: 600;
-      background: transparent; border: 1px solid rgba(255,255,255,0.1);
-      color: var(--text-secondary); border-radius: 8px; cursor: pointer;
-    }
-    .ear-tab.active { background: rgba(232,74,39,0.15); color: var(--accent); border-color: rgba(232,74,39,0.3); }
-
-    .ear-body { padding: 16px; text-align: center; }
-    .ear-prompt { font-size: 15px; margin-bottom: 12px; color: var(--text-primary); min-height: 24px; }
-    .ear-play-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 10px 28px; font-size: 14px; font-weight: 700;
-      background: var(--accent); color: white; border: none;
-      border-radius: 24px; cursor: pointer; margin-bottom: 16px;
-    }
-    .ear-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px; }
-    .ear-option {
-      padding: 10px 4px; font-size: 12px; font-weight: 600;
-      background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1);
-      color: var(--text-primary); border-radius: 8px; cursor: pointer; transition: all 0.15s;
-    }
-    .ear-option:hover { border-color: rgba(255,255,255,0.3); }
-    .ear-option.correct { background: rgba(40,167,69,0.3); border-color: #28a745; color: #5cb85c; }
-    .ear-option.wrong { background: rgba(220,53,69,0.25); border-color: #dc3545; color: #e06070; }
-    .ear-option.disabled { pointer-events: none; opacity: 0.5; }
-    .ear-option.reveal { background: rgba(40,167,69,0.12); border-color: rgba(40,167,69,0.5); }
-    .ear-score {
-      font-size: 14px; color: var(--text-secondary); padding-top: 8px;
-      border-top: 1px solid rgba(255,255,255,0.06);
-    }
-    .ear-streak { margin-left: 12px; color: var(--accent); font-weight: 600; }
-
-    /* Tools row — buttons alongside Ear Training */
-    .tools-row {
-      margin-left: 12px;
-      display: inline-flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    @media (max-width: 479px) {
-      .tools-row { margin-left: 0; margin-top: 4px; display: flex; }
-      .tools-row .ear-btn { padding: 5px 10px; font-size: 11px; }
-    }
-
-    /* Quotes modal — grid of quote buttons */
-    .quotes-panel { max-width: 480px; }
-    .quotes-body { padding: 14px 16px 18px; }
-    .quotes-hint {
-      font-size: 12px; color: var(--text-secondary);
-      margin-bottom: 12px; line-height: 1.4;
-    }
-    .quotes-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-    }
-    .quote-btn {
-      padding: 12px 10px;
-      font-size: 13px; font-weight: 600;
-      background: var(--bg-card);
-      color: var(--text-primary);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.15s;
-    }
-    .quote-btn:hover {
-      border-color: var(--accent);
-      background: rgba(232,74,39,0.1);
-    }
-    .quote-btn.playing {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-
-    /* Call & Response */
-    .cnr-stage {
-      padding: 14px 16px;
-      font-size: 14px;
-      line-height: 1.5;
-      color: var(--text-secondary);
-      text-align: center;
-      min-height: 60px;
-    }
-    .cnr-stage.active { color: var(--accent); font-weight: 600; }
-    .cnr-countdown {
-      text-align: center;
-      font-size: 48px;
-      font-weight: 700;
-      color: var(--accent);
-      height: 60px;
-      line-height: 60px;
-    }
-    .cnr-controls {
-      padding: 12px 16px;
-      border-top: 1px solid rgba(255,255,255,0.06);
-    }
-    .cnr-label {
-      display: block;
-      font-size: 11px;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 6px;
-    }
-    .cnr-difficulty { display: flex; gap: 0; }
-    .cnr-diff {
-      flex: 1; padding: 7px 4px;
-      font-size: 11px; font-weight: 600;
-      background: var(--bg-card); color: var(--text-secondary);
-      border: 1px solid rgba(255,255,255,0.08);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .cnr-diff:first-child { border-radius: 6px 0 0 6px; }
-    .cnr-diff:last-child { border-radius: 0 6px 6px 0; }
-    .cnr-diff.active {
-      background: rgba(200,80,192,0.2);
-      color: var(--accent2);
-      border-color: var(--accent2);
-    }
-
-    /* Recording indicator + transport record button */
-    .record-indicator {
-      display: none;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 12px;
-      background: rgba(232,74,39,0.15);
-      border: 1px solid var(--accent);
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--accent);
-    }
-    .record-indicator.on { display: inline-flex; }
-    .record-dot {
-      width: 8px; height: 8px;
-      background: var(--accent);
-      border-radius: 50%;
-      animation: recpulse 1s infinite;
-    }
-    @keyframes recpulse { 50% { opacity: 0.3; } }
-    .recording-playback {
-      display: none;
-      align-items: center; gap: 8px;
-      padding: 6px 12px;
-      margin-top: 8px;
-      background: var(--bg-card);
-      border-radius: 8px;
-    }
-    .recording-playback.show { display: flex; }
-    .recording-playback audio { flex: 1; height: 32px; }
-    .recording-playback button {
-      background: none; border: none;
-      color: var(--text-secondary);
-      cursor: pointer; font-size: 16px;
-    }
-    .recording-playback button:hover { color: var(--accent); }
-
-    /* Share */
-    .share-btn {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%; padding: 12px; margin-top: 8px;
-      font-size: 14px; font-weight: 600;
-      background: rgba(232,74,39,0.12); color: var(--accent);
-      border: 1px solid rgba(232,74,39,0.25); border-radius: 10px; cursor: pointer;
-    }
-    .share-btn:hover { background: rgba(232,74,39,0.2); }
-
-    /* Practice suggestions */
-    .suggestions-list { display: flex; flex-direction: column; gap: 6px; }
-    .suggestion-item {
-      display: flex; align-items: flex-start; gap: 10px;
-      background: rgba(232, 74, 39, 0.08);
-      border: 1px solid rgba(232, 74, 39, 0.15);
-      border-radius: 8px; padding: 10px 12px;
-      font-size: 13px; color: var(--text-primary);
-      line-height: 1.4;
-    }
-    .suggestion-item i { color: var(--accent); font-size: 16px; margin-top: 1px; flex-shrink: 0; }
-    .no-suggestions { color: var(--text-secondary); font-size: 13px; font-style: italic; padding: 6px 0; }
-
-    /* Slide position toggle */
-    .slide-toggle-row {
-      display: flex; align-items: center; gap: 8px;
-      padding: 4px 16px 2px; font-size: 12px; color: var(--text-secondary);
-    }
-    .slide-toggle {
-      position: relative; width: 34px; height: 18px;
-      background: rgba(255,255,255,0.08); border-radius: 10px;
-      cursor: pointer; border: none; padding: 0;
-      transition: background 0.2s;
-    }
-    .slide-toggle.active { background: var(--accent); }
-    .slide-toggle::after {
-      content: ''; position: absolute; top: 2px; left: 2px;
-      width: 14px; height: 14px; border-radius: 50%;
-      background: white; transition: transform 0.2s;
-    }
-    .slide-toggle.active::after { transform: translateX(16px); }
-
-    /* ===== MOBILE-FIRST RESPONSIVE ===== */
-    @media (max-width: 479px) {
-      /* Header — compact single line */
-      .app-header { padding: 6px 10px; min-height: 42px; }
-      .app-title { font-size: 13px; letter-spacing: 1px; white-space: nowrap; }
-      .progression-select { font-size: 12px; padding: 5px 8px; max-width: 155px; }
-      .header-stats { gap: 5px; }
-      .xp-micro-bar { width: 36px; }
-      .xp-micro-label { display: none; }
-      .streak-badge { font-size: 12px; }
-      .stats-toggle-btn { font-size: 16px; padding: 2px; }
-
-      /* Instruments — compact wrap grid */
-      .instrument-row { padding: 5px 8px; gap: 4px; }
-      .inst-btn { padding: 4px 9px; font-size: 11px; border-radius: 14px; }
-
-      /* Mode / Level — tighter */
-      .mode-bar { padding: 5px 10px; }
-      .mode-btn { padding: 7px 4px; font-size: 11px; }
-      .level-bar { padding: 4px 10px 5px; gap: 6px; }
-      .level-btn { padding: 5px 4px; font-size: 10px; }
-
-      /* Hear Lick / Slide toggle — compact */
-      .hear-lick-row { padding: 5px 10px 2px; }
-      .hear-lick-btn { padding: 6px 14px; font-size: 12px; }
-      .slide-toggle-row { padding: 3px 14px; font-size: 12px; }
-
-      /* Notation — max space */
-      .notation-area { padding: 4px 4px 8px; }
-
-      /* Transport — compact */
-      .transport-bar { padding: 6px 10px; padding-bottom: calc(6px + var(--safe-bottom)); }
-      .transport-controls { gap: 10px; margin-bottom: 6px; }
-      .transport-btn { width: 38px; height: 38px; font-size: 16px; }
-      .transport-btn.play-btn { width: 48px; height: 48px; font-size: 22px; }
-      .tempo-row { gap: 8px; }
-      .tempo-label { font-size: 11px; min-width: 40px; }
-      .tempo-bpm { font-size: 12px; min-width: 52px; }
-      .swing-row { margin-top: 5px; gap: 8px; }
-      .swing-label { font-size: 11px; min-width: 40px; }
-      .swing-btn { padding: 5px 2px; font-size: 10px; }
-
-      /* Gamification */
-      .achievements-grid { grid-template-columns: repeat(5, 1fr); gap: 6px; }
-      .achievement-icon { width: 34px; height: 34px; font-size: 14px; }
-    }
-
-    /* Tablet and up — slightly more room */
-    @media (min-width: 480px) {
-      .inst-btn { padding: 6px 13px; font-size: 12px; }
-      .instrument-row { gap: 6px; padding: 8px 12px; }
-    }
-  </style>
+  <link href="woodshed.css" rel="stylesheet">
 </head>
 <body>
 
@@ -1325,6 +38,25 @@
       <!-- Options populated dynamically from PROGRESSIONS at init -->
     </select>
   </header>
+
+  <!-- Persistent tune metadata strip — under the header, above the stats panel.
+       Populated by updateTuneMetaStrip() on init and on tune change. -->
+  <div class="tune-strip" id="tuneStrip">
+    <button class="tune-fav-btn" id="tuneFavBtn" title="Favorite" aria-label="Favorite this tune">
+      <i class="bi bi-star" id="tuneFavIcon"></i>
+    </button>
+    <div class="tune-strip-meta">
+      <div class="tune-strip-composer" id="tuneStripComposer"></div>
+      <div class="tune-strip-badges">
+        <span class="tune-meta-badge difficulty" id="tuneStripDifficulty"></span>
+        <span class="tune-meta-badge" id="tuneStripForm"></span>
+        <span class="tune-meta-badge tempo-source" id="tuneStripTempo"></span>
+      </div>
+    </div>
+    <a class="tune-ref-btn" id="tuneRefBtn" target="_blank" rel="noopener" title="Listen to reference recording" style="display:none">
+      <i class="bi bi-play-circle"></i> Listen
+    </a>
+  </div>
 
   <!-- Stats Dashboard (collapsible) -->
   <div class="stats-panel" id="statsPanel">
@@ -1607,6 +339,7 @@
       'Bm7':   ['B3', 'D4', 'F#4', 'A4'],
       'Bbm7':  ['Bb3', 'Db4', 'F4', 'Ab4'],
       'Ebm7':  ['Eb3', 'Gb3', 'Bb3', 'Db4'],
+      'Abm7':  ['Ab3', 'B3', 'Eb4', 'Gb4'],   // iv-minor color ("Lovely Day")
       'F#m7':  ['F#3', 'A3', 'C#4', 'E4'],
       // Aliases (major/minor triads map to m7/Maj7 for backing)
       'Bb':  ['A3', 'Bb3', 'D4', 'F4'],
@@ -1670,6 +403,7 @@
       'Bm7':   ['B2', 'D3', 'F#3', 'D3'],
       'Bbm7':  ['Bb2', 'Db3', 'F3', 'Db3'],
       'Ebm7':  ['Eb2', 'Gb2', 'Bb2', 'Gb2'],
+      'Abm7':  ['Ab2', 'B2', 'Eb3', 'B2'],
       'F#m7':  ['F#2', 'A2', 'C#3', 'A2'],
       // Triad aliases mirror the 7ths
       'Bb':  ['Bb2', 'D3', 'F3', 'D3'],
@@ -1696,6 +430,26 @@
       'F#m': ['F#2', 'A2', 'C#3', 'A2']
     };
 
+    // Default difficulty inferred from bookSection — acts as a suggestion
+    // when a tune doesn't specify its own. Explicit `difficulty` on a tune
+    // always wins.
+    //   core         → beginner (simple I-IV-V, traditional standards)
+    //   active       → intermediate (standards with color changes)
+    //   developing   → advanced (harder harmony or odd forms)
+    //   dusty        → varied (grab bag — neither simple nor hard universally)
+    //   vault        → varied
+    //   grooves      → beginner (just a groove pattern)
+    //   fundamentals → beginner (fundamentals drills)
+    const DIFFICULTY_BY_SECTION = {
+      core: 'beginner',
+      active: 'intermediate',
+      developing: 'advanced',
+      dusty: 'varied',
+      vault: 'varied',
+      grooves: 'beginner',
+      fundamentals: 'beginner'
+    };
+
     // Compact song builder. def = { id, t: title, cp: composer, k: key,
     // bpm, sec: bookSection, m: [chord strings OR {c:chord, ml:melody}],
     // cl: clef ('bass'|'treble'), mpl: measuresPerLine,
@@ -1707,6 +461,11 @@
     //              (provenance of the default tempo; 'xml'/'pdf' = read from
     //               the band's chart, 'recording' = verified against
     //               recording, 'estimate' = best guess — may need correction)
+    // difficulty: 'beginner' | 'intermediate' | 'advanced' | 'varied'
+    //              (defaults inferred from sec; override per-tune when a
+    //               specific tune is easier or harder than its section)
+    // refUrl:     optional reference recording URL (YouTube, Bandcamp, etc.)
+    //              rendered as a "Listen" button under the tune picker.
     function mkProg(def) {
       const tempo = def.bpm || 110;
       const chordSet = new Set(def.m.map(mm => typeof mm === 'string' ? mm : mm.c));
@@ -1715,17 +474,20 @@
         V[c] = VOICINGS[c] || VOICINGS['Bb7'];
         B[c] = BASS_NOTES[c] || BASS_NOTES['Bb7'];
       });
+      const sec = def.sec || 'core';
       return {
         id: def.id,
         title: def.t,
         composer: def.cp || '',
         key: def.k,
-        bookSection: def.sec || 'core',
+        bookSection: sec,
         timeSignature: '4/4',
         defaultTempo: tempo,
         tempoRange: [Math.max(60, tempo - 30), Math.min(200, tempo + 40)],
         form: def.form || 'solo-form',     // NEW — default: progression IS the solo form
         tempoSource: def.tempoSource || 'estimate',
+        difficulty: def.difficulty || DIFFICULTY_BY_SECTION[sec] || 'intermediate',
+        referenceUrl: def.refUrl || null,
         measures: def.m.map(mm => {
           if (typeof mm === 'string') return { chord: mm, beats: 4 };
           const out = { chord: mm.c, beats: 4 };
@@ -6489,7 +5251,11 @@
       });
 
       document.getElementById('progressionSelect').addEventListener('change', e => {
-        const prog = PROGRESSIONS[e.target.value];
+        // Favorites group uses 'fav::' prefix to disambiguate from the
+        // native-section entry for the same tune — strip it.
+        const rawVal = e.target.value;
+        const tuneId = rawVal.startsWith('fav::') ? rawVal.slice(5) : rawVal;
+        const prog = PROGRESSIONS[tuneId];
         if (prog) {
           currentProgression = prog;
           stop();
@@ -6501,9 +5267,20 @@
           tempoSlider.value = prog.defaultTempo;
           tempoBpm.textContent = prog.defaultTempo + ' BPM';
           updateMelodyAvailability();
+          updateTuneMetaStrip();
           renderTips();
           renderNotation();
         }
+      });
+
+      // Favorite toggle button
+      document.getElementById('tuneFavBtn').addEventListener('click', () => {
+        if (!currentProgression) return;
+        toggleFavorite(currentProgression.id);
+        populateProgressionSelect();  // rebuild so favorites group updates
+        // Re-sync select value (prefer the native entry, not the fav copy)
+        document.getElementById('progressionSelect').value = currentProgression.id;
+        updateTuneMetaStrip();
       });
 
       document.getElementById('tipsToggle').addEventListener('click', () => {
@@ -6651,11 +5428,36 @@
     // INIT
     // =========================================================================
 
+    // Favorites — tune IDs starred by the user. Stored in localStorage under
+    // 'woodshed_favorites' as a JSON array. Starred tunes appear in a pinned
+    // "⭐ Favorites" group at the top of the dropdown.
+    const FAV_KEY = 'woodshed_favorites';
+    function loadFavorites() {
+      try {
+        const raw = localStorage.getItem(FAV_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return new Set(Array.isArray(arr) ? arr : []);
+      } catch (_e) {
+        return new Set();
+      }
+    }
+    function saveFavorites(set) {
+      try { localStorage.setItem(FAV_KEY, JSON.stringify([...set])); } catch (_e) {}
+    }
+    let favorites = loadFavorites();
+    function isFavorite(id) { return favorites.has(id); }
+    function toggleFavorite(id) {
+      if (favorites.has(id)) favorites.delete(id);
+      else favorites.add(id);
+      saveFavorites(favorites);
+    }
+
     // Populate the progression dropdown dynamically from PROGRESSIONS,
     // grouped by bookSection (core, active, developing, dusty, vault,
-    // grooves, fundamentals).
+    // grooves, fundamentals). Favorites pin to the top.
     function populateProgressionSelect() {
       const SECTION_ORDER = [
+        ['favorites',    '⭐ Favorites'],
         ['core',         '🎺 Core Standards'],
         ['active',       '🎵 Active Repertoire'],
         ['developing',   '🔨 Developing'],
@@ -6669,10 +5471,15 @@
         const cat = p.bookSection || 'fundamentals';
         (byCat[cat] = byCat[cat] || []).push(p);
       });
+      // Collect favorites into their own group (tunes also still appear
+      // under their native section — favorites is just a quick-access copy).
+      const favProgs = Object.values(PROGRESSIONS).filter(p => favorites.has(p.id));
+      if (favProgs.length) byCat.favorites = favProgs;
       // Sort within each category alphabetically
       Object.values(byCat).forEach(arr => arr.sort((a,b) => a.title.localeCompare(b.title)));
 
       const select = document.getElementById('progressionSelect');
+      const prevValue = select.value;
       select.innerHTML = '';
       SECTION_ORDER.forEach(([key, label]) => {
         const progs = byCat[key];
@@ -6681,13 +5488,77 @@
         og.label = label;
         progs.forEach(p => {
           const opt = document.createElement('option');
-          opt.value = p.id;
+          // Favorites section uses a disambiguated value so <select>'s
+          // "match first option with this value" doesn't jump the user
+          // to the favorites copy when they select from the main section.
+          opt.value = key === 'favorites' ? 'fav::' + p.id : p.id;
           const keyBadge = p.key ? ` [${p.key}]` : '';
           opt.textContent = p.title + keyBadge;
           og.appendChild(opt);
         });
         select.appendChild(og);
       });
+      // Restore previous selection if still valid
+      if (prevValue) select.value = prevValue;
+    }
+
+    // Update the persistent tune metadata strip — composer, difficulty /
+    // form / tempo badges, reference link, favorite star. Called on init
+    // and on every tune change.
+    const FORM_SHORT_LABELS = {
+      'solo-form':        'Solo form',
+      'head':             'Head',
+      'vamp':             'Vamp',
+      'outro-turnaround': 'Outro',
+      'bridge':           'Bridge'
+    };
+    const TEMPO_SHORT_LABELS = {
+      'xml':       '♩ verified',
+      'pdf':       '♩ from PDF',
+      'recording': '♩ verified',
+      'estimate':  '♩ estimate'
+    };
+    const DIFFICULTY_LABELS = {
+      'beginner':     'Beginner',
+      'intermediate': 'Intermediate',
+      'advanced':     'Advanced',
+      'varied':       'Varied'
+    };
+    function updateTuneMetaStrip() {
+      const prog = currentProgression;
+      if (!prog) return;
+      // Composer line
+      const composerEl = document.getElementById('tuneStripComposer');
+      composerEl.textContent = prog.composer || '';
+      // Difficulty
+      const diff = prog.difficulty || 'intermediate';
+      const diffEl = document.getElementById('tuneStripDifficulty');
+      diffEl.textContent = DIFFICULTY_LABELS[diff] || diff;
+      diffEl.className = 'tune-meta-badge difficulty difficulty-' + diff;
+      // Form
+      const formEl = document.getElementById('tuneStripForm');
+      formEl.textContent = FORM_SHORT_LABELS[prog.form] || prog.form || 'Solo form';
+      // Tempo source
+      const src = prog.tempoSource || 'estimate';
+      const tempoEl = document.getElementById('tuneStripTempo');
+      tempoEl.textContent = TEMPO_SHORT_LABELS[src] || src;
+      tempoEl.className = 'tune-meta-badge tempo-source tempo-' + src;
+      // Reference link
+      const refBtn = document.getElementById('tuneRefBtn');
+      if (prog.referenceUrl) {
+        refBtn.href = prog.referenceUrl;
+        refBtn.style.display = 'inline-flex';
+      } else {
+        refBtn.removeAttribute('href');
+        refBtn.style.display = 'none';
+      }
+      // Favorite star
+      const favBtn = document.getElementById('tuneFavBtn');
+      const favIcon = document.getElementById('tuneFavIcon');
+      const fav = isFavorite(prog.id);
+      favBtn.classList.toggle('is-fav', fav);
+      favIcon.className = fav ? 'bi bi-star-fill' : 'bi bi-star';
+      favBtn.title = fav ? 'Unfavorite' : 'Favorite';
     }
 
     function init() {
@@ -6715,6 +5586,7 @@
       if (hearLabel) hearLabel.textContent = currentMode === 'melody' ? 'Hear Melody' : 'Hear Lick';
       updateSlideToggleVisibility();
       updateMelodyAvailability();
+      updateTuneMetaStrip();
 
       gamification.init();
       setupUI();
