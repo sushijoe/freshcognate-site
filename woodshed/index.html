@@ -51,6 +51,11 @@
         <span class="tune-meta-badge difficulty" id="tuneStripDifficulty"></span>
         <span class="tune-meta-badge" id="tuneStripForm"></span>
         <span class="tune-meta-badge tempo-source" id="tuneStripTempo"></span>
+        <!-- Parade-ready badge appears when the current tune × instrument has
+             passed the threshold. See updateParadeBadge() + isParadeReady(). -->
+        <span class="tune-meta-badge parade-ready" id="tuneStripParade" style="display:none">
+          <i class="bi bi-megaphone-fill"></i> Parade ready
+        </span>
       </div>
     </div>
     <a class="tune-ref-btn" id="tuneRefBtn" target="_blank" rel="noopener" title="Listen to reference recording" style="display:none">
@@ -74,10 +79,14 @@
         <div class="stat-card-num" id="statsTime">0m</div>
         <div class="stat-card-label"><i class="bi bi-clock"></i> Practice</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-card-num" id="statsStreak">0</div>
-        <div class="stat-card-label"><i class="bi bi-fire"></i> Streak</div>
+      <div class="stat-card" title="Unique days practiced in the last 28 days. Forgives rest — you don't lose this by taking time off.">
+        <div class="stat-card-num" id="statsRhythm">0</div>
+        <div class="stat-card-label"><i class="bi bi-heart-pulse"></i> Monthly rhythm</div>
       </div>
+    </div>
+    <div class="growth-tip-row">
+      <i class="bi bi-stars"></i>
+      <span id="growthTip">Showing up is most of it.</span>
     </div>
     <div class="stats-section-label">Tempo &amp; Instruments</div>
     <div class="tempo-range-row">
@@ -96,6 +105,27 @@
     <div class="stats-section-label">Recent Sessions</div>
     <div class="session-list" id="sessionHistory"></div>
     <button class="share-btn" id="shareBtn"><i class="bi bi-share"></i> Share Progress</button>
+
+    <!-- Your Data — portability + ownership. Export downloads a JSON backup;
+         Import replaces localStorage with the contents of a previously
+         exported file. No server, no account, no tracking. Keeps the user in
+         control of their own practice history. -->
+    <div class="stats-section-label">Your Data</div>
+    <div class="data-panel">
+      <div class="data-panel-blurb">
+        Your progress lives in this browser. Back it up or move it to another
+        device with Export / Import — no login required.
+      </div>
+      <div class="data-panel-actions">
+        <button class="data-btn" id="exportProgressBtn" type="button">
+          <i class="bi bi-download"></i> Export progress
+        </button>
+        <label class="data-btn" for="importProgressInput">
+          <i class="bi bi-upload"></i> Import progress
+        </label>
+        <input type="file" id="importProgressInput" accept="application/json,.json" hidden>
+      </div>
+    </div>
   </div>
 
   <!-- Instrument Picker -->
@@ -3302,18 +3332,21 @@
     const gamification = (function() {
       const STORAGE_KEY = 'woodshed_progress';
 
+      // Growth-mindset ladder: every rung names an identity/role you grow INTO,
+      // not a fixed "elite" state. Level numbers + thresholds stay unchanged so
+      // existing users don't see a demotion — only the title strings changed.
       const XP_LEVELS = [
-        { level: 0,  name: 'Listener',          xp: 0 },
-        { level: 1,  name: 'Woodshedder',       xp: 50 },
+        { level: 0,  name: 'Listener',           xp: 0 },
+        { level: 1,  name: 'Woodshedder',        xp: 50 },
         { level: 2,  name: 'Tone Seeker',        xp: 150 },
-        { level: 3,  name: 'Groove Apprentice',   xp: 350 },
-        { level: 4,  name: 'Changes Runner',      xp: 650 },
-        { level: 5,  name: 'Bebopper',            xp: 1100 },
-        { level: 6,  name: 'Session Player',      xp: 1800 },
-        { level: 7,  name: 'First Call',           xp: 2800 },
-        { level: 8,  name: 'Cats',                 xp: 4200 },
-        { level: 9,  name: 'Monster',              xp: 6500 },
-        { level: 10, name: 'Legend',               xp: 10000 }
+        { level: 3,  name: 'Groove Keeper',      xp: 350 },
+        { level: 4,  name: 'Changes Runner',     xp: 650 },
+        { level: 5,  name: 'Bebopper',           xp: 1100 },
+        { level: 6,  name: 'Session Player',     xp: 1800 },
+        { level: 7,  name: 'First Call',         xp: 2800 },
+        { level: 8,  name: 'Sideperson',         xp: 4200 },
+        { level: 9,  name: 'Bandleader',         xp: 6500 },
+        { level: 10, name: 'Tradition-bearer',   xp: 10000 }
       ];
 
       const ACHIEVEMENTS = [
@@ -3376,10 +3409,23 @@
       function createDefaults() {
         const progs = {};
         Object.keys(PROGRESSIONS).forEach(id => {
-          progs[id] = { choruses: 0, practiceSec: 0, sessions: 0 };
+          // Per-tune temporal fields let us show "played 14 times, first 3 weeks
+          // ago, max 160 BPM" — progress against self, the growth-mindset frame.
+          // levelsAttempted tracks stretch moments: the first time you open a
+          // harder level on this tune. paradeReady is tune × instrument.
+          progs[id] = {
+            choruses: 0,
+            practiceSec: 0,
+            sessions: 0,
+            maxTempo: null,
+            firstPlayedAt: null,
+            lastPlayedAt: null,
+            levelsAttempted: [],
+            paradeReady: {}  // { trombone: { choruses, maxTempo, lastAt } }
+          };
         });
         return {
-          schemaVersion: 1,
+          schemaVersion: 2,
           userId: null,
           syncedAt: null,
           stats: {
@@ -3397,6 +3443,17 @@
             // dashboard show "practiced between 90-180 BPM" as facility signal.
             tempos: { minBpm: null, maxBpm: null },
             combos: [],
+            // Bravery counters — cumulative counts of stretch behaviors. Used
+            // to surface growth-mindset stats ("you braved the record button 14
+            // times") and unlock future achievements without touching XP math.
+            bravery: {
+              slowPractice: 0,   // choruses at <70% of tune's target
+              soloMute: 0,       // choruses with harmony muted
+              loopFocus: 0,      // loop-range active chorus completions
+              recordAttempts: 0, // record button starts
+              newTunes: 0,       // first chorus on a never-played tune
+              levelStretches: 0  // first chorus at a higher level on a tune
+            },
             _nightOwl: false,
             _earlyBird: false,
             _marathon: false
@@ -3413,18 +3470,47 @@
           const raw = localStorage.getItem(STORAGE_KEY);
           if (raw) {
             data = JSON.parse(raw);
-            // Ensure new progressions exist in stats
+            // Ensure new progressions exist + backfill schema-v2 fields on
+            // existing entries. Additive migration — no data loss.
             Object.keys(PROGRESSIONS).forEach(id => {
               if (!data.stats.progressions[id]) {
-                data.stats.progressions[id] = { choruses: 0, practiceSec: 0, sessions: 0 };
+                data.stats.progressions[id] = {
+                  choruses: 0, practiceSec: 0, sessions: 0,
+                  maxTempo: null, firstPlayedAt: null, lastPlayedAt: null,
+                  levelsAttempted: [], paradeReady: {}
+                };
+              } else {
+                const p = data.stats.progressions[id];
+                if (p.maxTempo === undefined) p.maxTempo = null;
+                if (p.firstPlayedAt === undefined) p.firstPlayedAt = null;
+                if (p.lastPlayedAt === undefined) p.lastPlayedAt = null;
+                if (!p.levelsAttempted) p.levelsAttempted = [];
+                if (!p.paradeReady) p.paradeReady = {};
               }
             });
             if (!data.stats.combos) data.stats.combos = [];
             if (!data.stats.instruments) data.stats.instruments = {};
             if (!data.stats.tempos) data.stats.tempos = { minBpm: null, maxBpm: null };
+            if (!data.stats.bravery) {
+              data.stats.bravery = {
+                slowPractice: 0, soloMute: 0, loopFocus: 0,
+                recordAttempts: 0, newTunes: 0, levelStretches: 0
+              };
+            }
             if (data.stats._nightOwl === undefined) data.stats._nightOwl = false;
             if (data.stats._earlyBird === undefined) data.stats._earlyBird = false;
             if (data.stats._marathon === undefined) data.stats._marathon = false;
+            // Refresh level name — the XP ladder titles evolved in v2 (e.g.
+            // "Monster" → "Bandleader"). Keep user's XP + level number intact;
+            // just re-derive the current title from the new table.
+            for (let i = XP_LEVELS.length - 1; i >= 0; i--) {
+              if ((data.xp.total || 0) >= XP_LEVELS[i].xp) {
+                data.xp.level = XP_LEVELS[i].level;
+                data.xp.levelName = XP_LEVELS[i].name;
+                break;
+              }
+            }
+            data.schemaVersion = 2;
           } else {
             data = createDefaults();
           }
@@ -3441,11 +3527,68 @@
       }
 
       // --- XP Engine ---
-      function awardXP(amount) {
+      // Bravery XP events get tagged so we can show a different toast and
+      // (eventually) report on stretch activity separately from grind activity.
+      function awardXP(amount, kind) {
         data.xp.total += amount;
         checkLevelUp();
         save();
         updateHeaderXP();
+        if (kind === 'bravery' && amount > 0) {
+          // One affirming message per event. Picker varies the copy so it
+          // doesn't feel repetitive.
+          const bravePhrases = [
+            'You stretched — ',
+            'Brave move — ',
+            'Growth mindset — ',
+            'Nice reach — ',
+            'Good risk — '
+          ];
+          const p = bravePhrases[Math.floor(Math.random() * bravePhrases.length)];
+          showToast('bravery', p + '+' + amount + ' XP', 'bi-lightning-charge-fill');
+        }
+      }
+
+      // Record one-shot bravery events per session so we don't spam the user
+      // with XP for the same behavior over and over.
+      const _bravedThisSession = new Set();
+      function brave(eventKey, amount, counterField) {
+        if (_bravedThisSession.has(eventKey)) return;
+        _bravedThisSession.add(eventKey);
+        if (counterField && data.stats.bravery) {
+          data.stats.bravery[counterField] = (data.stats.bravery[counterField] || 0) + 1;
+        }
+        awardXP(amount, 'bravery');
+      }
+
+      // Parade-ready test: tune + instrument must have enough reps AT target
+      // tempo to go on the road. 14-day freshness window keeps it honest —
+      // "ready" means you've played it recently, not in a long-ago past.
+      function isParadeReady(progId, instName) {
+        const prog = data.stats.progressions[progId];
+        const tune = PROGRESSIONS[progId];
+        if (!prog || !tune) return false;
+        const pr = (prog.paradeReady || {})[instName];
+        if (!pr || pr.choruses < 10) return false;
+        const target = tune.defaultTempo || 120;
+        if ((pr.maxTempo || 0) < target) return false;
+        if (!pr.lastAt) return false;
+        const ageDays = (Date.now() - new Date(pr.lastAt).getTime()) / 86400000;
+        return ageDays <= 14;
+      }
+
+      // Unique days practiced in the last 28. This replaces the punitive
+      // "current streak" frame with a rolling fitness metric that doesn't
+      // reset to zero the moment life gets in the way.
+      function monthlyRhythm() {
+        if (!data.streak || !data.streak.history) return 0;
+        const cutoff = Date.now() - 28 * 86400000;
+        const cutoffStr = new Date(cutoff).toISOString().slice(0, 10);
+        const unique = new Set();
+        for (const ds of data.streak.history) {
+          if (ds >= cutoffStr) unique.add(ds);
+        }
+        return unique.size;
       }
 
       function checkLevelUp() {
@@ -3538,12 +3681,25 @@
         totalPausedMs = 0;
         modesUsedThisSession = new Set([mode]);
         progressionsToday = new Set();
+        // Reset the "one bravery award per session" tracker
+        _bravedThisSession.clear();
 
         // First session of the day bonus
         const today = todayStr();
         const todaySessions = data.sessions.filter(s => s.startedAt && s.startedAt.startsWith(today));
         if (todaySessions.length === 0) {
           awardXP(20);
+          // Affirm the return — especially important if there was a gap. Growth
+          // mindset frames this as "welcome back," never "streak broken."
+          const lastDate = data.streak && data.streak.lastPracticeDate;
+          if (lastDate && lastDate !== today) {
+            const gapDays = Math.floor(
+              (new Date(today) - new Date(lastDate)) / 86400000
+            );
+            if (gapDays >= 3) {
+              showToast('bravery', 'Welcome back. Starting fresh today.', 'bi-emoji-smile');
+            }
+          }
         }
 
         // Time-based fun achievements
@@ -3616,7 +3772,26 @@
       function onChorusComplete(progId, mode, level) {
         // Core stats
         data.stats.totalChoruses++;
-        if (data.stats.progressions[progId]) data.stats.progressions[progId].choruses++;
+        const progEntry = data.stats.progressions[progId];
+        const tune = PROGRESSIONS[progId];
+        const nowIso = new Date().toISOString();
+
+        // Per-tune tracking — we record "first ever touch" and "last touch" so
+        // the stats panel can narrate progress against self: "you've played
+        // Honeysuckle 14 times across 3 weeks." Growth-mindset framing.
+        let isFirstEverOnThisTune = false;
+        let isFirstEverAtThisLevel = false;
+        if (progEntry) {
+          if (progEntry.choruses === 0) isFirstEverOnThisTune = true;
+          if (!progEntry.levelsAttempted) progEntry.levelsAttempted = [];
+          if (!progEntry.levelsAttempted.includes(level)) {
+            progEntry.levelsAttempted.push(level);
+            if (!isFirstEverOnThisTune) isFirstEverAtThisLevel = true;
+          }
+          progEntry.choruses++;
+          if (!progEntry.firstPlayedAt) progEntry.firstPlayedAt = nowIso;
+          progEntry.lastPlayedAt = nowIso;
+        }
         if (data.stats.modes[mode]) data.stats.modes[mode].choruses++;
         if (data.stats.levels[level]) data.stats.levels[level].choruses++;
 
@@ -3639,6 +3814,30 @@
           const t = data.stats.tempos;
           if (t.minBpm === null || bpm < t.minBpm) t.minBpm = bpm;
           if (t.maxBpm === null || bpm > t.maxBpm) t.maxBpm = bpm;
+          if (progEntry) {
+            if (!progEntry.maxTempo || bpm > progEntry.maxTempo) progEntry.maxTempo = bpm;
+          }
+
+          // Parade-ready: tune × instrument rolling ledger. Counts only
+          // choruses at or above the tune's target tempo so we don't give
+          // parade-ready credit for slow-practice passes.
+          const target = (tune && tune.defaultTempo) || 120;
+          if (progEntry && instName && bpm >= target) {
+            if (!progEntry.paradeReady[instName]) {
+              progEntry.paradeReady[instName] = { choruses: 0, maxTempo: bpm, lastAt: nowIso };
+            }
+            const pr = progEntry.paradeReady[instName];
+            pr.choruses++;
+            if (bpm > pr.maxTempo) pr.maxTempo = bpm;
+            pr.lastAt = nowIso;
+            // Crossing the threshold: celebrate it
+            if (pr.choruses === 10) {
+              const tuneName = (tune && tune.title) || progId;
+              const prettyInst = instName.charAt(0).toUpperCase() + instName.slice(1);
+              showToast('parade', prettyInst + ' parade-ready on ' + tuneName + '!', 'bi-megaphone-fill');
+              awardXP(30); // Meaningful landmark — not just per-rep grind
+            }
+          }
         }
 
         // Track combo for Renaissance Player
@@ -3647,9 +3846,44 @@
           data.stats.combos.push(combo);
         }
 
-        // XP by level
+        // XP by level (base reward for showing up)
         const xpMap = { beginner: 5, intermediate: 7, advanced: 10 };
         awardXP(xpMap[level] || 5);
+
+        // ================= Bravery XP — growth-mindset incentives =================
+        // Stretching into harder territory matters more than repeating what's
+        // comfortable. These fire at most once per session (via brave()) except
+        // for slow-practice and mute, which are per-chorus stretch choices.
+
+        // 1. First chorus on a never-before-played tune
+        if (isFirstEverOnThisTune) {
+          brave('new-tune:' + progId, 15, 'newTunes');
+        }
+        // 2. First time at a new level on a tune they already know
+        if (isFirstEverAtThisLevel && level !== 'beginner') {
+          brave('level-stretch:' + progId + ':' + level, 8, 'levelStretches');
+        }
+        // 3. Slow-practice — chorus at <=70% of tune's target tempo
+        if (bpm && tune && tune.defaultTempo) {
+          if (bpm <= Math.round(tune.defaultTempo * 0.7)) {
+            data.stats.bravery.slowPractice = (data.stats.bravery.slowPractice || 0) + 1;
+            // Soft reward per chorus + once-per-session celebration
+            awardXP(3);
+            brave('slow:' + progId, 5, null);
+          }
+        }
+        // 4. Harmony-muted chorus (soloing without safety net)
+        if (typeof isHarmonyMuted !== 'undefined' && isHarmonyMuted) {
+          data.stats.bravery.soloMute = (data.stats.bravery.soloMute || 0) + 1;
+          awardXP(2);
+          brave('mute', 5, null);
+        }
+        // 5. Loop-range chorus (focused work on a hard section)
+        if (typeof loopRangeStart !== 'undefined' && loopRangeStart !== null) {
+          data.stats.bravery.loopFocus = (data.stats.bravery.loopFocus || 0) + 1;
+          awardXP(2);
+          brave('loop:' + progId, 5, null);
+        }
 
         // New progression today bonus
         const today = todayStr();
@@ -3663,6 +3897,8 @@
 
         // Achievements
         checkAchievements();
+        // Update tune-strip in case parade-ready status flipped
+        if (typeof updateParadeBadge === 'function') updateParadeBadge();
         save();
       }
 
@@ -3690,10 +3926,39 @@
       }
 
       function updateHeaderStreak() {
+        // Header shows Monthly Rhythm — unique days in the last 28. Forgiving,
+        // growth-oriented: a rest day doesn't reset it to zero. The flame icon
+        // only turns "hot" once you've built a consistent rhythm (8+ days/mo).
         const num = document.getElementById('headerStreakNum');
         const badge = document.getElementById('headerStreak');
-        if (num) num.textContent = data.streak.current;
-        if (badge) badge.classList.toggle('hot', data.streak.current >= 3);
+        const rhythm = monthlyRhythm();
+        if (num) num.textContent = rhythm;
+        if (badge) {
+          badge.classList.toggle('hot', rhythm >= 8);
+          badge.title = rhythm + ' day' + (rhythm === 1 ? '' : 's') + ' practiced in the last 28 — you set the pace.';
+        }
+      }
+
+      // Short, warm, growth-oriented message that rotates with the user's
+      // current pattern. Avoids guilt language; praises process.
+      function pickGrowthTip() {
+        const s = data.stats;
+        const rhythm = monthlyRhythm();
+        const tips = [];
+        if ((s.bravery && s.bravery.slowPractice || 0) >= 5) {
+          tips.push('Slowing down is how speed is built. Keep at it.');
+        }
+        if ((s.bravery && s.bravery.recordAttempts || 0) >= 1) {
+          tips.push('Recording yourself takes guts. That\'s the real work.');
+        }
+        if ((s.bravery && s.bravery.newTunes || 0) >= 3) {
+          tips.push('You keep trying new things — that\'s how the ears grow.');
+        }
+        if (rhythm >= 16) tips.push('You\'ve set a steady rhythm this month. Proud of you.');
+        else if (rhythm >= 8) tips.push('You\'re building a real rhythm. Keep showing up.');
+        else if (rhythm >= 1) tips.push('Every session counts. No such thing as a wasted rep.');
+        else tips.push('Showing up is most of it.');
+        return tips[Math.floor(Math.random() * tips.length)];
       }
 
       function getPracticeSuggestions() {
@@ -3763,7 +4028,13 @@
         // Quick stats
         el('statsChoruses').textContent = data.stats.totalChoruses;
         el('statsTime').textContent = formatTime(data.stats.totalPracticeSec);
-        el('statsStreak').textContent = data.streak.current;
+        const rhythmEl = el('statsRhythm');
+        if (rhythmEl) rhythmEl.textContent = monthlyRhythm();
+
+        // Growth tip — short affirming rotation. Updated every time the panel
+        // opens so the user sees something a bit different each time.
+        const tipEl = el('growthTip');
+        if (tipEl) tipEl.textContent = pickGrowthTip();
 
         // Tempo range — only show if there's any data
         const t = data.stats.tempos || {};
@@ -3850,17 +4121,57 @@
         });
         el('achieveCount').textContent = unlocked + '/' + ACHIEVEMENTS.length;
 
-        // Progression breakdown
+        // Progression breakdown — expanded per-tune progress. Each row shows
+        // choruses + personal-best tempo + how long they've been working on it
+        // + parade-ready instruments. Progress against self, not a leaderboard.
         const progDiv = el('progBreakdown');
         progDiv.innerHTML = '';
-        const maxChoruses = Math.max(1, ...Object.values(data.stats.progressions).map(p => p.choruses));
+        const maxChoruses = Math.max(1, ...Object.values(data.stats.progressions).map(p => p.choruses || 0));
+        const daysSince = (iso) => {
+          if (!iso) return null;
+          const ms = Date.now() - new Date(iso).getTime();
+          return Math.floor(ms / 86400000);
+        };
+        const humanAge = (days) => {
+          if (days === null || days === undefined) return '';
+          if (days <= 0) return 'today';
+          if (days === 1) return 'yesterday';
+          if (days < 7) return days + 'd ago';
+          if (days < 30) return Math.floor(days / 7) + 'w ago';
+          if (days < 365) return Math.floor(days / 30) + 'mo ago';
+          return Math.floor(days / 365) + 'y ago';
+        };
         Object.keys(PROGRESSIONS).forEach(id => {
           const p = data.stats.progressions[id] || { choruses: 0 };
-          const pct = (p.choruses / maxChoruses) * 100;
-          progDiv.innerHTML += '<div class="prog-row">' +
-            '<span class="prog-row-name">' + PROGRESSIONS[id].title + '</span>' +
-            '<div class="prog-row-bar"><div class="prog-row-fill" style="width:' + pct + '%"></div></div>' +
-            '<span class="prog-row-num">' + p.choruses + '</span></div>';
+          const pct = ((p.choruses || 0) / maxChoruses) * 100;
+          const subBits = [];
+          if (p.maxTempo) subBits.push('<i class="bi bi-speedometer2"></i> ' + p.maxTempo + ' BPM');
+          if (p.firstPlayedAt) {
+            const d = daysSince(p.firstPlayedAt);
+            if (d !== null && d >= 1) subBits.push('<i class="bi bi-hourglass"></i> first ' + humanAge(d));
+          }
+          // Parade-ready instrument count
+          const pr = p.paradeReady || {};
+          const readyCount = Object.keys(pr).filter(k =>
+            (typeof gamification !== 'undefined' && gamification.isParadeReady)
+              ? gamification.isParadeReady(id, k)
+              : false
+          ).length;
+          if (readyCount > 0) {
+            subBits.push('<span class="prog-row-parade"><i class="bi bi-megaphone-fill"></i> ' + readyCount + ' parade-ready</span>');
+          }
+          const subLine = subBits.length
+            ? '<div class="prog-row-sub">' + subBits.join(' · ') + '</div>'
+            : '';
+          progDiv.innerHTML +=
+            '<div class="prog-row">' +
+              '<div class="prog-row-main">' +
+                '<span class="prog-row-name">' + PROGRESSIONS[id].title + '</span>' +
+                '<div class="prog-row-bar"><div class="prog-row-fill" style="width:' + pct + '%"></div></div>' +
+                '<span class="prog-row-num">' + (p.choruses || 0) + '</span>' +
+              '</div>' +
+              subLine +
+            '</div>';
         });
 
         // Practice suggestions
@@ -3901,7 +4212,11 @@
         const container = document.getElementById('toastContainer');
         if (!container) return;
         const toast = document.createElement('div');
-        toast.className = 'toast' + (type === 'achievement' ? ' purple' : '');
+        const variant = type === 'achievement' ? ' purple'
+                       : type === 'bravery'     ? ' bravery'
+                       : type === 'parade'      ? ' parade'
+                       : '';
+        toast.className = 'toast' + variant;
         toast.innerHTML = '<i class="toast-icon bi ' + icon + '"></i><span>' + message + '</span>';
         container.appendChild(toast);
         setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3200);
@@ -3934,9 +4249,55 @@
         // Public accessors for Phase 5 features
         showToastPublic: showToast,
         getData: () => data,
+        setData: (newData) => { data = newData; save(); },
         formatTimePublic: formatTime,
         awardXPPublic: awardXP,
-        getAchievementCount: () => ACHIEVEMENTS.length
+        // Growth-mindset public API
+        brave: brave,
+        isParadeReady: isParadeReady,
+        monthlyRhythm: monthlyRhythm,
+        getAchievementCount: () => ACHIEVEMENTS.length,
+        // Data portability — user-owned export / import
+        exportJson: () => JSON.stringify(data, null, 2),
+        importJson: (json) => {
+          try {
+            const parsed = JSON.parse(json);
+            // Minimal sanity: must have stats + xp. If it looks right, save it
+            // and force a reload so every view re-reads the new state.
+            if (!parsed || typeof parsed !== 'object' || !parsed.stats || !parsed.xp) {
+              return { ok: false, error: 'Not a valid Woodshed progress file.' };
+            }
+            data = parsed;
+            // Run the same migrations load() would so the incoming file is
+            // brought up to v2 if it was exported from an older app build.
+            Object.keys(PROGRESSIONS).forEach(id => {
+              if (!data.stats.progressions[id]) {
+                data.stats.progressions[id] = {
+                  choruses: 0, practiceSec: 0, sessions: 0,
+                  maxTempo: null, firstPlayedAt: null, lastPlayedAt: null,
+                  levelsAttempted: [], paradeReady: {}
+                };
+              } else {
+                const p = data.stats.progressions[id];
+                if (p.maxTempo === undefined) p.maxTempo = null;
+                if (!p.levelsAttempted) p.levelsAttempted = [];
+                if (!p.paradeReady) p.paradeReady = {};
+              }
+            });
+            if (!data.stats.bravery) {
+              data.stats.bravery = {
+                slowPractice: 0, soloMute: 0, loopFocus: 0,
+                recordAttempts: 0, newTunes: 0, levelStretches: 0
+              };
+            }
+            if (!data.stats.tempos) data.stats.tempos = { minBpm: null, maxBpm: null };
+            if (!data.stats.instruments) data.stats.instruments = {};
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
+            return { ok: true };
+          } catch (e) {
+            return { ok: false, error: 'Could not read that file.' };
+          }
+        }
       };
     })();
 
@@ -5036,6 +5397,15 @@
         isRecording = true;
         updateRecordBtn();
         gamification.showToastPublic('info', 'Recording... press again to stop', 'bi-record-circle');
+        // Bravery XP — hitting record is a vulnerable, self-assessing act.
+        // One reward per session so it doesn't become a farm button.
+        try {
+          const d = gamification.getData();
+          if (d && d.stats && d.stats.bravery) {
+            d.stats.bravery.recordAttempts = (d.stats.bravery.recordAttempts || 0) + 1;
+          }
+          gamification.brave('record', 10, null);
+        } catch (e) {}
       } catch(e) {
         console.error('Recording failed:', e);
         gamification.showToastPublic('error', 'Mic access denied. Allow the browser to use your microphone.', 'bi-mic-mute');
@@ -5734,6 +6104,8 @@
           }
           updateSlideToggleVisibility();
           renderNotation();
+          // Parade-ready is tune × instrument, so re-check on instrument swap
+          if (typeof updateParadeBadge === 'function') updateParadeBadge();
         });
       });
 
@@ -5887,6 +6259,55 @@
 
       // Share
       document.getElementById('shareBtn').addEventListener('click', shareProgress);
+
+      // Export / Import progress — cross-device backup without a server.
+      // User ownership is intentional: we don't transmit practice data
+      // anywhere; the user downloads a file and puts it wherever they want.
+      document.getElementById('exportProgressBtn').addEventListener('click', () => {
+        try {
+          const json = gamification.exportJson();
+          const blob = new Blob([json], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          const stamp = new Date().toISOString().slice(0, 10);
+          a.download = 'woodshed-progress-' + stamp + '.json';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          gamification.showToastPublic('info', 'Progress exported. Keep it safe.', 'bi-download');
+        } catch (e) {
+          gamification.showToastPublic('error', 'Export failed — please try again.', 'bi-exclamation-triangle');
+        }
+      });
+
+      document.getElementById('importProgressInput').addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        // Irreversible — confirm before we replace localStorage
+        const sure = confirm(
+          'Importing will replace your current progress (XP, achievements, ' +
+          'per-tune history) with the contents of this file. Continue?'
+        );
+        if (!sure) { e.target.value = ''; return; }
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = gamification.importJson(String(reader.result || ''));
+          if (result.ok) {
+            gamification.showToastPublic('info', 'Progress imported. Reloading...', 'bi-check-circle');
+            setTimeout(() => location.reload(), 800);
+          } else {
+            gamification.showToastPublic('error', result.error || 'Import failed.', 'bi-exclamation-triangle');
+            e.target.value = '';
+          }
+        };
+        reader.onerror = () => {
+          gamification.showToastPublic('error', 'Could not read file.', 'bi-exclamation-triangle');
+          e.target.value = '';
+        };
+        reader.readAsText(file);
+      });
 
       let resizeTimer;
       window.addEventListener('resize', () => {
@@ -6094,6 +6515,22 @@
       favBtn.classList.toggle('is-fav', fav);
       favIcon.className = fav ? 'bi bi-star-fill' : 'bi bi-star';
       favBtn.title = fav ? 'Unfavorite' : 'Favorite';
+      updateParadeBadge();
+    }
+
+    // Parade-ready badge — shown when current tune × current instrument has
+    // crossed the threshold (10+ choruses at target tempo or higher, within
+    // the last 14 days). Reads live from the gamification module so it stays
+    // in sync after each chorus completion.
+    function updateParadeBadge() {
+      const el = document.getElementById('tuneStripParade');
+      if (!el || !currentProgression || !currentInstrumentName) return;
+      try {
+        const ready = gamification.isParadeReady(currentProgression.id, currentInstrumentName);
+        el.style.display = ready ? 'inline-flex' : 'none';
+      } catch (e) {
+        el.style.display = 'none';
+      }
     }
 
     function init() {
