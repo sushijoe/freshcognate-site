@@ -1730,35 +1730,46 @@ body {
 /* Mic / Pitch Detection */
 .mic-btn.active { background: rgba(232,74,39,0.2); color: var(--accent); border-color: rgba(232,74,39,0.5); }
 
+/* Pitch display — kept compact so turning on the mic doesn't squeeze the
+   notation. Single row, minimal vertical footprint. Cents label sits
+   inline next to the bar instead of stacked beneath, saving ~25px. */
 .pitch-display {
-  display: none; align-items: center; gap: 12px;
-  padding: 8px 16px;
+  display: none; align-items: center; gap: 10px;
+  padding: 4px 14px;
   background: var(--bg-surface);
   border-top: 1px solid rgba(255,255,255,0.06);
+  min-height: 30px;
 }
 .pitch-display.active { display: flex; }
 
 .pitch-note-name {
-  font-size: 26px; font-weight: 800; min-width: 52px;
+  font-size: 18px; font-weight: 800; min-width: 38px;
   text-align: center; font-family: 'Courier New', monospace;
   color: var(--text-secondary); transition: color 0.15s;
+  letter-spacing: 0.3px;
 }
-.pitch-cents-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.pitch-cents-wrap {
+  flex: 1; display: flex; flex-direction: row; align-items: center; gap: 8px;
+}
 .pitch-cents-bar {
-  position: relative; width: 100%; height: 8px;
-  background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden;
+  position: relative; flex: 1; height: 5px;
+  background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden;
 }
 .pitch-cents-center {
   position: absolute; left: 50%; top: 0; bottom: 0;
   width: 2px; background: rgba(255,255,255,0.25); transform: translateX(-50%);
 }
 .pitch-cents-marker {
-  position: absolute; top: -1px; width: 10px; height: 10px;
+  position: absolute; top: -2px; width: 9px; height: 9px;
   border-radius: 50%; background: var(--accent);
   transform: translateX(-50%); transition: left 0.08s ease-out; left: 50%;
+  box-shadow: 0 0 6px rgba(232, 74, 39, 0.5);
 }
-.pitch-cents-label { font-size: 10px; color: var(--text-secondary); font-family: monospace; }
-.pitch-match { font-size: 12px; display: flex; align-items: center; gap: 4px; min-width: 90px; }
+.pitch-cents-label {
+  font-size: 10px; color: var(--text-secondary); font-family: monospace;
+  min-width: 34px; text-align: right;
+}
+.pitch-match { font-size: 11px; display: flex; align-items: center; gap: 4px; min-width: 72px; justify-content: flex-end; }
 .pitch-match small { white-space: nowrap; }
 
 /* Ear Training */
@@ -2080,6 +2091,16 @@ body {
 
   /* Notation — max space */
   .notation-area { padding: 4px 4px 8px; }
+
+  /* Pitch display — even tighter on phones so the mic doesn't squeeze
+     the staff. Target ~26px total height. */
+  .pitch-display { padding: 3px 10px; gap: 8px; min-height: 26px; }
+  .pitch-note-name { font-size: 16px; min-width: 32px; }
+  .pitch-cents-wrap { gap: 6px; }
+  .pitch-cents-bar { height: 4px; }
+  .pitch-cents-marker { width: 8px; height: 8px; top: -2px; }
+  .pitch-cents-label { font-size: 9px; min-width: 28px; }
+  .pitch-match { font-size: 10px; min-width: 60px; }
 
   /* Transport — compact */
   .transport-bar { padding: 6px 10px; padding-bottom: calc(6px + var(--safe-bottom)); }

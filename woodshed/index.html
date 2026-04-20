@@ -696,17 +696,11 @@
       const errs = validateTune(tune);
       if (errs.length) {
         console.error('Tune "' + (tune.id || '?') + '" rejected:\n  ' + errs.join('\n  '));
-        if (tune.id === 'gospel-medley') {
-          window.__DBG_gospel = window.__DBG_gospel || [];
-          window.__DBG_gospel.push({ measures: tune.measures, stack: new Error().stack });
-        }
         _REJECTED_TUNES.push({ id: tune.id, errors: errs });
         return;
       }
       PROGRESSIONS[tune.id] = tune;
     }
-    window._REJECTED_TUNES = _REJECTED_TUNES;
-    window.PROGRESSIONS = PROGRESSIONS;
 
     // ======================================================================
     // GOOD TROUBLE BRASS BAND REPERTOIRE

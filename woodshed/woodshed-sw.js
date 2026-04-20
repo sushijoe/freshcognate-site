@@ -1,4 +1,4 @@
-const CACHE_NAME = 'woodshed-v14-growth-mindset-gamification';
+const CACHE_NAME = 'woodshed-v15-compact-pitch-display';
 const ASSETS = [
   './index.html',
   './woodshed.css',
