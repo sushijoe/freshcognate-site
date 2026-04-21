@@ -1,4 +1,4 @@
-const CACHE_NAME = 'woodshed-v18-visible-jam-btn';
+const CACHE_NAME = 'woodshed-v19-jam-btn-always-shown';
 const ASSETS = [
   './index.html',
   './woodshed.css',

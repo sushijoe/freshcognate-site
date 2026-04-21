@@ -6924,10 +6924,17 @@
       if (melodyBtn) {
         melodyBtn.style.display = hasMelody ? '' : 'none';
       }
-      // Jam Mode button mirrors melody availability
+      // Jam Mode button STAYS VISIBLE even when this tune has no melody —
+      // hiding it entirely means new users never discover the feature exists.
+      // Instead we toggle a `.disabled` class that dims the button; clicking
+      // it while disabled still fires enterJamMode() which shows a "pick a
+      // different tune" toast (see the guard at the top of enterJamMode()).
       const jamBtn = document.getElementById('jamToggleBtn');
       if (jamBtn) {
-        jamBtn.style.display = hasMelody ? '' : 'none';
+        jamBtn.classList.toggle('disabled', !hasMelody);
+        jamBtn.title = hasMelody
+          ? 'Jam Mode (Guitar-Hero-style scrolling staff)'
+          : 'Jam Mode — needs a tune with a verified melody. Pick another tune.';
       }
       // If user was in jam mode and the new tune has no melody, drop out
       // cleanly so we don't leave the UI in a half-transformed state.

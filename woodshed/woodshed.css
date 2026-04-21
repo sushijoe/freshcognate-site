@@ -2213,6 +2213,26 @@ body {
   box-shadow: 0 0 16px rgba(232, 74, 39, 0.55), 0 0 26px rgba(200, 80, 192, 0.45);
   text-shadow: 0 1px 2px rgba(0,0,0,0.45);
 }
+/* Disabled state: tune has no verified melody. Button stays visible so new
+   users see the feature exists, but goes muted — no shimmer, no glow, low
+   saturation ring. Click still works and fires a "pick a different tune"
+   toast from enterJamMode(). */
+.jam-toggle-btn.disabled {
+  background-image:
+    linear-gradient(rgba(10,22,41,0.92), rgba(10,22,41,0.92)),
+    linear-gradient(90deg, #555, #777, #555);
+  animation: none;
+  box-shadow: none;
+  color: rgba(255,255,255,0.55);
+  cursor: help;
+  opacity: 0.75;
+}
+.jam-toggle-btn.disabled:hover {
+  transform: none;
+  filter: brightness(1.05);
+  box-shadow: 0 0 8px rgba(255,255,255,0.08);
+  opacity: 0.9;
+}
 .jam-toggle-label { white-space: nowrap; }
 
 /* Hide Jam HUD + strike line by default; show only when body.jam-on */
