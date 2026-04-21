@@ -30,6 +30,13 @@
       <div class="streak-badge" id="headerStreak">
         <i class="bi bi-fire"></i><span id="headerStreakNum">0</span>
       </div>
+      <!-- Jam Mode toggle — Guitar-Hero-style scrolling-staff game. When
+           active, notation scrolls horizontally past a strike line and the
+           mic grades each note as it passes. See jam-mode code block. -->
+      <button class="jam-toggle-btn" id="jamToggleBtn" title="Jam Mode (Guitar-Hero-style scrolling staff)">
+        <i class="bi bi-controller"></i>
+        <span class="jam-toggle-label">Jam</span>
+      </button>
       <button class="stats-toggle-btn" id="statsToggle" title="Stats">
         <i class="bi bi-bar-chart-line"></i>
       </button>
@@ -176,7 +183,33 @@
   </div>
 
   <!-- Notation -->
-  <div class="notation-area">
+  <div class="notation-area" id="notationArea">
+    <!-- =============================================================
+         JAM MODE HUD — overlay shown only when body.jam-on is set.
+         Strike line, score, combo, multiplier, big verdict flash, and
+         a ledger of the last 8 hits. Built as overlays so toggling Jam
+         on/off doesn't reflow the notation layout. -->
+    <div class="jam-hud" id="jamHud">
+      <div class="jam-scoreboard">
+        <div class="jam-score-group">
+          <div class="jam-score-label">SCORE</div>
+          <div class="jam-score-value" id="jamScore">0</div>
+        </div>
+        <div class="jam-score-group jam-combo-group">
+          <div class="jam-score-label">COMBO</div>
+          <div class="jam-score-value" id="jamCombo">0</div>
+        </div>
+        <div class="jam-score-group jam-mult-group">
+          <div class="jam-multiplier" id="jamMultiplier">1×</div>
+        </div>
+      </div>
+      <div class="jam-ledger" id="jamLedger"></div>
+      <!-- Verdict flash: "PERFECT" / "GREAT" / "GOOD" / "MISS" -->
+      <div class="jam-verdict" id="jamVerdict"></div>
+    </div>
+    <!-- The strike line is drawn inside the scrolling notation, at a fixed
+         viewport-x. It's a full-height vertical bar with a glow. -->
+    <div class="jam-strike-line" id="jamStrikeLine"></div>
     <!-- Current-lick concept label — shows what the user is practicing this
          chorus (e.g. "1. Root only", "6. Bebop scale up"). Hidden outside
          Licks mode. -->
@@ -3249,6 +3282,39 @@
       catch (e) { /* quota or private-mode; non-fatal */ }
     }
 
+    // =========================================================================
+    // JAM MODE STATE
+    // Guitar-Hero-style scrolling staff. When on, the notation unrolls into
+    // one wide horizontal row and scrolls right→left past a strike line. Mic
+    // samples each note as it crosses the line and grades it. See buildJamTargets,
+    // jamTick, jamGradeTarget below.
+    // =========================================================================
+    let jamMode = false;
+    const JAM_SCORES_KEY = 'woodshed.jamScores.v1';
+    const jamState = {
+      targets: [],            // [{beat, x, midi, noteName, octave, judged, grade}]
+      combo: 0,
+      multiplier: 1,
+      maxCombo: 0,
+      score: 0,
+      hits: [],               // recent grades for ledger (capped at 10)
+      rafId: null,
+      totalWidth: 0,          // width of the unrolled staff in px
+      totalBeats: 0,          // beats in one chorus
+      pxPerBeat: 0,
+      strikeX: 0,             // strike line pixel X (inside viewport)
+      scoreByTune: {},        // persisted best scores: { 'tune-id|inst': { score, combo } }
+      pitchHistory: []        // rolling pitch samples: { t, midi, cents }
+    };
+    try {
+      const stored = JSON.parse(localStorage.getItem(JAM_SCORES_KEY) || '{}');
+      if (stored && typeof stored === 'object') jamState.scoreByTune = stored;
+    } catch (e) { /* ignore */ }
+    function saveJamScores() {
+      try { localStorage.setItem(JAM_SCORES_KEY, JSON.stringify(jamState.scoreByTune)); }
+      catch (e) { /* non-fatal */ }
+    }
+
     // Extract the leading concept number from a lick name like "1. Root only".
     function lickConceptNum(lick) {
       const m = /^(\d+)\./.exec(lick?.name || '');
@@ -4229,6 +4295,9 @@
           if (panel.classList.contains('open')) renderStatsPanel();
         });
 
+        // Jam Mode toggle — handled in-line below (gamification module isn't
+        // ready yet at this point, so wiring is deferred to setupUI).
+
         // Close tooltip on outside click
         document.addEventListener('click', (e) => {
           if (!e.target.closest('.achievement-icon')) {
@@ -4413,6 +4482,10 @@
     }
 
     function renderNotation() {
+      // Jam Mode renders everything on one unrolled horizontal row for
+      // scrolling. Totally different layout path.
+      if (jamMode) return renderJamNotation();
+
       const container = document.getElementById('notation');
       const highlightEl = document.getElementById('highlight');
       container.innerHTML = '';
@@ -5008,6 +5081,17 @@
       const marker = document.getElementById('pitchCentsMarker');
       const matchEl = document.getElementById('pitchMatch');
 
+      // Jam mode feeds the pitch history buffer so targets crossing the
+      // strike line can look back at recent samples for scoring.
+      if (jamMode && note) {
+        const now = performance.now();
+        jamState.pitchHistory.push({ t: now, midi: note.midi, cents: note.cents });
+        // Keep only last 500ms of samples
+        while (jamState.pitchHistory.length > 0 && jamState.pitchHistory[0].t < now - 500) {
+          jamState.pitchHistory.shift();
+        }
+      }
+
       if (!note) {
         nameEl.textContent = '—';
         nameEl.style.color = 'var(--text-secondary)';
@@ -5047,6 +5131,406 @@
           ? '<i class="bi bi-check-circle-fill" style="color:var(--accent)"></i><small>In tune</small>'
           : '<small>' + (note.cents > 0 ? 'Sharp' : 'Flat') + '</small>';
       }
+    }
+
+    // =========================================================================
+    // JAM MODE — Guitar-Hero-style scrolling staff
+    //
+    // When jamMode is active, renderNotation() delegates to renderJamNotation()
+    // which lays the entire progression on ONE horizontal row. An overflow-
+    // hidden wrapper + CSS translate on the SVG scrolls notes past a fixed
+    // strike line. As each note crosses the line, jamTick samples the mic
+    // pitch history and grades Perfect/Great/Good/Miss.
+    //
+    // Pitch comparison uses concert MIDI (what the mic detects) against the
+    // target's concert MIDI (from measure.parts[instrument] raw data) —
+    // no transposition math needed on the match path, because transposition
+    // only affects what's *drawn* on the staff, not what's played.
+    // =========================================================================
+
+    function vexKeyToConcertMidi(key) {
+      // Convert a VexFlow key string like "Bb/3" into MIDI number (concert pitch).
+      // C4 = MIDI 60; MIDI = (octave + 1) * 12 + semitone
+      const [noteName, octStr] = key.split('/');
+      const letter = noteName[0];
+      const acc = noteName.substring(1);
+      let semi = NOTE_TO_SEMI[letter];
+      if (acc === 'b') semi -= 1;
+      else if (acc === 'bb') semi -= 2;
+      else if (acc === '#') semi += 1;
+      else if (acc === '##') semi += 2;
+      const oct = parseInt(octStr, 10);
+      return (oct + 1) * 12 + semi;
+    }
+
+    function durationToBeatsJam(d) {
+      // VexFlow-ish duration strings → beats in 4/4
+      const map = { 'w': 4, 'h': 2, 'q': 1, '8': 0.5, '16': 0.25, '32': 0.125 };
+      // Handle dotted notes (e.g., "qd" = dotted quarter = 1.5 beats)
+      const base = d.replace('d', '').replace('r', '');
+      let b = map[base] != null ? map[base] : 1;
+      if (d.includes('d')) b *= 1.5;
+      return b;
+    }
+
+    function renderJamNotation() {
+      // Unrolled single-line layout. Much wider than the viewport — we scroll
+      // it left via CSS transform as playback advances.
+      const container = document.getElementById('notation');
+      const highlightEl = document.getElementById('highlight');
+      container.innerHTML = '';
+      container.appendChild(highlightEl);
+      measureBounds = [];
+      updateLickConcept();
+
+      const prog = currentProgression;
+      const containerWidth = container.clientWidth || 600;
+
+      // Fixed measure width so scroll speed feels consistent regardless of
+      // viewport size. Each measure is 4 beats; strike line sits at ~30% from
+      // the left so the student has ~70% of viewport as lookahead.
+      const measureWidth = Math.max(200, Math.min(containerWidth, 320));
+      const pxPerBeat = measureWidth / 4;
+
+      const clefWidth = 50;
+      const keySigWidth = 30;
+      const timeSigWidth = 30;
+      const leadInX = clefWidth + keySigWidth + timeSigWidth;
+      const totalWidth = leadInX + prog.measures.length * measureWidth + 20;
+      const height = 165;
+
+      // Render a wide SVG. The container is still fixed-width (from CSS), but
+      // SVG is absolutely positioned inside and we translate it.
+      const renderer = new VF.Renderer(container, VF.Renderer.Backends.SVG);
+      renderer.resize(totalWidth, height);
+      const context = renderer.getContext();
+      // Position the SVG so we can transform it — it'll overflow the container
+      const svgEl = container.querySelector('svg');
+      if (svgEl) {
+        svgEl.style.position = 'absolute';
+        svgEl.style.left = '0';
+        svgEl.style.top = '0';
+        svgEl.style.willChange = 'transform';
+      }
+
+      for (let i = 0; i < prog.measures.length; i++) {
+        const measure = prog.measures[i];
+        const isFirst = i === 0;
+        const baseX = leadInX + i * measureWidth;
+        const x = isFirst ? 0 : baseX;
+        const w = isFirst ? (leadInX + measureWidth) : measureWidth;
+
+        const clef = currentInstrument.clef;
+        const displayKey = getTransposedKey();
+        const stave = new VF.Stave(x, 15, w);
+        if (isFirst) {
+          stave.addClef(clef);
+          stave.addKeySignature(displayKey);
+          stave.addTimeSignature('4/4');
+        }
+        stave.setContext(context).draw();
+        renderMeasure(context, stave, measure, i, w, isFirst, isFirst);
+        measureBounds.push({ x: baseX, y: 15, width: measureWidth, height: height - 30 });
+      }
+
+      // Build the target list: every playable note across the chorus
+      buildJamTargets(pxPerBeat, leadInX);
+
+      // Save layout dims for the scroll loop
+      jamState.totalWidth = totalWidth;
+      jamState.pxPerBeat = pxPerBeat;
+      jamState.leadInX = leadInX;
+      jamState.totalBeats = prog.measures.length * 4;
+      // Strike line sits at ~30% of the notation-area viewport
+      const areaEl = document.getElementById('notationArea');
+      const areaW = areaEl ? areaEl.clientWidth : containerWidth;
+      jamState.strikeX = Math.round(areaW * 0.30);
+
+      // Position the strike-line element at jamState.strikeX
+      const strikeEl = document.getElementById('jamStrikeLine');
+      if (strikeEl) strikeEl.style.left = jamState.strikeX + 'px';
+
+      // Reset scroll to the start
+      if (svgEl) svgEl.style.transform = 'translateX(' + jamState.strikeX + 'px)';
+
+      updateHighlight();
+      updateLoopRangeBadge();
+    }
+
+    function buildJamTargets(pxPerBeat, leadInX) {
+      const prog = currentProgression;
+      jamState.targets = [];
+      let absBeat = 0;
+
+      prog.measures.forEach((measure, mi) => {
+        // Reuse the existing playable-notes accessor so we get the right
+        // note array for the current instrument + mode + level.
+        let notes;
+        try {
+          notes = getPlayableNotesForMeasure(measure);
+        } catch (e) {
+          notes = measure.parts && measure.parts[currentInstrumentName]
+            ? measure.parts[currentInstrumentName]
+            : (measure.melody || []);
+        }
+        if (!Array.isArray(notes)) notes = [];
+
+        let beatInMeasure = 0;
+        notes.forEach(n => {
+          const beats = durationToBeatsJam(n.duration || 'q');
+          const isRest = (n.duration || '').includes('r') || !n.keys || !n.keys.length;
+          if (!isRest) {
+            // One target per note (use first pitch of a chord as the melodic target)
+            const key = n.keys[0];
+            const concertMidi = vexKeyToConcertMidi(key);
+            jamState.targets.push({
+              beat: absBeat + beatInMeasure,
+              x: leadInX + (absBeat + beatInMeasure) * pxPerBeat,
+              concertMidi,
+              noteName: key.split('/')[0],
+              judged: false,
+              grade: null
+            });
+          }
+          beatInMeasure += beats;
+        });
+        absBeat += 4;
+      });
+    }
+
+    // Convert Tone.Transport.position "bar:beat:sixteenth" to absolute beats
+    function transportAbsBeats() {
+      const pos = Tone.Transport.position.split(':');
+      const bars = parseFloat(pos[0]) || 0;
+      const beats = parseFloat(pos[1]) || 0;
+      const sixteenths = parseFloat(pos[2]) || 0;
+      return bars * 4 + beats + sixteenths / 4;
+    }
+
+    function jamTick() {
+      if (!jamMode) { jamState.rafId = null; return; }
+      const svgEl = document.querySelector('#notation svg');
+
+      // Only scroll + grade during active playback. When stopped/paused,
+      // park at beat 0 so the first measure sits at the strike line.
+      let absBeat = 0;
+      let playing = false;
+      if (Tone.Transport.state === 'started') {
+        const countInBeats = countInEnabled ? 4 : 0;
+        const raw = transportAbsBeats();
+        // Still in count-in: no scroll yet, targets silent
+        if (raw >= countInBeats) {
+          const chorusBeats = jamState.totalBeats;
+          let b = raw - countInBeats;
+          if (chorusBeats > 0) b = b % chorusBeats;
+          absBeat = b;
+          playing = true;
+        }
+      }
+
+      // Detect chorus wrap: if absBeat went backward meaningfully, reset target judgements
+      if (playing && jamState._lastBeat !== undefined && absBeat < jamState._lastBeat - 2) {
+        jamState.targets.forEach(t => { t.judged = false; t.grade = null; });
+      }
+      jamState._lastBeat = playing ? absBeat : undefined;
+
+      // Scroll: current beat sits under the strike line.
+      if (svgEl) {
+        const currentX = jamState.leadInX + absBeat * jamState.pxPerBeat;
+        const translate = jamState.strikeX - currentX;
+        svgEl.style.transform = 'translateX(' + translate + 'px)';
+      }
+
+      // Grade any target whose beat has just passed the strike line (only while playing)
+      if (playing) {
+        for (const t of jamState.targets) {
+          if (t.judged) continue;
+          if (absBeat >= t.beat) {
+            jamGradeTarget(t);
+          }
+        }
+      }
+
+      jamState.rafId = requestAnimationFrame(jamTick);
+    }
+
+    function jamGradeTarget(target) {
+      target.judged = true;
+      // Look back ~250ms around the crossing
+      const now = performance.now();
+      const windowStart = now - 250;
+      const samples = jamState.pitchHistory.filter(s => s.t >= windowStart);
+
+      let bestCents = null;
+      for (const s of samples) {
+        const diff = s.midi - target.concertMidi;
+        const pc = ((diff % 12) + 12) % 12;
+        if (pc === 0) {
+          const absCents = Math.abs(s.cents);
+          if (bestCents === null || absCents < bestCents) bestCents = absCents;
+        }
+      }
+
+      let grade, pts;
+      if (bestCents === null) {
+        grade = 'miss'; pts = 0;
+      } else if (bestCents <= 25) {
+        grade = 'perfect'; pts = 100;
+      } else if (bestCents <= 60) {
+        grade = 'great'; pts = 70;
+      } else {
+        grade = 'good'; pts = 40;
+      }
+      target.grade = grade;
+      jamApplyGrade(target, grade, pts);
+    }
+
+    function jamApplyGrade(target, grade, basePts) {
+      // Combo + multiplier
+      if (grade === 'miss') {
+        jamState.combo = 0;
+        jamState.multiplier = 1;
+      } else {
+        jamState.combo += 1;
+        if (jamState.combo > jamState.maxCombo) jamState.maxCombo = jamState.combo;
+        // Ramp multiplier: 5, 10, 20 consecutive hits
+        if (jamState.combo >= 20) jamState.multiplier = 4;
+        else if (jamState.combo >= 10) jamState.multiplier = 3;
+        else if (jamState.combo >= 5) jamState.multiplier = 2;
+        else jamState.multiplier = 1;
+      }
+      const earned = basePts * jamState.multiplier;
+      jamState.score += earned;
+
+      // Push to ledger (capped at 10)
+      jamState.hits.push({ grade, t: performance.now() });
+      if (jamState.hits.length > 10) jamState.hits.shift();
+
+      // Flash verdict
+      jamFlashVerdict(grade);
+      jamUpdateScoreboard();
+      jamRenderLedger();
+
+      // Feed XP (Perfect=3 xp, Great=2, Good=1, Miss=0) through existing gamification
+      const xpMap = { perfect: 3, great: 2, good: 1, miss: 0 };
+      const xp = xpMap[grade] || 0;
+      if (xp > 0 && typeof gamification !== 'undefined' && gamification.awardXPPublic) {
+        gamification.awardXPPublic(xp, 'jam');
+      }
+    }
+
+    function jamFlashVerdict(grade) {
+      const el = document.getElementById('jamVerdict');
+      if (!el) return;
+      const labels = { perfect: 'PERFECT', great: 'GREAT', good: 'GOOD', miss: 'MISS' };
+      el.textContent = labels[grade] || '';
+      el.className = 'jam-verdict jam-verdict-' + grade + ' show';
+      clearTimeout(jamState._verdictTimer);
+      jamState._verdictTimer = setTimeout(() => { el.classList.remove('show'); }, 450);
+    }
+
+    function jamUpdateScoreboard() {
+      const scoreEl = document.getElementById('jamScore');
+      const comboEl = document.getElementById('jamCombo');
+      const multEl = document.getElementById('jamMultiplier');
+      if (scoreEl) scoreEl.textContent = jamState.score.toLocaleString();
+      if (comboEl) comboEl.textContent = jamState.combo;
+      if (multEl) {
+        multEl.textContent = jamState.multiplier + '×';
+        multEl.className = 'jam-multiplier jam-mult-' + jamState.multiplier;
+      }
+    }
+
+    function jamRenderLedger() {
+      const el = document.getElementById('jamLedger');
+      if (!el) return;
+      el.innerHTML = '';
+      jamState.hits.forEach(h => {
+        const pip = document.createElement('span');
+        pip.className = 'jam-pip jam-pip-' + h.grade;
+        el.appendChild(pip);
+      });
+    }
+
+    function jamReset() {
+      jamState.targets.forEach(t => { t.judged = false; t.grade = null; });
+      jamState.combo = 0;
+      jamState.multiplier = 1;
+      jamState.maxCombo = 0;
+      jamState.score = 0;
+      jamState.hits = [];
+      jamState.pitchHistory = [];
+      jamState._lastBeat = undefined;
+      jamUpdateScoreboard();
+      jamRenderLedger();
+    }
+
+    function enterJamMode() {
+      // Jam Mode requires per-beat melodic notes. If this tune has no
+      // verified melody (only chord-progression data), bail with a toast
+      // rather than entering a broken state where Melody mode's button
+      // is hidden by updateMelodyAvailability().
+      if (!tuneHasVerifiedMelody(currentProgression)) {
+        gamification.showToastPublic(
+          'info',
+          'Jam Mode needs a verified melody. Try a different tune.',
+          'bi-music-note-beamed'
+        );
+        return;
+      }
+      jamMode = true;
+      document.body.classList.add('jam-on');
+      // Jam requires per-beat melodic notes. Melody mode fits; Licks rotates
+      // per chorus (v2); Symbols/Tones don't have beat-mapped notes. For MVP,
+      // auto-switch to melody when turning on Jam.
+      if (currentMode !== 'melody') {
+        currentMode = 'melody';
+        document.querySelectorAll('.mode-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.mode === 'melody');
+        });
+        // Hide level bar / hear-lick / slide toggle (not needed in melody)
+        document.getElementById('levelBar').style.display = 'none';
+        document.getElementById('hearLickRow').style.display = 'none';
+        document.getElementById('slideToggleRow').style.display = 'none';
+      }
+      document.getElementById('jamToggleBtn').classList.add('active');
+      jamReset();
+      renderNotation();
+      // Scroll loop runs even when not playing — gives a still preview
+      if (!jamState.rafId) jamState.rafId = requestAnimationFrame(jamTick);
+      // Turn on mic prompt (user still has to grant permission; startMic handles it)
+      if (!micActive && typeof startMic === 'function') {
+        gamification.showToastPublic('info', 'Turn on the mic to start scoring', 'bi-mic');
+      }
+    }
+
+    function exitJamMode() {
+      jamMode = false;
+      document.body.classList.remove('jam-on');
+      document.getElementById('jamToggleBtn').classList.remove('active');
+      if (jamState.rafId) { cancelAnimationFrame(jamState.rafId); jamState.rafId = null; }
+      // Persist best score for this tune × instrument
+      const key = currentProgression.id + '|' + currentInstrumentName;
+      const prev = jamState.scoreByTune[key] || { score: 0, combo: 0 };
+      if (jamState.score > prev.score || jamState.maxCombo > prev.combo) {
+        jamState.scoreByTune[key] = {
+          score: Math.max(jamState.score, prev.score),
+          combo: Math.max(jamState.maxCombo, prev.combo),
+          at: new Date().toISOString()
+        };
+        saveJamScores();
+      }
+      // Restore hear-lick / slide toggle visibility based on current mode
+      renderNotation();
+      const isLicks = currentMode === 'licks';
+      document.getElementById('levelBar').style.display = isLicks ? '' : 'none';
+      document.getElementById('hearLickRow').style.display = (isLicks || currentMode === 'melody') ? '' : 'none';
+      const showSlide = isLicks && currentInstrumentName === 'trombone';
+      document.getElementById('slideToggleRow').style.display = showSlide ? '' : 'none';
+    }
+
+    function toggleJamMode() {
+      if (jamMode) exitJamMode(); else enterJamMode();
     }
 
     // =========================================================================
@@ -6208,6 +6692,12 @@
         if (micActive) stopMic(); else startMic();
       });
 
+      // Jam Mode toggle — transforms the entire notation into a Guitar Hero
+      // style scrolling game. See JAM MODE block above renderJamNotation().
+      document.getElementById('jamToggleBtn').addEventListener('click', () => {
+        toggleJamMode();
+      });
+
       // Quotes
       document.getElementById('quotesBtn').addEventListener('click', openQuotes);
       document.getElementById('quotesClose').addEventListener('click', closeQuotes);
@@ -6312,12 +6802,23 @@
 
     // Hide the Melody tab (and auto-exit melody mode) when the current tune
     // has no verified melody data. Chord progression still shows in Licks /
-    // Symbols / Tones modes as expected.
+    // Symbols / Tones modes as expected. Also gates the Jam-Mode toggle —
+    // Jam relies on beat-mapped melody notes, so it's useless without them.
     function updateMelodyAvailability() {
       const hasMelody = tuneHasVerifiedMelody(currentProgression);
       const melodyBtn = document.querySelector('.mode-btn[data-mode="melody"]');
       if (melodyBtn) {
         melodyBtn.style.display = hasMelody ? '' : 'none';
+      }
+      // Jam Mode button mirrors melody availability
+      const jamBtn = document.getElementById('jamToggleBtn');
+      if (jamBtn) {
+        jamBtn.style.display = hasMelody ? '' : 'none';
+      }
+      // If user was in jam mode and the new tune has no melody, drop out
+      // cleanly so we don't leave the UI in a half-transformed state.
+      if (!hasMelody && jamMode) {
+        exitJamMode();
       }
       // If user was in melody mode and the new tune has no melody, bounce
       // to Licks (the main chord-progression practice mode).

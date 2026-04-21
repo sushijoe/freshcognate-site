@@ -1,4 +1,4 @@
-const CACHE_NAME = 'woodshed-v15-compact-pitch-display';
+const CACHE_NAME = 'woodshed-v16-jam-mode';
 const ASSETS = [
   './index.html',
   './woodshed.css',
