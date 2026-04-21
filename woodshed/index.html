@@ -5186,10 +5186,10 @@
       const prog = currentProgression;
       const containerWidth = container.clientWidth || 600;
 
-      // Fixed measure width so scroll speed feels consistent regardless of
-      // viewport size. Each measure is 4 beats; strike line sits at ~30% from
-      // the left so the student has ~70% of viewport as lookahead.
-      const measureWidth = Math.max(200, Math.min(containerWidth, 320));
+      // Wide measures so busy 8th-note passages don't cram. Each measure is
+      // 4 beats; strike line sits at ~25% from the left so the student has
+      // a generous lookahead window.
+      const measureWidth = Math.max(260, Math.min(containerWidth, 420));
       const pxPerBeat = measureWidth / 4;
 
       const clefWidth = 50;
@@ -5197,7 +5197,10 @@
       const timeSigWidth = 30;
       const leadInX = clefWidth + keySigWidth + timeSigWidth;
       const totalWidth = leadInX + prog.measures.length * measureWidth + 20;
-      const height = 165;
+      // Taller staff in jam mode — gives notes, stems, and above-staff
+      // measure numbers room to breathe without overlapping the scoreboard.
+      const height = 200;
+      const staveTop = 40;  // leaves room for the measure-number strip above
 
       // Render a wide SVG. The container is still fixed-width (from CSS), but
       // SVG is absolutely positioned inside and we translate it.
@@ -5222,7 +5225,7 @@
 
         const clef = currentInstrument.clef;
         const displayKey = getTransposedKey();
-        const stave = new VF.Stave(x, 15, w);
+        const stave = new VF.Stave(x, staveTop, w);
         if (isFirst) {
           stave.addClef(clef);
           stave.addKeySignature(displayKey);
@@ -5230,7 +5233,118 @@
         }
         stave.setContext(context).draw();
         renderMeasure(context, stave, measure, i, w, isFirst, isFirst);
-        measureBounds.push({ x: baseX, y: 15, width: measureWidth, height: height - 30 });
+        measureBounds.push({ x: baseX, y: staveTop, width: measureWidth, height: 80 });
+      }
+
+      // ===== Beat tick marks + bold bar lines + measure numbers =====
+      // VexFlow's default bar lines are faint in a scrolling context. Inject
+      // custom markings into the SVG so the student can always see which
+      // beat they're on as the notation flies past the strike line.
+      if (svgEl) {
+        const SVG_NS = 'http://www.w3.org/2000/svg';
+        const gridGroup = document.createElementNS(SVG_NS, 'g');
+        gridGroup.setAttribute('class', 'jam-grid');
+        // Insert at the FRONT so notes render on top of grid lines.
+        svgEl.insertBefore(gridGroup, svgEl.firstChild);
+
+        const staveTopY = staveTop;
+        const staveBotY = staveTop + 50; // 5 lines × 10px ≈ 50
+
+        for (let m = 0; m < prog.measures.length; m++) {
+          const mX = leadInX + m * measureWidth;
+          const barX = m === 0 ? leadInX : mX;
+
+          // Alternating measure shading — a very faint wash to group each
+          // measure visually. Odd measures get a touch more accent tone.
+          const shade = document.createElementNS(SVG_NS, 'rect');
+          shade.setAttribute('x', barX);
+          shade.setAttribute('y', staveTopY - 8);
+          shade.setAttribute('width', measureWidth);
+          shade.setAttribute('height', staveBotY - staveTopY + 16);
+          shade.setAttribute('fill', m % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'rgba(255,120,0,0.04)');
+          gridGroup.appendChild(shade);
+
+          // BOLD bar line at the START of every measure — full-height, bright
+          // white, with a subtle glow. This is the primary visual guide for
+          // "you just entered a new bar."
+          const bar = document.createElementNS(SVG_NS, 'line');
+          bar.setAttribute('x1', barX);
+          bar.setAttribute('x2', barX);
+          bar.setAttribute('y1', staveTopY - 10);
+          bar.setAttribute('y2', staveBotY + 12);
+          bar.setAttribute('stroke', '#ffffff');
+          bar.setAttribute('stroke-opacity', '1');
+          bar.setAttribute('stroke-width', '3');
+          gridGroup.appendChild(bar);
+
+          // Measure number in a pill above the bar line
+          const pillBg = document.createElementNS(SVG_NS, 'rect');
+          pillBg.setAttribute('x', barX - 11);
+          pillBg.setAttribute('y', 8);
+          pillBg.setAttribute('width', 22);
+          pillBg.setAttribute('height', 18);
+          pillBg.setAttribute('rx', 4);
+          pillBg.setAttribute('fill', 'rgba(255,255,255,0.12)');
+          pillBg.setAttribute('stroke', 'rgba(255,255,255,0.25)');
+          pillBg.setAttribute('stroke-width', '1');
+          gridGroup.appendChild(pillBg);
+          const num = document.createElementNS(SVG_NS, 'text');
+          num.setAttribute('x', barX);
+          num.setAttribute('y', 21);
+          num.setAttribute('fill', '#ffffff');
+          num.setAttribute('font-size', '12');
+          num.setAttribute('font-family', 'system-ui, -apple-system, sans-serif');
+          num.setAttribute('font-weight', '700');
+          num.setAttribute('text-anchor', 'middle');
+          num.textContent = (m + 1);
+          gridGroup.appendChild(num);
+
+          // Beat tick marks for beats 2, 3, 4 within the measure. Longer and
+          // brighter than before so you can clearly feel the pulse.
+          for (let beat = 1; beat < 4; beat++) {
+            const tx = mX + beat * pxPerBeat;
+            // Dashed full-height guide at each beat, semi-transparent
+            const tick = document.createElementNS(SVG_NS, 'line');
+            tick.setAttribute('x1', tx);
+            tick.setAttribute('x2', tx);
+            tick.setAttribute('y1', staveTopY - 6);
+            tick.setAttribute('y2', staveBotY + 8);
+            tick.setAttribute('stroke', 'rgba(255,255,255,0.35)');
+            tick.setAttribute('stroke-width', '1');
+            tick.setAttribute('stroke-dasharray', '3 3');
+            gridGroup.appendChild(tick);
+            // Small beat-number caption above (2, 3, 4)
+            const bn = document.createElementNS(SVG_NS, 'text');
+            bn.setAttribute('x', tx);
+            bn.setAttribute('y', staveTopY - 10);
+            bn.setAttribute('fill', 'rgba(255,255,255,0.45)');
+            bn.setAttribute('font-size', '9');
+            bn.setAttribute('font-family', 'system-ui, -apple-system, sans-serif');
+            bn.setAttribute('text-anchor', 'middle');
+            bn.textContent = (beat + 1);
+            gridGroup.appendChild(bn);
+          }
+        }
+        // Final bar line at the end of the chorus — double-line style
+        const endX = leadInX + prog.measures.length * measureWidth;
+        const endBar1 = document.createElementNS(SVG_NS, 'line');
+        endBar1.setAttribute('x1', endX - 3);
+        endBar1.setAttribute('x2', endX - 3);
+        endBar1.setAttribute('y1', staveTopY - 4);
+        endBar1.setAttribute('y2', staveBotY + 4);
+        endBar1.setAttribute('stroke', '#ffffff');
+        endBar1.setAttribute('stroke-opacity', '0.9');
+        endBar1.setAttribute('stroke-width', '2');
+        gridGroup.appendChild(endBar1);
+        const endBar2 = document.createElementNS(SVG_NS, 'line');
+        endBar2.setAttribute('x1', endX);
+        endBar2.setAttribute('x2', endX);
+        endBar2.setAttribute('y1', staveTopY - 4);
+        endBar2.setAttribute('y2', staveBotY + 4);
+        endBar2.setAttribute('stroke', '#ffffff');
+        endBar2.setAttribute('stroke-opacity', '0.9');
+        endBar2.setAttribute('stroke-width', '4');
+        gridGroup.appendChild(endBar2);
       }
 
       // Build the target list: every playable note across the chorus
@@ -5241,10 +5355,10 @@
       jamState.pxPerBeat = pxPerBeat;
       jamState.leadInX = leadInX;
       jamState.totalBeats = prog.measures.length * 4;
-      // Strike line sits at ~30% of the notation-area viewport
+      // Strike line sits at ~25% of the notation-area viewport (more lookahead)
       const areaEl = document.getElementById('notationArea');
       const areaW = areaEl ? areaEl.clientWidth : containerWidth;
-      jamState.strikeX = Math.round(areaW * 0.30);
+      jamState.strikeX = Math.round(areaW * 0.25);
 
       // Position the strike-line element at jamState.strikeX
       const strikeEl = document.getElementById('jamStrikeLine');

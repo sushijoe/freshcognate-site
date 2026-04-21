@@ -1,4 +1,4 @@
-const CACHE_NAME = 'woodshed-v16-jam-mode';
+const CACHE_NAME = 'woodshed-v17-compact-chrome';
 const ASSETS = [
   './index.html',
   './woodshed.css',

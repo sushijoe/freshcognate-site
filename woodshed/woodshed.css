@@ -2431,3 +2431,235 @@ body.jam-on .mode-bar .mode-btn:not(.active) {
   .jam-verdict { font-size: 28px; letter-spacing: 1.5px; }
   .jam-pip { width: 8px; height: 8px; }
 }
+
+/* =========================================================================
+   DESKTOP COMPACT LAYOUT (≥ 900px)
+   On wide viewports the mobile-stacked chrome (header, tune strip,
+   instruments, mode tabs, level tabs, hear-lick, slide toggle — 6+ rows
+   tall) wastes vertical space the staff desperately needs. This block
+   collapses related controls onto fewer rows without touching their
+   markup, so the notation gets ~150-180px more breathing room.
+   ========================================================================= */
+@media (min-width: 900px) {
+
+  /* --- Header: keep as-is but trim vertical padding --- */
+  .app-header {
+    padding: 6px 16px;
+    min-height: 44px;
+  }
+
+  /* --- Tune strip: put composer text + badges INLINE instead of stacked --- */
+  .tune-strip {
+    padding: 4px 16px 5px;
+    gap: 8px;
+  }
+  .tune-strip-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .tune-strip-composer {
+    font-size: 11px;
+    margin: 0;
+  }
+  .tune-strip-badges {
+    margin-top: 0;
+  }
+  .tune-meta-badge {
+    padding: 2px 8px;
+    font-size: 10px;
+  }
+  .tune-fav-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 13px;
+  }
+
+  /* --- Instrument row: tighter padding, same wrap --- */
+  .instrument-row {
+    padding: 4px 10px;
+    gap: 5px;
+  }
+  .inst-btn {
+    padding: 4px 11px;
+    font-size: 11px;
+  }
+
+  /* --- Mode + Level on ONE row ---
+     Desktop: float the level-bar up alongside the mode-bar using negative
+     margin, so they occupy the same visual band. Mode takes ~60% width,
+     level sits to its right. */
+  .mode-bar {
+    padding: 4px 16px;
+    position: relative;
+  }
+  .mode-btn {
+    padding: 6px 4px;
+    font-size: 12px;
+  }
+  /* Level bar: collapse into the right side of the mode bar row */
+  .level-bar {
+    padding: 4px 16px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--section-border);
+    gap: 6px;
+  }
+  .level-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  /* --- Hear Lick + Slide toggle: collapse into ONE row, centered --- */
+  .hear-lick-row {
+    padding: 4px 16px 4px;
+  }
+  .hear-lick-btn {
+    padding: 5px 14px;
+    font-size: 12px;
+  }
+  .slide-toggle-row {
+    padding: 2px 16px 4px;
+    font-size: 11px;
+    justify-content: center;
+  }
+
+  /* --- Notation padding: minimal --- */
+  .notation-area {
+    padding: 6px 8px 8px;
+  }
+
+  /* --- Transport bar: compact all sub-rows --- */
+  .transport-bar {
+    padding: 6px 16px;
+    padding-bottom: calc(6px + var(--safe-bottom));
+  }
+  .transport-controls {
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .transport-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+  }
+  .transport-btn.play-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  /* Tempo + Swing on the SAME row, side by side */
+  .tempo-row {
+    gap: 10px;
+  }
+  .tempo-label {
+    font-size: 11px;
+    min-width: 38px;
+  }
+  .tempo-bpm {
+    font-size: 12px;
+    min-width: 54px;
+  }
+  .swing-row {
+    margin-top: 4px;
+    gap: 10px;
+  }
+  .swing-label {
+    font-size: 11px;
+    min-width: 38px;
+  }
+  .swing-btn {
+    padding: 5px 4px;
+    font-size: 10px;
+  }
+
+  /* Practice row — compact */
+  .practice-row {
+    margin-top: 6px;
+    padding: 4px 4px;
+    gap: 12px;
+  }
+}
+
+/* Wider desktop (≥ 1100px): actually merge rows horizontally.
+   Mode-bar gets ~60% width, level-bar floats to the right on the same line
+   via flexbox on the body-level row container? No — that needs markup.
+   Instead, use display:grid on the parent container stack is tricky without
+   wrapping rows; we settle for trimming vertical padding maximally, and
+   combining hear-lick-row + slide-toggle-row into a single horizontal band
+   via their existing flex alignment. */
+@media (min-width: 1100px) {
+  /* Merge mode-bar + level-bar into one visual row */
+  .level-bar {
+    margin-top: -47px;  /* pull level-bar up onto the mode-bar's row */
+    padding-left: 68%;   /* push level buttons to the right half */
+    padding-right: 16px;
+    border-bottom: none;
+    background: transparent;
+    pointer-events: none;
+  }
+  .level-bar .level-btn {
+    pointer-events: auto;
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+  /* Give the mode-bar extra right padding so mode buttons don't run under
+     the overlaid level buttons */
+  .mode-bar {
+    padding-right: calc(32% + 16px);
+  }
+
+  /* Similarly: overlay slide toggle onto the hear-lick-row */
+  .slide-toggle-row {
+    margin-top: -32px;
+    padding-left: 16px;
+    padding-right: 70%;
+    justify-content: flex-start;
+    pointer-events: none;
+    background: transparent;
+  }
+  .slide-toggle-row .slide-toggle,
+  .slide-toggle-row label {
+    pointer-events: auto;
+  }
+}
+
+/* In Jam Mode on desktop, hide the mode bar entirely — we know we're
+   in Melody. Also skip the instrument-row overlap tweaks since jam has
+   a cleaner layout already. */
+@media (min-width: 900px) {
+  body.jam-on .mode-bar { display: none; }
+}
+
+/* Wider desktop (≥ 1100px): stack tempo-row and swing-row on one visual
+   band so the bottom controls don't eat 4 rows of vertical space.
+   Swing buttons get pulled UP to align with the tempo slider. */
+@media (min-width: 1100px) {
+  .swing-row {
+    margin-top: -28px;
+    padding-left: 58%;
+    background: transparent;
+    pointer-events: none;
+  }
+  .swing-row .swing-label,
+  .swing-row .swing-options,
+  .swing-row .swing-btn {
+    pointer-events: auto;
+  }
+  .swing-row .swing-label { min-width: 30px; font-size: 10px; }
+  .tempo-row {
+    padding-right: 44%;
+  }
+  /* Compact practice row — pull up onto the same horizontal band with
+     the slider tail */
+  .practice-row {
+    margin-top: 4px;
+    padding: 2px 4px;
+    font-size: 11px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+  /* Trim transport button sizing slightly more at this breakpoint */
+  .transport-controls { gap: 10px; margin-bottom: 4px; }
+}
+
