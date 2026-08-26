@@ -22,31 +22,12 @@
   <!-- Header -->
   <header class="app-header">
     <div class="app-title">THE WOODSHED</div>
-    <div class="header-stats">
-      <div class="xp-micro">
-        <span class="xp-micro-label" id="headerLevelLabel">Lv.0 Listener</span>
-        <div class="xp-micro-bar"><div class="xp-micro-fill" id="headerXpFill" style="width:0%"></div></div>
-      </div>
-      <div class="streak-badge" id="headerStreak">
-        <i class="bi bi-fire"></i><span id="headerStreakNum">0</span>
-      </div>
-      <!-- Jam Mode toggle — Guitar-Hero-style scrolling-staff game. When
-           active, notation scrolls horizontally past a strike line and the
-           mic grades each note as it passes. See jam-mode code block. -->
-      <button class="jam-toggle-btn" id="jamToggleBtn" title="Jam Mode (Guitar-Hero-style scrolling staff)">
-        <i class="bi bi-controller"></i>
-        <span class="jam-toggle-label">Jam</span>
-      </button>
-      <button class="stats-toggle-btn" id="statsToggle" title="Stats">
-        <i class="bi bi-bar-chart-line"></i>
-      </button>
-    </div>
     <select class="progression-select" id="progressionSelect">
       <!-- Options populated dynamically from PROGRESSIONS at init -->
     </select>
   </header>
 
-  <!-- Persistent tune metadata strip — under the header, above the stats panel.
+  <!-- Persistent tune metadata strip — directly under the header.
        Populated by updateTuneMetaStrip() on init and on tune change. -->
   <div class="tune-strip" id="tuneStrip">
     <button class="tune-fav-btn" id="tuneFavBtn" title="Favorite" aria-label="Favorite this tune">
@@ -58,81 +39,11 @@
         <span class="tune-meta-badge difficulty" id="tuneStripDifficulty"></span>
         <span class="tune-meta-badge" id="tuneStripForm"></span>
         <span class="tune-meta-badge tempo-source" id="tuneStripTempo"></span>
-        <!-- Parade-ready badge appears when the current tune × instrument has
-             passed the threshold. See updateParadeBadge() + isParadeReady(). -->
-        <span class="tune-meta-badge parade-ready" id="tuneStripParade" style="display:none">
-          <i class="bi bi-megaphone-fill"></i> Parade ready
-        </span>
       </div>
     </div>
     <a class="tune-ref-btn" id="tuneRefBtn" target="_blank" rel="noopener" title="Listen to reference recording" style="display:none">
       <i class="bi bi-play-circle"></i> Listen
     </a>
-  </div>
-
-  <!-- Stats Dashboard (collapsible) -->
-  <div class="stats-panel" id="statsPanel">
-    <div class="stats-profile">
-      <div class="stats-level-name" id="statsLevelName">Listener</div>
-      <div class="stats-xp-label" id="statsXpLabel">0 / 50 XP</div>
-      <div class="xp-bar-full"><div class="xp-bar-full-fill" id="statsXpFill" style="width:0%"></div></div>
-    </div>
-    <div class="quick-stats">
-      <div class="stat-card">
-        <div class="stat-card-num" id="statsChoruses">0</div>
-        <div class="stat-card-label"><i class="bi bi-music-note-beamed"></i> Choruses</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-num" id="statsTime">0m</div>
-        <div class="stat-card-label"><i class="bi bi-clock"></i> Practice</div>
-      </div>
-      <div class="stat-card" title="Unique days practiced in the last 28 days. Forgives rest — you don't lose this by taking time off.">
-        <div class="stat-card-num" id="statsRhythm">0</div>
-        <div class="stat-card-label"><i class="bi bi-heart-pulse"></i> Monthly rhythm</div>
-      </div>
-    </div>
-    <div class="growth-tip-row">
-      <i class="bi bi-stars"></i>
-      <span id="growthTip">Showing up is most of it.</span>
-    </div>
-    <div class="stats-section-label">Tempo &amp; Instruments</div>
-    <div class="tempo-range-row">
-      <div class="tempo-range-label"><i class="bi bi-speedometer2"></i> Tempo range</div>
-      <div class="tempo-range-value" id="statsTempoRange">—</div>
-    </div>
-    <div class="instruments-grid" id="statsInstruments"></div>
-    <div class="stats-section-label">Last 4 Weeks</div>
-    <div class="streak-cal" id="streakCal"></div>
-    <div class="stats-section-label">Achievements <span id="achieveCount">0/20</span></div>
-    <div class="achievements-grid" id="achieveGrid"></div>
-    <div class="stats-section-label">Progressions</div>
-    <div id="progBreakdown"></div>
-    <div class="stats-section-label">Practice Suggestions</div>
-    <div class="suggestions-list" id="practiceSuggestions"></div>
-    <div class="stats-section-label">Recent Sessions</div>
-    <div class="session-list" id="sessionHistory"></div>
-    <button class="share-btn" id="shareBtn"><i class="bi bi-share"></i> Share Progress</button>
-
-    <!-- Your Data — portability + ownership. Export downloads a JSON backup;
-         Import replaces localStorage with the contents of a previously
-         exported file. No server, no account, no tracking. Keeps the user in
-         control of their own practice history. -->
-    <div class="stats-section-label">Your Data</div>
-    <div class="data-panel">
-      <div class="data-panel-blurb">
-        Your progress lives in this browser. Back it up or move it to another
-        device with Export / Import — no login required.
-      </div>
-      <div class="data-panel-actions">
-        <button class="data-btn" id="exportProgressBtn" type="button">
-          <i class="bi bi-download"></i> Export progress
-        </button>
-        <label class="data-btn" for="importProgressInput">
-          <i class="bi bi-upload"></i> Import progress
-        </label>
-        <input type="file" id="importProgressInput" accept="application/json,.json" hidden>
-      </div>
-    </div>
   </div>
 
   <!-- Instrument Picker -->
@@ -184,32 +95,6 @@
 
   <!-- Notation -->
   <div class="notation-area" id="notationArea">
-    <!-- =============================================================
-         JAM MODE HUD — overlay shown only when body.jam-on is set.
-         Strike line, score, combo, multiplier, big verdict flash, and
-         a ledger of the last 8 hits. Built as overlays so toggling Jam
-         on/off doesn't reflow the notation layout. -->
-    <div class="jam-hud" id="jamHud">
-      <div class="jam-scoreboard">
-        <div class="jam-score-group">
-          <div class="jam-score-label">SCORE</div>
-          <div class="jam-score-value" id="jamScore">0</div>
-        </div>
-        <div class="jam-score-group jam-combo-group">
-          <div class="jam-score-label">COMBO</div>
-          <div class="jam-score-value" id="jamCombo">0</div>
-        </div>
-        <div class="jam-score-group jam-mult-group">
-          <div class="jam-multiplier" id="jamMultiplier">1×</div>
-        </div>
-      </div>
-      <div class="jam-ledger" id="jamLedger"></div>
-      <!-- Verdict flash: "PERFECT" / "GREAT" / "GOOD" / "MISS" -->
-      <div class="jam-verdict" id="jamVerdict"></div>
-    </div>
-    <!-- The strike line is drawn inside the scrolling notation, at a fixed
-         viewport-x. It's a full-height vertical bar with a glow. -->
-    <div class="jam-strike-line" id="jamStrikeLine"></div>
     <!-- Current-lick concept label — shows what the user is practicing this
          chorus (e.g. "1. Root only", "6. Bebop scale up"). Hidden outside
          Licks mode. -->
@@ -248,31 +133,7 @@
       <span class="tools-row">
         <button class="ear-btn" id="quotesBtn" title="Drop a quote into your solo"><i class="bi bi-chat-quote"></i> Quotes</button>
         <button class="ear-btn" id="callResponseBtn" title="Call & Response practice"><i class="bi bi-arrow-left-right"></i> Call &amp; Response</button>
-        <button class="ear-btn" id="earTrainBtn"><i class="bi bi-ear"></i> Ear Training</button>
       </span>
-    </div>
-
-    <!-- Ear Training Modal -->
-    <div class="ear-overlay" id="earOverlay">
-      <div class="ear-panel">
-        <div class="ear-header">
-          <span class="ear-title"><i class="bi bi-ear"></i> Ear Training</span>
-          <button class="ear-close" id="earClose"><i class="bi bi-x-lg"></i></button>
-        </div>
-        <div class="ear-tabs">
-          <button class="ear-tab active" data-quiz="intervals">Intervals</button>
-          <button class="ear-tab" data-quiz="chords">Chord Quality</button>
-        </div>
-        <div class="ear-body">
-          <div class="ear-prompt" id="earPrompt">Tap play to start</div>
-          <button class="ear-play-btn" id="earPlayBtn"><i class="bi bi-play-fill"></i> Play</button>
-          <div class="ear-options" id="earOptions"></div>
-          <div class="ear-score">
-            Score: <span id="earScore">0</span> / <span id="earTotal">0</span>
-            <span id="earStreak" class="ear-streak"></span>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Quotes Modal -->
@@ -322,19 +183,6 @@
     </div>
   </div>
 
-  <!-- Pitch Display (visible when mic active) -->
-  <div class="pitch-display" id="pitchDisplay">
-    <div class="pitch-note-name" id="pitchNoteName">—</div>
-    <div class="pitch-cents-wrap">
-      <div class="pitch-cents-bar">
-        <div class="pitch-cents-center"></div>
-        <div class="pitch-cents-marker" id="pitchCentsMarker"></div>
-      </div>
-      <div class="pitch-cents-label" id="pitchCentsLabel"></div>
-    </div>
-    <div class="pitch-match" id="pitchMatch"></div>
-  </div>
-
   <!-- Transport -->
   <div class="transport-bar">
     <div class="transport-controls">
@@ -353,16 +201,6 @@
       <button class="transport-btn" id="harmonyMuteBtn" title="Mute harmony (keep bass + drums) — solo over the rhythm section">
         <i class="bi bi-music-note-list" id="harmonyMuteIcon"></i>
       </button>
-      <button class="transport-btn" id="micBtn" title="Microphone">
-        <i class="bi bi-mic" id="micIcon"></i>
-      </button>
-      <button class="transport-btn" id="recordBtn" title="Record your solo">
-        <i class="bi bi-record-circle" id="recordIcon"></i>
-      </button>
-    </div>
-    <div class="recording-playback" id="recPlayback">
-      <audio id="recAudio" controls></audio>
-      <button id="recDelete" title="Delete recording"><i class="bi bi-trash"></i></button>
     </div>
     <div class="tempo-row">
       <span class="tempo-label">Tempo</span>
@@ -427,6 +265,10 @@
       'G7':   ['G3', 'B3', 'D4', 'F4'],
       'D7':   ['F#3', 'A3', 'C4', 'D4'],
       'A7':   ['A3', 'C#4', 'E4', 'G4'],
+      // Minor ii-V colors — added for chart-verified tunes (e.g. the
+      // Dø7 → G7♭9 cadence in Never Gonna Let You Go).
+      'Dm7b5': ['D3', 'F3', 'Ab3', 'C4'],
+      'G7b9':  ['G3', 'B3', 'F4', 'Ab4'],
       'E7':   ['E3', 'G#3', 'B3', 'D4'],
       'B7':   ['B3', 'D#4', 'F#4', 'A4'],
       'Ab7':  ['Gb3', 'Ab3', 'C4', 'Eb4'],
@@ -494,6 +336,10 @@
       'G7':   ['G2', 'B2', 'D3', 'B2'],
       'D7':   ['D2', 'F#2', 'A2', 'F#2'],
       'A7':   ['A2', 'C#3', 'E3', 'C#3'],
+      // Minor ii-V colors — b9 color stays in the comp voicing; the bass
+      // keeps chord tones (R-3-5 shapes) like every other entry here.
+      'Dm7b5': ['D2', 'F2', 'Ab2', 'F2'],
+      'G7b9':  ['G2', 'B2', 'D3', 'B2'],
       'E7':   ['E2', 'G#2', 'B2', 'G#2'],
       'B7':   ['B2', 'D#3', 'F#3', 'D#3'],
       'Ab7':  ['Ab2', 'C3', 'Eb3', 'C3'],
@@ -571,6 +417,9 @@
 
     // Compact song builder. def = { id, t: title, cp: composer, k: key,
     // bpm, sec: bookSection, m: [chord strings OR {c:chord, ml:melody}],
+    //   Split bars: {c:'F7', chords:[['F7',2],['Dm7b5',1],['G7b9',1]]} puts
+    //   several chords in ONE bar ([chord, beats] pairs summing to the bar).
+    //   c must equal the first chord; renderer + audio honor the splits.
     // cl: clef ('bass'|'treble'), mpl: measuresPerLine,
     // tb/ti/ta: tips,
     // form: 'head' | 'solo-form' | 'outro-turnaround' | 'vamp' | 'bridge'
@@ -587,11 +436,18 @@
     //              rendered as a "Listen" button under the tune picker.
     function mkProg(def) {
       const tempo = def.bpm || 110;
-      const chordSet = new Set(def.m.map(mm => typeof mm === 'string' ? mm : mm.c));
+      const chordSet = new Set();
+      def.m.forEach(mm => {
+        if (typeof mm === 'string') { chordSet.add(mm); return; }
+        if (mm.c) chordSet.add(mm.c);
+        (mm.chords || []).forEach(pair => chordSet.add(pair[0]));
+      });
       const V = {}, B = {};
       chordSet.forEach(c => {
-        V[c] = VOICINGS[c] || VOICINGS['Bb7'];
-        B[c] = BASS_NOTES[c] || BASS_NOTES['Bb7'];
+        // No silent fallback: a chord without a real voicing must fail
+        // validation loudly, never comp a wrong chord underneath the student.
+        if (VOICINGS[c]) V[c] = VOICINGS[c];
+        if (BASS_NOTES[c]) B[c] = BASS_NOTES[c];
       });
       const sec = def.sec || 'core';
       return {
@@ -610,6 +466,13 @@
         measures: def.m.map(mm => {
           if (typeof mm === 'string') return { chord: mm, beats: 4 };
           const out = { chord: mm.c, beats: 4 };
+          // Split bar: [chord, beats] pairs. measure.chord stays the first
+          // chord (fallback for one-chord-per-bar consumers); the renderer
+          // and audio scheduler read measure.chords for the real harmony.
+          if (mm.chords) {
+            out.chords = mm.chords.map(pair => ({ chord: pair[0], beats: pair[1] }));
+            out.chord = mm.c || mm.chords[0][0];
+          }
           if (mm.ml) out.melody = mm.ml;
           // Per-instrument parts — { tuba: [...], trombone: [...], ... }
           // Each part is in concert pitch. Renderer handles transposition.
@@ -678,6 +541,27 @@
         if (!m.chord) errors.push('m' + (i+1) + ': no chord');
         if (tune.audio && tune.audio.voicings && m.chord && !tune.audio.voicings[m.chord]) {
           errors.push('m' + (i+1) + ': chord "' + m.chord + '" has no voicing');
+        }
+        // Split-bar validation: sub-chords must sum to the bar, every
+        // sub-chord needs a voicing, and measure.chord must be the first one.
+        if (m.chords) {
+          if (!Array.isArray(m.chords) || !m.chords.length) {
+            errors.push('m' + (i+1) + ': chords must be a non-empty array');
+          } else {
+            const sum = m.chords.reduce((s, sc) => s + (sc.beats || 0), 0);
+            if (sum !== (m.beats || 4)) {
+              errors.push('m' + (i+1) + ': split chords sum to ' + sum + ' beats, expected ' + (m.beats || 4));
+            }
+            m.chords.forEach(sc => {
+              if (!sc.chord) errors.push('m' + (i+1) + ': split entry missing chord');
+              else if (tune.audio && tune.audio.voicings && !tune.audio.voicings[sc.chord]) {
+                errors.push('m' + (i+1) + ': split chord "' + sc.chord + '" has no voicing');
+              }
+            });
+            if (m.chords[0].chord !== m.chord) {
+              errors.push('m' + (i+1) + ': measure.chord must equal the first split chord');
+            }
+          }
         }
         // Validate per-instrument parts (if present)
         if (m.parts) {
@@ -967,8 +851,17 @@
       // ♩=85, "Swing 16ths" feel. Chord progression is C7 - F7 - Dø7 -
       // G7b9, a minor-blues color with dominant tonic. (Book listed Gm but
       // the actual chart is in Cm.)
+      // Verified against band's 9/11/24 tuba chart — ♩=85, swing 16ths,
+      // 3-flat signature (Cm). The true form is FOUR bars: the minor ii-V
+      // (Dø7 → G7♭9) is packed into beats 3-4 of bars 2 and 4 (the tuba
+      // line hits B natural under the G7♭9). "Solos over 1 (16)" on the
+      // chart = this 4-bar phrase cycled 4×.
       mkProg({id:'never-gonna-let-you-go', t:'Never Gonna Let You Go', cp:'24:43', k:'Cm', bpm:85, sec:'core',
-        m:['C7','F7','Dm7','G7','C7','F7','Dm7','G7'],
+        form:'solo-form', tempoSource:'pdf',
+        m:['C7',
+           { c:'F7', chords:[['F7',2],['Dm7b5',1],['G7b9',1]] },
+           'C7',
+           { c:'F7', chords:[['F7',2],['Dm7b5',1],['G7b9',1]] }],
         tb:['Swing-16ths groove in Cm. C7 as bluesy dominant tonic.','C blues scale (C Eb F Gb G Bb) works over the whole form.','Pace yourself — 85 BPM with swung 16ths feels busy. Leave space.'],
         ti:['The Dm7(b5) → G7(b9) → C7 is a classic minor ii-V-i cadence.','Target guide tones: 3rd and b7 of each chord on strong beats.','C harmonic minor (C D Eb F G Ab B) resolves beautifully over G7b9.'],
         ta:['Over Dm7b5-G7b9, play C harmonic minor or altered-scale lines.','Chromatic approaches into the 3rd of F7 (A natural).','Tuba PU (pickup) entries between sections — land your phrases with the pickup.']
@@ -1016,21 +909,25 @@
       // still need their PDFs transcribed — they currently fall back to
       // slash notation (which is the proper "part not yet available"
       // state, not wrong data).
-      mkProg({id:'do-whatcha-wanna', t:'Do Whatcha Wanna', cp:'Rebirth Brass Band', k:'Bb', bpm:160, sec:'active',
+      // Re-verified against band's tuba chart (2026-08): key is Eb — 3-flat
+      // signature, B/C-section riffs arpeggiate Eb and Ab triads, D-section
+      // vamps on an Eb pedal. Earlier data had this a whole step off in Bb.
+      // ♩=160 read from the same chart.
+      mkProg({id:'do-whatcha-wanna', t:'Do Whatcha Wanna', cp:'Rebirth Brass Band', k:'Eb', bpm:160, sec:'active',
         form:'solo-form', tempoSource:'pdf',
         m:[
-          'Bb7',
-          'Bb7',
+          'Eb7',
+          'Eb7',
+          'Ab7',
+          'Ab7',
           'Eb7',
           'Eb7',
           'Bb7',
-          'Bb7',
-          'F7',
-          'Bb7'
+          'Eb7'
         ],
-        tb:['Rebirth signature tune in Bb. I7-IV7-V7 vamp at ♩=160.','Each instrument has its own part — switch to your instrument and see what YOU play.','Form: A (4x) → B (4x) → C (4x) → D (8x).'],
+        tb:['Rebirth signature tune in Eb. I7-IV7-V7 vamp at ♩=160.','The riffs outline the changes — hear Eb move to Ab and back.','Form: A (4x) → B (4x) → C (4x) → D (8x).'],
         ti:['Tuba plays the iconic dotted-quarter + 8th "up-down" bass line.','Trombone plays a syncopated harmonic counter-line.','Trumpet plays the high "do whatcha wanna" hook.'],
-        ta:['Major 3rd (D) + minor 3rd (Db) together = classic NOLA bend.','Phil Frazier\'s tuba line drives the groove — match his swing.','For other instruments (horn, saxes, clarinet, piano), parts still need transcribing.']
+        ta:['Major 3rd (G) + minor 3rd (Gb) together = classic NOLA bend.','Phil Frazier\'s tuba line drives the groove — match his swing.','For other instruments (horn, saxes, clarinet, piano), parts still need transcribing.']
       }),
       // Verified against band's tuba + Bb trumpet scores — Eb major
       // (3 flats), ballad tempo ~85. Only two chords: Eb7 and Ab7 (I7-IV7).
@@ -1108,7 +1005,9 @@
       // 16-bar gospel hymn form. Melody extracted from Bb-horns part
       // (trumpet/clarinet) transposed to concert F. Lyrics: "Bye and bye,
       // when the morning comes, when the saints all have gathered home".
+      // Verified against band's tuba chart: all 16 bars and ♩=190 match.
       mkProg({id:'bye-and-bye', t:'By and By', cp:'Traditional', k:'F', bpm:190, sec:'active',
+        tempoSource:'pdf',
         m:[
           'F',
           'F',
@@ -1301,7 +1200,10 @@
       // trumpet Am-G-Dm7-Em7-Am = concert Gm-F-Cm7-Dm7-Gm ✓. Tempo 140.
       // G dorian (1 flat key sig). Melody approximated from the section 2
       // vocal hook contour.
+      // Verified against band's 081324 tuba chart: solo section printed as
+      // Gm ×2 | F ×2 | Cm7 | Dm7 | Gm ×2 at ♩=140 — exact match.
       mkProg({id:'she-works-hard', t:'She Works Hard For the Money', cp:'Donna Summer, arr. SO', k:'Gm', bpm:140, sec:'active',
+        tempoSource:'pdf',
         m:[
           'Gm',
           'Gm',
@@ -1673,6 +1575,7 @@
         timeSignature: '4/4',
         defaultTempo: 120,
         tempoRange: [60, 200],
+        tempoSource: 'estimate',
         measures: [
           { chord: 'Bb7', beats: 4 },
           { chord: 'Bb7', beats: 4 },
@@ -1736,6 +1639,7 @@
         timeSignature: '4/4',
         defaultTempo: 120,
         tempoRange: [60, 200],
+        tempoSource: 'estimate',
         measures: [
           { chord: 'F7',  beats: 4 },
           { chord: 'F7',  beats: 4 },
@@ -1797,6 +1701,7 @@
         timeSignature: '4/4',
         defaultTempo: 100,
         tempoRange: [50, 180],
+        tempoSource: 'estimate',
         measures: [
           { chord: 'Cm7',    beats: 4 },
           { chord: 'F7',     beats: 4 },
@@ -1858,6 +1763,7 @@
         timeSignature: '4/4',
         defaultTempo: 120,
         tempoRange: [60, 200],
+        tempoSource: 'estimate',
         measures: [
           { chord: 'Eb7', beats: 4 },
           { chord: 'Eb7', beats: 4 },
@@ -1920,6 +1826,7 @@
         timeSignature: '4/4',
         defaultTempo: 110,
         tempoRange: [50, 180],
+        tempoSource: 'estimate',
         measures: [
           { chord: 'Cm7', beats: 4 },
           { chord: 'Cm7', beats: 4 },
@@ -1986,6 +1893,7 @@
         timeSignature: '4/4',
         defaultTempo: 132,
         tempoRange: [100, 180],
+        tempoSource: 'estimate',
         measures: [
           { chord: 'Bb7', beats: 4 },
           { chord: 'Bb7', beats: 4 },
@@ -2042,6 +1950,7 @@
         timeSignature: '4/4',
         defaultTempo: 108,
         tempoRange: [80, 150],
+        tempoSource: 'estimate',
         measures: [
           { chord: 'Eb7', beats: 4 },
           { chord: 'Ab7', beats: 4 },
@@ -2098,6 +2007,7 @@
         timeSignature: '4/4',
         defaultTempo: 116,
         tempoRange: [80, 160],
+        tempoSource: 'estimate',
         measures: [
           { chord: 'BbMaj7', beats: 4 },
           { chord: 'BbMaj7', beats: 4 },
@@ -3254,7 +3164,8 @@
     let isLooping = true;
     let chorusCount = 1;
     let currentMeasure = -1;
-    let measureBounds = [];
+    let measureBounds = [];      // logical (layout-space) rects, one per measure
+    let notationScale = 1;       // display px per layout px — set by renderNotation
     let audioReady = false;
     let isMuted = false; // Start UNMUTED — user hits play, they hear the band
     let isHarmonyMuted = false; // Solo-over-rhythm-section mode: mute comping, keep bass+drums
@@ -3280,39 +3191,6 @@
     function saveLickFavorites() {
       try { localStorage.setItem(LICK_FAV_KEY, JSON.stringify([...lickFavorites])); }
       catch (e) { /* quota or private-mode; non-fatal */ }
-    }
-
-    // =========================================================================
-    // JAM MODE STATE
-    // Guitar-Hero-style scrolling staff. When on, the notation unrolls into
-    // one wide horizontal row and scrolls right→left past a strike line. Mic
-    // samples each note as it crosses the line and grades it. See buildJamTargets,
-    // jamTick, jamGradeTarget below.
-    // =========================================================================
-    let jamMode = false;
-    const JAM_SCORES_KEY = 'woodshed.jamScores.v1';
-    const jamState = {
-      targets: [],            // [{beat, x, midi, noteName, octave, judged, grade}]
-      combo: 0,
-      multiplier: 1,
-      maxCombo: 0,
-      score: 0,
-      hits: [],               // recent grades for ledger (capped at 10)
-      rafId: null,
-      totalWidth: 0,          // width of the unrolled staff in px
-      totalBeats: 0,          // beats in one chorus
-      pxPerBeat: 0,
-      strikeX: 0,             // strike line pixel X (inside viewport)
-      scoreByTune: {},        // persisted best scores: { 'tune-id|inst': { score, combo } }
-      pitchHistory: []        // rolling pitch samples: { t, midi, cents }
-    };
-    try {
-      const stored = JSON.parse(localStorage.getItem(JAM_SCORES_KEY) || '{}');
-      if (stored && typeof stored === 'object') jamState.scoreByTune = stored;
-    } catch (e) { /* ignore */ }
-    function saveJamScores() {
-      try { localStorage.setItem(JAM_SCORES_KEY, JSON.stringify(jamState.scoreByTune)); }
-      catch (e) { /* non-fatal */ }
     }
 
     // Extract the leading concept number from a lick name like "1. Root only".
@@ -3384,985 +3262,6 @@
 
     let currentInstrument = INSTRUMENTS['bass-concert'];
     let currentInstrumentName = 'trombone';
-
-    // =========================================================================
-    // GAMIFICATION ENGINE
-    // =========================================================================
-
-    const gamification = (function() {
-      const STORAGE_KEY = 'woodshed_progress';
-
-      // Growth-mindset ladder: every rung names an identity/role you grow INTO,
-      // not a fixed "elite" state. Level numbers + thresholds stay unchanged so
-      // existing users don't see a demotion — only the title strings changed.
-      const XP_LEVELS = [
-        { level: 0,  name: 'Listener',           xp: 0 },
-        { level: 1,  name: 'Woodshedder',        xp: 50 },
-        { level: 2,  name: 'Tone Seeker',        xp: 150 },
-        { level: 3,  name: 'Groove Keeper',      xp: 350 },
-        { level: 4,  name: 'Changes Runner',     xp: 650 },
-        { level: 5,  name: 'Bebopper',           xp: 1100 },
-        { level: 6,  name: 'Session Player',     xp: 1800 },
-        { level: 7,  name: 'First Call',         xp: 2800 },
-        { level: 8,  name: 'Sideperson',         xp: 4200 },
-        { level: 9,  name: 'Bandleader',         xp: 6500 },
-        { level: 10, name: 'Tradition-bearer',   xp: 10000 }
-      ];
-
-      const ACHIEVEMENTS = [
-        // Consistency
-        { id: 'first-steps',     name: 'First Steps',            desc: 'Complete your first session',            icon: 'bi-play-circle',       cat: 'consistency', check: d => d.stats.totalSessions >= 1 },
-        { id: 'hour-of-power',   name: 'Hour of Power',          desc: '1 hour total practice',                  icon: 'bi-clock-history',     cat: 'consistency', check: d => d.stats.totalPracticeSec >= 3600 },
-        { id: 'five-hour-club',  name: 'Five-Hour Club',         desc: '5 hours total practice',                 icon: 'bi-hourglass-split',   cat: 'consistency', check: d => d.stats.totalPracticeSec >= 18000 },
-        { id: 'hot-streak',      name: 'Hot Streak',             desc: '3-day practice streak',                  icon: 'bi-fire',              cat: 'consistency', check: d => d.streak.longest >= 3 },
-        { id: 'iron-discipline', name: 'Iron Discipline',        desc: '7-day practice streak',                  icon: 'bi-calendar-check',    cat: 'consistency', check: d => d.streak.longest >= 7 },
-        { id: 'month-woodshed',  name: 'Month of Woodshedding',  desc: '30-day practice streak',                 icon: 'bi-calendar-heart',    cat: 'consistency', check: d => d.streak.longest >= 30 },
-        // Choruses
-        { id: 'first-chorus',    name: 'First Chorus',           desc: 'Complete your first chorus',             icon: 'bi-music-note',        cat: 'choruses',    check: d => d.stats.totalChoruses >= 1 },
-        { id: 'ten-rounds',      name: 'Ten Rounds',             desc: '10 choruses total',                      icon: 'bi-music-note-list',   cat: 'choruses',    check: d => d.stats.totalChoruses >= 10 },
-        { id: 'century',         name: 'Century',                desc: '100 choruses total',                     icon: 'bi-trophy',            cat: 'choruses',    check: d => d.stats.totalChoruses >= 100 },
-        { id: 'five-hundred',    name: 'Five Hundred',           desc: '500 choruses total',                     icon: 'bi-star-fill',         cat: 'choruses',    check: d => d.stats.totalChoruses >= 500 },
-        // Exploration
-        { id: 'all-blues',       name: 'All Blues',              desc: 'Play all progressions',                  icon: 'bi-collection',        cat: 'explore',     check: d => Object.values(d.stats.progressions).filter(p => p.choruses > 0).length >= Object.keys(PROGRESSIONS).length },
-        { id: 'mode-explorer',   name: 'Mode Explorer',          desc: 'Use all 3 modes',                        icon: 'bi-compass',           cat: 'explore',     check: d => Object.values(d.stats.modes).filter(m => m.choruses > 0).length >= 3 },
-        { id: 'level-up',        name: 'Level Up',               desc: 'Practice at all 3 difficulty levels',    icon: 'bi-bar-chart-steps',   cat: 'explore',     check: d => Object.values(d.stats.levels).filter(l => l.choruses > 0).length >= 3 },
-        { id: 'renaissance',     name: 'Renaissance Player',     desc: 'All progression/mode/level combos',       icon: 'bi-globe',             cat: 'explore',     check: d => (d.stats.combos || []).length >= Object.keys(PROGRESSIONS).length * 9 },
-        // Mastery
-        { id: 'bb-master',       name: 'Bb Blues Master',        desc: '50 choruses on Bb Blues',                icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['bb-blues']||{}).choruses >= 50 },
-        { id: 'f-master',        name: 'F Blues Master',         desc: '50 choruses on F Blues',                 icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['f-blues']||{}).choruses >= 50 },
-        { id: 'ii-v-i-master',   name: 'ii-V-I Master',         desc: '50 choruses on ii-V-I',                  icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['ii-v-i-bb']||{}).choruses >= 50 },
-        { id: 'eb-master',       name: 'Eb Blues Master',       desc: '50 choruses on Eb Blues',                icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['eb-blues']||{}).choruses >= 50 },
-        { id: 'minor-master',    name: 'Minor Blues Master',    desc: '50 choruses on Minor Blues',             icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['c-minor-blues']||{}).choruses >= 50 },
-        { id: 'nola-master',     name: 'Second Line Master',   desc: '50 choruses on Second Line',            icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['nola-second-line']||{}).choruses >= 50 },
-        { id: 'funk-master',     name: 'NOLA Funk Master',     desc: '50 choruses on NOLA Funk',              icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['nola-funk']||{}).choruses >= 50 },
-        { id: 'trad-master',     name: 'Brass Band Master',    desc: '50 choruses on Brass Band Trad',        icon: 'bi-award',             cat: 'mastery',     check: d => (d.stats.progressions['nola-traditional']||{}).choruses >= 50 },
-        // Fun
-        { id: 'night-owl',       name: 'Night Owl',              desc: 'Practice after 10 PM',                   icon: 'bi-moon-stars',        cat: 'fun',         check: d => d.stats._nightOwl },
-        { id: 'early-bird',      name: 'Early Bird',             desc: 'Practice before 7 AM',                   icon: 'bi-sunrise',           cat: 'fun',         check: d => d.stats._earlyBird },
-        { id: 'marathon',        name: 'Marathon',               desc: '30+ minute session',                     icon: 'bi-stopwatch',         cat: 'fun',         check: d => d.stats._marathon }
-      ];
-
-      // --- Private state ---
-      let data = null;
-      let sessionStartTime = null;
-      let pauseStartTime = null;
-      let totalPausedMs = 0;
-      let modesUsedThisSession = new Set();
-      let progressionsToday = new Set();
-      let sessionActive = false;
-      let saveTimer = null;
-
-      // --- Helpers ---
-      function todayStr() {
-        return new Date().toISOString().slice(0, 10);
-      }
-
-      function formatTime(sec) {
-        if (sec < 60) return sec + 's';
-        const m = Math.floor(sec / 60);
-        if (m < 60) return m + 'm';
-        const h = Math.floor(m / 60);
-        return h + 'h ' + (m % 60) + 'm';
-      }
-
-      // --- Persistence ---
-      function createDefaults() {
-        const progs = {};
-        Object.keys(PROGRESSIONS).forEach(id => {
-          // Per-tune temporal fields let us show "played 14 times, first 3 weeks
-          // ago, max 160 BPM" — progress against self, the growth-mindset frame.
-          // levelsAttempted tracks stretch moments: the first time you open a
-          // harder level on this tune. paradeReady is tune × instrument.
-          progs[id] = {
-            choruses: 0,
-            practiceSec: 0,
-            sessions: 0,
-            maxTempo: null,
-            firstPlayedAt: null,
-            lastPlayedAt: null,
-            levelsAttempted: [],
-            paradeReady: {}  // { trombone: { choruses, maxTempo, lastAt } }
-          };
-        });
-        return {
-          schemaVersion: 2,
-          userId: null,
-          syncedAt: null,
-          stats: {
-            totalPracticeSec: 0,
-            totalChoruses: 0,
-            totalSessions: 0,
-            progressions: progs,
-            modes: { symbols: { choruses: 0 }, licks: { choruses: 0 }, tones: { choruses: 0 } },
-            levels: { beginner: { choruses: 0 }, intermediate: { choruses: 0 }, advanced: { choruses: 0 } },
-            // Per-instrument choruses — one entry per INSTRUMENT_LIST member.
-            // Populated on demand in onChorusComplete so new instruments added
-            // later don't need a schema migration.
-            instruments: {},
-            // Tempo range seen across all practice. minBpm / maxBpm let the
-            // dashboard show "practiced between 90-180 BPM" as facility signal.
-            tempos: { minBpm: null, maxBpm: null },
-            combos: [],
-            // Bravery counters — cumulative counts of stretch behaviors. Used
-            // to surface growth-mindset stats ("you braved the record button 14
-            // times") and unlock future achievements without touching XP math.
-            bravery: {
-              slowPractice: 0,   // choruses at <70% of tune's target
-              soloMute: 0,       // choruses with harmony muted
-              loopFocus: 0,      // loop-range active chorus completions
-              recordAttempts: 0, // record button starts
-              newTunes: 0,       // first chorus on a never-played tune
-              levelStretches: 0  // first chorus at a higher level on a tune
-            },
-            _nightOwl: false,
-            _earlyBird: false,
-            _marathon: false
-          },
-          xp: { total: 0, level: 0, levelName: 'Listener' },
-          streak: { current: 0, longest: 0, lastPracticeDate: null, history: [] },
-          achievements: {},
-          sessions: []
-        };
-      }
-
-      function load() {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (raw) {
-            data = JSON.parse(raw);
-            // Ensure new progressions exist + backfill schema-v2 fields on
-            // existing entries. Additive migration — no data loss.
-            Object.keys(PROGRESSIONS).forEach(id => {
-              if (!data.stats.progressions[id]) {
-                data.stats.progressions[id] = {
-                  choruses: 0, practiceSec: 0, sessions: 0,
-                  maxTempo: null, firstPlayedAt: null, lastPlayedAt: null,
-                  levelsAttempted: [], paradeReady: {}
-                };
-              } else {
-                const p = data.stats.progressions[id];
-                if (p.maxTempo === undefined) p.maxTempo = null;
-                if (p.firstPlayedAt === undefined) p.firstPlayedAt = null;
-                if (p.lastPlayedAt === undefined) p.lastPlayedAt = null;
-                if (!p.levelsAttempted) p.levelsAttempted = [];
-                if (!p.paradeReady) p.paradeReady = {};
-              }
-            });
-            if (!data.stats.combos) data.stats.combos = [];
-            if (!data.stats.instruments) data.stats.instruments = {};
-            if (!data.stats.tempos) data.stats.tempos = { minBpm: null, maxBpm: null };
-            if (!data.stats.bravery) {
-              data.stats.bravery = {
-                slowPractice: 0, soloMute: 0, loopFocus: 0,
-                recordAttempts: 0, newTunes: 0, levelStretches: 0
-              };
-            }
-            if (data.stats._nightOwl === undefined) data.stats._nightOwl = false;
-            if (data.stats._earlyBird === undefined) data.stats._earlyBird = false;
-            if (data.stats._marathon === undefined) data.stats._marathon = false;
-            // Refresh level name — the XP ladder titles evolved in v2 (e.g.
-            // "Monster" → "Bandleader"). Keep user's XP + level number intact;
-            // just re-derive the current title from the new table.
-            for (let i = XP_LEVELS.length - 1; i >= 0; i--) {
-              if ((data.xp.total || 0) >= XP_LEVELS[i].xp) {
-                data.xp.level = XP_LEVELS[i].level;
-                data.xp.levelName = XP_LEVELS[i].name;
-                break;
-              }
-            }
-            data.schemaVersion = 2;
-          } else {
-            data = createDefaults();
-          }
-        } catch (e) {
-          data = createDefaults();
-        }
-      }
-
-      function save() {
-        clearTimeout(saveTimer);
-        saveTimer = setTimeout(() => {
-          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
-        }, 300);
-      }
-
-      // --- XP Engine ---
-      // Bravery XP events get tagged so we can show a different toast and
-      // (eventually) report on stretch activity separately from grind activity.
-      function awardXP(amount, kind) {
-        data.xp.total += amount;
-        checkLevelUp();
-        save();
-        updateHeaderXP();
-        if (kind === 'bravery' && amount > 0) {
-          // One affirming message per event. Picker varies the copy so it
-          // doesn't feel repetitive.
-          const bravePhrases = [
-            'You stretched — ',
-            'Brave move — ',
-            'Growth mindset — ',
-            'Nice reach — ',
-            'Good risk — '
-          ];
-          const p = bravePhrases[Math.floor(Math.random() * bravePhrases.length)];
-          showToast('bravery', p + '+' + amount + ' XP', 'bi-lightning-charge-fill');
-        }
-      }
-
-      // Record one-shot bravery events per session so we don't spam the user
-      // with XP for the same behavior over and over.
-      const _bravedThisSession = new Set();
-      function brave(eventKey, amount, counterField) {
-        if (_bravedThisSession.has(eventKey)) return;
-        _bravedThisSession.add(eventKey);
-        if (counterField && data.stats.bravery) {
-          data.stats.bravery[counterField] = (data.stats.bravery[counterField] || 0) + 1;
-        }
-        awardXP(amount, 'bravery');
-      }
-
-      // Parade-ready test: tune + instrument must have enough reps AT target
-      // tempo to go on the road. 14-day freshness window keeps it honest —
-      // "ready" means you've played it recently, not in a long-ago past.
-      function isParadeReady(progId, instName) {
-        const prog = data.stats.progressions[progId];
-        const tune = PROGRESSIONS[progId];
-        if (!prog || !tune) return false;
-        const pr = (prog.paradeReady || {})[instName];
-        if (!pr || pr.choruses < 10) return false;
-        const target = tune.defaultTempo || 120;
-        if ((pr.maxTempo || 0) < target) return false;
-        if (!pr.lastAt) return false;
-        const ageDays = (Date.now() - new Date(pr.lastAt).getTime()) / 86400000;
-        return ageDays <= 14;
-      }
-
-      // Unique days practiced in the last 28. This replaces the punitive
-      // "current streak" frame with a rolling fitness metric that doesn't
-      // reset to zero the moment life gets in the way.
-      function monthlyRhythm() {
-        if (!data.streak || !data.streak.history) return 0;
-        const cutoff = Date.now() - 28 * 86400000;
-        const cutoffStr = new Date(cutoff).toISOString().slice(0, 10);
-        const unique = new Set();
-        for (const ds of data.streak.history) {
-          if (ds >= cutoffStr) unique.add(ds);
-        }
-        return unique.size;
-      }
-
-      function checkLevelUp() {
-        const oldLevel = data.xp.level;
-        for (let i = XP_LEVELS.length - 1; i >= 0; i--) {
-          if (data.xp.total >= XP_LEVELS[i].xp) {
-            data.xp.level = XP_LEVELS[i].level;
-            data.xp.levelName = XP_LEVELS[i].name;
-            break;
-          }
-        }
-        if (data.xp.level > oldLevel) {
-          showToast('level', 'Level Up! You\'re now ' + (data.xp.level <= 1 ? 'a ' : '') + data.xp.levelName, 'bi-arrow-up-circle-fill');
-        }
-      }
-
-      function xpForNextLevel() {
-        const next = XP_LEVELS.find(l => l.xp > data.xp.total);
-        return next ? next.xp : XP_LEVELS[XP_LEVELS.length - 1].xp;
-      }
-
-      function xpForCurrentLevel() {
-        let xp = 0;
-        for (let i = XP_LEVELS.length - 1; i >= 0; i--) {
-          if (data.xp.total >= XP_LEVELS[i].xp) { xp = XP_LEVELS[i].xp; break; }
-        }
-        return xp;
-      }
-
-      // --- Streak ---
-      function updateStreak() {
-        const today = todayStr();
-        if (data.streak.lastPracticeDate === today) return; // Already counted today
-
-        const last = data.streak.lastPracticeDate;
-        if (last) {
-          const lastDate = new Date(last + 'T00:00:00');
-          const todayDate = new Date(today + 'T00:00:00');
-          const diffDays = Math.round((todayDate - lastDate) / 86400000);
-          if (diffDays === 1) {
-            data.streak.current++;
-          } else {
-            data.streak.current = 1;
-          }
-        } else {
-          data.streak.current = 1;
-        }
-
-        data.streak.lastPracticeDate = today;
-        if (data.streak.current > data.streak.longest) {
-          data.streak.longest = data.streak.current;
-          if (data.streak.current === 3 || data.streak.current === 7 || data.streak.current === 30) {
-            showToast('streak', data.streak.current + '-Day Streak!', 'bi-fire');
-          }
-        }
-
-        // History (cap at 90)
-        if (!data.streak.history.includes(today)) {
-          data.streak.history.push(today);
-          if (data.streak.history.length > 90) data.streak.history.shift();
-        }
-
-        updateHeaderStreak();
-        save();
-      }
-
-      // --- Achievements ---
-      function checkAchievements() {
-        const newlyUnlocked = [];
-        ACHIEVEMENTS.forEach(a => {
-          if (!data.achievements[a.id] || !data.achievements[a.id].unlocked) {
-            if (a.check(data)) {
-              data.achievements[a.id] = { unlocked: true, unlockedAt: new Date().toISOString() };
-              newlyUnlocked.push(a);
-            }
-          }
-        });
-        newlyUnlocked.forEach(a => {
-          showToast('achievement', a.name, a.icon);
-        });
-        if (newlyUnlocked.length > 0) save();
-      }
-
-      // --- Session Tracking ---
-      function startSession(progId, mode, level) {
-        if (sessionActive) return;
-        sessionActive = true;
-        sessionStartTime = Date.now();
-        pauseStartTime = null;
-        totalPausedMs = 0;
-        modesUsedThisSession = new Set([mode]);
-        progressionsToday = new Set();
-        // Reset the "one bravery award per session" tracker
-        _bravedThisSession.clear();
-
-        // First session of the day bonus
-        const today = todayStr();
-        const todaySessions = data.sessions.filter(s => s.startedAt && s.startedAt.startsWith(today));
-        if (todaySessions.length === 0) {
-          awardXP(20);
-          // Affirm the return — especially important if there was a gap. Growth
-          // mindset frames this as "welcome back," never "streak broken."
-          const lastDate = data.streak && data.streak.lastPracticeDate;
-          if (lastDate && lastDate !== today) {
-            const gapDays = Math.floor(
-              (new Date(today) - new Date(lastDate)) / 86400000
-            );
-            if (gapDays >= 3) {
-              showToast('bravery', 'Welcome back. Starting fresh today.', 'bi-emoji-smile');
-            }
-          }
-        }
-
-        // Time-based fun achievements
-        const hour = new Date().getHours();
-        if (hour >= 22 || hour < 4) data.stats._nightOwl = true;
-        if (hour >= 4 && hour < 7) data.stats._earlyBird = true;
-
-        checkAchievements();
-      }
-
-      function onPause() {
-        if (sessionActive && !pauseStartTime) {
-          pauseStartTime = Date.now();
-        }
-      }
-
-      function onResume() {
-        if (pauseStartTime) {
-          totalPausedMs += Date.now() - pauseStartTime;
-          pauseStartTime = null;
-        }
-      }
-
-      function endSession() {
-        if (!sessionActive || !sessionStartTime) return;
-        sessionActive = false;
-
-        // Account for pause
-        if (pauseStartTime) {
-          totalPausedMs += Date.now() - pauseStartTime;
-          pauseStartTime = null;
-        }
-
-        const durationMs = Date.now() - sessionStartTime - totalPausedMs;
-        const durationSec = Math.max(0, Math.round(durationMs / 1000));
-
-        // Duration-based XP
-        if (durationSec >= 1800) { awardXP(50); data.stats._marathon = true; }
-        else if (durationSec >= 900) awardXP(25);
-        else if (durationSec >= 300) awardXP(10);
-
-        // Update stats
-        data.stats.totalPracticeSec += durationSec;
-        data.stats.totalSessions++;
-
-        const progId = currentProgression.id;
-        if (data.stats.progressions[progId]) {
-          data.stats.progressions[progId].practiceSec += durationSec;
-          data.stats.progressions[progId].sessions++;
-        }
-
-        // Write session record (cap at 100)
-        data.sessions.push({
-          id: 's_' + Date.now(),
-          startedAt: new Date(sessionStartTime).toISOString(),
-          endedAt: new Date().toISOString(),
-          durationSec: durationSec,
-          choruses: chorusCount - 1,
-          progression: progId,
-          level: currentLevel,
-          mode: currentMode
-        });
-        if (data.sessions.length > 100) data.sessions.shift();
-
-        checkAchievements();
-        save();
-        sessionStartTime = null;
-      }
-
-      function onChorusComplete(progId, mode, level) {
-        // Core stats
-        data.stats.totalChoruses++;
-        const progEntry = data.stats.progressions[progId];
-        const tune = PROGRESSIONS[progId];
-        const nowIso = new Date().toISOString();
-
-        // Per-tune tracking — we record "first ever touch" and "last touch" so
-        // the stats panel can narrate progress against self: "you've played
-        // Honeysuckle 14 times across 3 weeks." Growth-mindset framing.
-        let isFirstEverOnThisTune = false;
-        let isFirstEverAtThisLevel = false;
-        if (progEntry) {
-          if (progEntry.choruses === 0) isFirstEverOnThisTune = true;
-          if (!progEntry.levelsAttempted) progEntry.levelsAttempted = [];
-          if (!progEntry.levelsAttempted.includes(level)) {
-            progEntry.levelsAttempted.push(level);
-            if (!isFirstEverOnThisTune) isFirstEverAtThisLevel = true;
-          }
-          progEntry.choruses++;
-          if (!progEntry.firstPlayedAt) progEntry.firstPlayedAt = nowIso;
-          progEntry.lastPlayedAt = nowIso;
-        }
-        if (data.stats.modes[mode]) data.stats.modes[mode].choruses++;
-        if (data.stats.levels[level]) data.stats.levels[level].choruses++;
-
-        // Track per-instrument practice. currentInstrumentName is module-scoped
-        // and reliably reflects what just played. Created lazily so adding a
-        // new instrument later doesn't require a schema migration.
-        const instName = currentInstrumentName;
-        if (instName) {
-          if (!data.stats.instruments[instName]) {
-            data.stats.instruments[instName] = { choruses: 0 };
-          }
-          data.stats.instruments[instName].choruses++;
-        }
-
-        // Track tempo range — pulled from the live BPM slider at the moment
-        // the chorus finishes. Gives us "practiced 90-180 BPM" for the display.
-        const slider = document.getElementById('tempoSlider');
-        const bpm = slider ? parseInt(slider.value) : null;
-        if (bpm && !isNaN(bpm)) {
-          const t = data.stats.tempos;
-          if (t.minBpm === null || bpm < t.minBpm) t.minBpm = bpm;
-          if (t.maxBpm === null || bpm > t.maxBpm) t.maxBpm = bpm;
-          if (progEntry) {
-            if (!progEntry.maxTempo || bpm > progEntry.maxTempo) progEntry.maxTempo = bpm;
-          }
-
-          // Parade-ready: tune × instrument rolling ledger. Counts only
-          // choruses at or above the tune's target tempo so we don't give
-          // parade-ready credit for slow-practice passes.
-          const target = (tune && tune.defaultTempo) || 120;
-          if (progEntry && instName && bpm >= target) {
-            if (!progEntry.paradeReady[instName]) {
-              progEntry.paradeReady[instName] = { choruses: 0, maxTempo: bpm, lastAt: nowIso };
-            }
-            const pr = progEntry.paradeReady[instName];
-            pr.choruses++;
-            if (bpm > pr.maxTempo) pr.maxTempo = bpm;
-            pr.lastAt = nowIso;
-            // Crossing the threshold: celebrate it
-            if (pr.choruses === 10) {
-              const tuneName = (tune && tune.title) || progId;
-              const prettyInst = instName.charAt(0).toUpperCase() + instName.slice(1);
-              showToast('parade', prettyInst + ' parade-ready on ' + tuneName + '!', 'bi-megaphone-fill');
-              awardXP(30); // Meaningful landmark — not just per-rep grind
-            }
-          }
-        }
-
-        // Track combo for Renaissance Player
-        const combo = progId + '|' + mode + '|' + level;
-        if (!data.stats.combos.includes(combo)) {
-          data.stats.combos.push(combo);
-        }
-
-        // XP by level (base reward for showing up)
-        const xpMap = { beginner: 5, intermediate: 7, advanced: 10 };
-        awardXP(xpMap[level] || 5);
-
-        // ================= Bravery XP — growth-mindset incentives =================
-        // Stretching into harder territory matters more than repeating what's
-        // comfortable. These fire at most once per session (via brave()) except
-        // for slow-practice and mute, which are per-chorus stretch choices.
-
-        // 1. First chorus on a never-before-played tune
-        if (isFirstEverOnThisTune) {
-          brave('new-tune:' + progId, 15, 'newTunes');
-        }
-        // 2. First time at a new level on a tune they already know
-        if (isFirstEverAtThisLevel && level !== 'beginner') {
-          brave('level-stretch:' + progId + ':' + level, 8, 'levelStretches');
-        }
-        // 3. Slow-practice — chorus at <=70% of tune's target tempo
-        if (bpm && tune && tune.defaultTempo) {
-          if (bpm <= Math.round(tune.defaultTempo * 0.7)) {
-            data.stats.bravery.slowPractice = (data.stats.bravery.slowPractice || 0) + 1;
-            // Soft reward per chorus + once-per-session celebration
-            awardXP(3);
-            brave('slow:' + progId, 5, null);
-          }
-        }
-        // 4. Harmony-muted chorus (soloing without safety net)
-        if (typeof isHarmonyMuted !== 'undefined' && isHarmonyMuted) {
-          data.stats.bravery.soloMute = (data.stats.bravery.soloMute || 0) + 1;
-          awardXP(2);
-          brave('mute', 5, null);
-        }
-        // 5. Loop-range chorus (focused work on a hard section)
-        if (typeof loopRangeStart !== 'undefined' && loopRangeStart !== null) {
-          data.stats.bravery.loopFocus = (data.stats.bravery.loopFocus || 0) + 1;
-          awardXP(2);
-          brave('loop:' + progId, 5, null);
-        }
-
-        // New progression today bonus
-        const today = todayStr();
-        if (!progressionsToday.has(progId)) {
-          progressionsToday.add(progId);
-          if (progressionsToday.size > 1) awardXP(15);
-        }
-
-        // Streak
-        updateStreak();
-
-        // Achievements
-        checkAchievements();
-        // Update tune-strip in case parade-ready status flipped
-        if (typeof updateParadeBadge === 'function') updateParadeBadge();
-        save();
-      }
-
-      function trackModeUsed(mode) {
-        if (!modesUsedThisSession.has(mode) && sessionActive) {
-          modesUsedThisSession.add(mode);
-          awardXP(5);
-        }
-      }
-
-      function trackLevelUsed(level) { /* tracked via onChorusComplete */ }
-      function trackProgressionUsed(progId) { /* tracked via onChorusComplete */ }
-
-      // --- UI Rendering ---
-      function updateHeaderXP() {
-        const curLvXp = xpForCurrentLevel();
-        const nextLvXp = xpForNextLevel();
-        const range = nextLvXp - curLvXp;
-        const progress = range > 0 ? ((data.xp.total - curLvXp) / range) * 100 : 100;
-
-        const label = document.getElementById('headerLevelLabel');
-        const fill = document.getElementById('headerXpFill');
-        if (label) label.textContent = 'Lv.' + data.xp.level + ' ' + data.xp.levelName;
-        if (fill) fill.style.width = Math.min(100, progress) + '%';
-      }
-
-      function updateHeaderStreak() {
-        // Header shows Monthly Rhythm — unique days in the last 28. Forgiving,
-        // growth-oriented: a rest day doesn't reset it to zero. The flame icon
-        // only turns "hot" once you've built a consistent rhythm (8+ days/mo).
-        const num = document.getElementById('headerStreakNum');
-        const badge = document.getElementById('headerStreak');
-        const rhythm = monthlyRhythm();
-        if (num) num.textContent = rhythm;
-        if (badge) {
-          badge.classList.toggle('hot', rhythm >= 8);
-          badge.title = rhythm + ' day' + (rhythm === 1 ? '' : 's') + ' practiced in the last 28 — you set the pace.';
-        }
-      }
-
-      // Short, warm, growth-oriented message that rotates with the user's
-      // current pattern. Avoids guilt language; praises process.
-      function pickGrowthTip() {
-        const s = data.stats;
-        const rhythm = monthlyRhythm();
-        const tips = [];
-        if ((s.bravery && s.bravery.slowPractice || 0) >= 5) {
-          tips.push('Slowing down is how speed is built. Keep at it.');
-        }
-        if ((s.bravery && s.bravery.recordAttempts || 0) >= 1) {
-          tips.push('Recording yourself takes guts. That\'s the real work.');
-        }
-        if ((s.bravery && s.bravery.newTunes || 0) >= 3) {
-          tips.push('You keep trying new things — that\'s how the ears grow.');
-        }
-        if (rhythm >= 16) tips.push('You\'ve set a steady rhythm this month. Proud of you.');
-        else if (rhythm >= 8) tips.push('You\'re building a real rhythm. Keep showing up.');
-        else if (rhythm >= 1) tips.push('Every session counts. No such thing as a wasted rep.');
-        else tips.push('Showing up is most of it.');
-        return tips[Math.floor(Math.random() * tips.length)];
-      }
-
-      function getPracticeSuggestions() {
-        const suggestions = [];
-
-        // Least-practiced progression
-        const progEntries = Object.keys(PROGRESSIONS).map(id => ({
-          id, title: PROGRESSIONS[id].title,
-          choruses: (data.stats.progressions[id] || {}).choruses || 0
-        }));
-        progEntries.sort((a, b) => a.choruses - b.choruses);
-        const least = progEntries[0];
-        const most = progEntries[progEntries.length - 1];
-        if (least && most && most.choruses > 0 && least.choruses < most.choruses * 0.4) {
-          suggestions.push({ icon: 'bi-signpost-2',
-            text: 'Try ' + least.title + ' — only ' + least.choruses + ' choruses so far' });
-        }
-
-        // Unused modes
-        const modeNames = { licks: 'Guided Licks', tones: 'Chord Tones', symbols: 'Symbols Only' };
-        const unusedModes = ['licks', 'tones', 'symbols'].filter(m =>
-          !((data.stats.modes[m] || {}).choruses));
-        if (unusedModes.length > 0) {
-          suggestions.push({ icon: 'bi-compass',
-            text: 'Explore ' + modeNames[unusedModes[0]] + ' mode — it\'s untouched!' });
-        }
-
-        // Unused levels (only if all modes explored)
-        const unusedLevels = ['beginner', 'intermediate', 'advanced'].filter(l =>
-          !((data.stats.levels[l] || {}).choruses));
-        if (unusedLevels.length > 0 && unusedModes.length === 0) {
-          const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
-          suggestions.push({ icon: 'bi-bar-chart-steps',
-            text: 'Challenge yourself at ' + capitalize(unusedLevels[unusedLevels.length - 1]) + ' level' });
-        }
-
-        // Tempo nudge
-        if (data.stats.totalChoruses >= 20 && data.stats.totalChoruses < 150) {
-          suggestions.push({ icon: 'bi-speedometer2',
-            text: 'Try bumping tempo up 10 BPM from your comfort zone' });
-        }
-
-        // Streak encouragement
-        if (data.streak.current > 0 && data.streak.current < 7) {
-          suggestions.push({ icon: 'bi-fire',
-            text: data.streak.current + '-day streak! Keep it going for a 7-day badge' });
-        } else if (data.streak.current === 0 && data.stats.totalSessions > 0) {
-          suggestions.push({ icon: 'bi-fire',
-            text: 'Start a streak — come back tomorrow too!' });
-        }
-
-        return suggestions.slice(0, 3);
-      }
-
-      function renderStatsPanel() {
-        // Level
-        const el = (id) => document.getElementById(id);
-        el('statsLevelName').textContent = data.xp.levelName;
-
-        const curLvXp = xpForCurrentLevel();
-        const nextLvXp = xpForNextLevel();
-        const range = nextLvXp - curLvXp;
-        const pct = range > 0 ? ((data.xp.total - curLvXp) / range) * 100 : 100;
-        el('statsXpLabel').textContent = data.xp.total + ' / ' + nextLvXp + ' XP';
-        el('statsXpFill').style.width = Math.min(100, pct) + '%';
-
-        // Quick stats
-        el('statsChoruses').textContent = data.stats.totalChoruses;
-        el('statsTime').textContent = formatTime(data.stats.totalPracticeSec);
-        const rhythmEl = el('statsRhythm');
-        if (rhythmEl) rhythmEl.textContent = monthlyRhythm();
-
-        // Growth tip — short affirming rotation. Updated every time the panel
-        // opens so the user sees something a bit different each time.
-        const tipEl = el('growthTip');
-        if (tipEl) tipEl.textContent = pickGrowthTip();
-
-        // Tempo range — only show if there's any data
-        const t = data.stats.tempos || {};
-        const trEl = el('statsTempoRange');
-        if (trEl) {
-          if (t.minBpm && t.maxBpm) {
-            trEl.textContent = t.minBpm === t.maxBpm
-              ? t.minBpm + ' BPM'
-              : t.minBpm + ' – ' + t.maxBpm + ' BPM';
-          } else {
-            trEl.textContent = 'No practice yet';
-          }
-        }
-
-        // Instruments — one pill per instrument with chorus count.
-        // Ordered by usage (most practiced first). Unused instruments dimmed
-        // so the student can see which ones they've ignored at a glance.
-        const instEl = el('statsInstruments');
-        if (instEl) {
-          instEl.innerHTML = '';
-          const instStats = data.stats.instruments || {};
-          const entries = INSTRUMENT_LIST.map(inst => ({
-            name: inst.name,
-            label: inst.label,
-            choruses: (instStats[inst.name] || {}).choruses || 0
-          }));
-          entries.sort((a, b) => b.choruses - a.choruses);
-          entries.forEach(e => {
-            const pill = document.createElement('div');
-            pill.className = 'instrument-pill' + (e.choruses > 0 ? ' used' : ' unused');
-            pill.innerHTML = '<span class="instrument-pill-name">' + e.label + '</span>' +
-                             '<span class="instrument-pill-count">' + e.choruses + '</span>';
-            instEl.appendChild(pill);
-          });
-        }
-
-        // Streak calendar (last 28 days)
-        const cal = el('streakCal');
-        cal.innerHTML = '';
-        const dayLabels = ['M','T','W','T','F','S','S'];
-        dayLabels.forEach(d => {
-          const lbl = document.createElement('div');
-          lbl.className = 'streak-cal-day-label';
-          lbl.textContent = d;
-          cal.appendChild(lbl);
-        });
-
-        const today = new Date();
-        // Find the Monday 4 weeks ago
-        const startDay = new Date(today);
-        startDay.setDate(startDay.getDate() - 27 - ((startDay.getDay() + 6) % 7));
-        for (let i = 0; i < 28; i++) {
-          const d = new Date(startDay);
-          d.setDate(d.getDate() + i);
-          const ds = d.toISOString().slice(0, 10);
-          const cell = document.createElement('div');
-          cell.className = 'streak-cal-cell';
-          if (data.streak.history.includes(ds)) {
-            cell.classList.add('practiced', 'heavy');
-          }
-          if (d > today) cell.style.opacity = '0.15';
-          cal.appendChild(cell);
-        }
-
-        // Achievements
-        const grid = el('achieveGrid');
-        grid.innerHTML = '';
-        let unlocked = 0;
-        ACHIEVEMENTS.forEach(a => {
-          const isUnlocked = data.achievements[a.id] && data.achievements[a.id].unlocked;
-          if (isUnlocked) unlocked++;
-          const icon = document.createElement('div');
-          icon.className = 'achievement-icon' + (isUnlocked ? ' unlocked' : '');
-          icon.innerHTML = '<i class="bi ' + (isUnlocked ? a.icon : 'bi-lock-fill') + '"></i>' +
-            '<div class="achievement-tooltip">' + a.name + (isUnlocked ? '' : ' — ' + a.desc) + '</div>';
-          icon.addEventListener('click', () => {
-            // Toggle tooltip
-            document.querySelectorAll('.achievement-icon.show-tip').forEach(el => {
-              if (el !== icon) el.classList.remove('show-tip');
-            });
-            icon.classList.toggle('show-tip');
-          });
-          grid.appendChild(icon);
-        });
-        el('achieveCount').textContent = unlocked + '/' + ACHIEVEMENTS.length;
-
-        // Progression breakdown — expanded per-tune progress. Each row shows
-        // choruses + personal-best tempo + how long they've been working on it
-        // + parade-ready instruments. Progress against self, not a leaderboard.
-        const progDiv = el('progBreakdown');
-        progDiv.innerHTML = '';
-        const maxChoruses = Math.max(1, ...Object.values(data.stats.progressions).map(p => p.choruses || 0));
-        const daysSince = (iso) => {
-          if (!iso) return null;
-          const ms = Date.now() - new Date(iso).getTime();
-          return Math.floor(ms / 86400000);
-        };
-        const humanAge = (days) => {
-          if (days === null || days === undefined) return '';
-          if (days <= 0) return 'today';
-          if (days === 1) return 'yesterday';
-          if (days < 7) return days + 'd ago';
-          if (days < 30) return Math.floor(days / 7) + 'w ago';
-          if (days < 365) return Math.floor(days / 30) + 'mo ago';
-          return Math.floor(days / 365) + 'y ago';
-        };
-        Object.keys(PROGRESSIONS).forEach(id => {
-          const p = data.stats.progressions[id] || { choruses: 0 };
-          const pct = ((p.choruses || 0) / maxChoruses) * 100;
-          const subBits = [];
-          if (p.maxTempo) subBits.push('<i class="bi bi-speedometer2"></i> ' + p.maxTempo + ' BPM');
-          if (p.firstPlayedAt) {
-            const d = daysSince(p.firstPlayedAt);
-            if (d !== null && d >= 1) subBits.push('<i class="bi bi-hourglass"></i> first ' + humanAge(d));
-          }
-          // Parade-ready instrument count
-          const pr = p.paradeReady || {};
-          const readyCount = Object.keys(pr).filter(k =>
-            (typeof gamification !== 'undefined' && gamification.isParadeReady)
-              ? gamification.isParadeReady(id, k)
-              : false
-          ).length;
-          if (readyCount > 0) {
-            subBits.push('<span class="prog-row-parade"><i class="bi bi-megaphone-fill"></i> ' + readyCount + ' parade-ready</span>');
-          }
-          const subLine = subBits.length
-            ? '<div class="prog-row-sub">' + subBits.join(' · ') + '</div>'
-            : '';
-          progDiv.innerHTML +=
-            '<div class="prog-row">' +
-              '<div class="prog-row-main">' +
-                '<span class="prog-row-name">' + PROGRESSIONS[id].title + '</span>' +
-                '<div class="prog-row-bar"><div class="prog-row-fill" style="width:' + pct + '%"></div></div>' +
-                '<span class="prog-row-num">' + (p.choruses || 0) + '</span>' +
-              '</div>' +
-              subLine +
-            '</div>';
-        });
-
-        // Practice suggestions
-        const sugDiv = el('practiceSuggestions');
-        const suggestions = getPracticeSuggestions();
-        if (suggestions.length === 0) {
-          sugDiv.innerHTML = '<div class="no-suggestions">Keep playing — suggestions appear as you build history.</div>';
-        } else {
-          sugDiv.innerHTML = suggestions.map(s =>
-            '<div class="suggestion-item"><i class="bi ' + s.icon + '"></i><span>' + s.text + '</span></div>'
-          ).join('');
-        }
-
-        // Session history (most recent first, last 20)
-        const histDiv = el('sessionHistory');
-        const recentSessions = (data.sessions || []).slice(-20).reverse();
-        if (recentSessions.length === 0) {
-          histDiv.innerHTML = '<div class="no-sessions">No sessions yet — hit Play!</div>';
-        } else {
-          const modeIcons = { licks: 'bi-music-note-beamed', tones: 'bi-collection', symbols: 'bi-slash-circle' };
-          histDiv.innerHTML = recentSessions.map(s => {
-            const d = new Date(s.startedAt);
-            const dateStr = (d.getMonth()+1) + '/' + d.getDate() + ' ' +
-              d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
-            const progTitle = PROGRESSIONS[s.progression] ? PROGRESSIONS[s.progression].title : s.progression;
-            const dur = formatTime(s.durationSec || 0);
-            const modeIcon = modeIcons[s.mode] || 'bi-music-note';
-            return '<div class="session-item">' +
-              '<span class="session-date">' + dateStr + '</span>' +
-              '<span class="session-prog"><i class="bi ' + modeIcon + '"></i> ' + progTitle + '</span>' +
-              '<span class="session-meta"><span class="choruses">' + (s.choruses || 0) + '×</span>' +
-              '<span class="duration">' + dur + '</span></span></div>';
-          }).join('');
-        }
-      }
-
-      function showToast(type, message, icon) {
-        const container = document.getElementById('toastContainer');
-        if (!container) return;
-        const toast = document.createElement('div');
-        const variant = type === 'achievement' ? ' purple'
-                       : type === 'bravery'     ? ' bravery'
-                       : type === 'parade'      ? ' parade'
-                       : '';
-        toast.className = 'toast' + variant;
-        toast.innerHTML = '<i class="toast-icon bi ' + icon + '"></i><span>' + message + '</span>';
-        container.appendChild(toast);
-        setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3200);
-      }
-
-      // --- Init ---
-      function init() {
-        load();
-        updateHeaderXP();
-        updateHeaderStreak();
-
-        // Stats toggle
-        document.getElementById('statsToggle').addEventListener('click', () => {
-          const panel = document.getElementById('statsPanel');
-          panel.classList.toggle('open');
-          if (panel.classList.contains('open')) renderStatsPanel();
-        });
-
-        // Jam Mode toggle — handled in-line below (gamification module isn't
-        // ready yet at this point, so wiring is deferred to setupUI).
-
-        // Close tooltip on outside click
-        document.addEventListener('click', (e) => {
-          if (!e.target.closest('.achievement-icon')) {
-            document.querySelectorAll('.achievement-icon.show-tip').forEach(el => el.classList.remove('show-tip'));
-          }
-        });
-      }
-
-      return {
-        init, startSession, endSession, onChorusComplete, onPause, onResume,
-        trackModeUsed, trackLevelUsed, trackProgressionUsed,
-        // Public accessors for Phase 5 features
-        showToastPublic: showToast,
-        getData: () => data,
-        setData: (newData) => { data = newData; save(); },
-        formatTimePublic: formatTime,
-        awardXPPublic: awardXP,
-        // Growth-mindset public API
-        brave: brave,
-        isParadeReady: isParadeReady,
-        monthlyRhythm: monthlyRhythm,
-        getAchievementCount: () => ACHIEVEMENTS.length,
-        // Data portability — user-owned export / import
-        exportJson: () => JSON.stringify(data, null, 2),
-        importJson: (json) => {
-          try {
-            const parsed = JSON.parse(json);
-            // Minimal sanity: must have stats + xp. If it looks right, save it
-            // and force a reload so every view re-reads the new state.
-            if (!parsed || typeof parsed !== 'object' || !parsed.stats || !parsed.xp) {
-              return { ok: false, error: 'Not a valid Woodshed progress file.' };
-            }
-            data = parsed;
-            // Run the same migrations load() would so the incoming file is
-            // brought up to v2 if it was exported from an older app build.
-            Object.keys(PROGRESSIONS).forEach(id => {
-              if (!data.stats.progressions[id]) {
-                data.stats.progressions[id] = {
-                  choruses: 0, practiceSec: 0, sessions: 0,
-                  maxTempo: null, firstPlayedAt: null, lastPlayedAt: null,
-                  levelsAttempted: [], paradeReady: {}
-                };
-              } else {
-                const p = data.stats.progressions[id];
-                if (p.maxTempo === undefined) p.maxTempo = null;
-                if (!p.levelsAttempted) p.levelsAttempted = [];
-                if (!p.paradeReady) p.paradeReady = {};
-              }
-            });
-            if (!data.stats.bravery) {
-              data.stats.bravery = {
-                slowPractice: 0, soloMute: 0, loopFocus: 0,
-                recordAttempts: 0, newTunes: 0, levelStretches: 0
-              };
-            }
-            if (!data.stats.tempos) data.stats.tempos = { minBpm: null, maxBpm: null };
-            if (!data.stats.instruments) data.stats.instruments = {};
-            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
-            return { ok: true };
-          } catch (e) {
-            return { ok: false, error: 'Could not read that file.' };
-          }
-        }
-      };
-    })();
 
     // =========================================================================
     // VEXFLOW NOTATION
@@ -4482,10 +3381,6 @@
     }
 
     function renderNotation() {
-      // Jam Mode renders everything on one unrolled horizontal row for
-      // scrolling. Totally different layout path.
-      if (jamMode) return renderJamNotation();
-
       const container = document.getElementById('notation');
       const highlightEl = document.getElementById('highlight');
       container.innerHTML = '';
@@ -4494,7 +3389,12 @@
       updateLickConcept();
 
       const prog = currentProgression;
-      const containerWidth = container.clientWidth || 600;
+      // Notation zoom: lay out at up to 800 logical px and let the SVG scale
+      // up to the container (max ~1.28×) via viewBox — bigger staves and
+      // glyphs for music-stand reading on desktop. ≤800px displays are 1:1.
+      const displayWidth = container.clientWidth || 600;
+      notationScale = Math.min(Math.max(displayWidth / 800, 1), 1.28);
+      const containerWidth = Math.round(displayWidth / notationScale);
       const isNarrow = containerWidth < 480;
       // Dense modes need wider measures for legibility (many notes per bar)
       let measuresPerLine;
@@ -4563,6 +3463,16 @@
         renderMeasure(context, stave, measure, i, w, isFirstInLine, isFirstMeasure);
 
         measureBounds.push({ x, y, width: w, height: lineHeight - 20 });
+      }
+
+      // Scale the SVG to the display width. The viewBox keeps overlay rects
+      // drawn in layout space (drawLoopRangeOverlay) aligned; DOM-space
+      // consumers (highlight div, click mapping) convert via notationScale.
+      const svgEl = container.querySelector('svg');
+      if (svgEl) {
+        svgEl.setAttribute('viewBox', '0 0 ' + containerWidth + ' ' + totalHeight);
+        svgEl.style.width = '';   // clear any inline size so the stylesheet's
+        svgEl.style.height = '';  // width:100%; height:auto does the scaling
       }
 
       // Draw loop-range overlays if a range is active: dim out-of-range
@@ -4639,8 +3549,9 @@
     function measureIndexFromPoint(clientX, clientY) {
       const container = document.getElementById('notation');
       const rect = container.getBoundingClientRect();
-      const x = clientX - rect.left;
-      const y = clientY - rect.top;
+      // measureBounds are layout-space; convert the click to layout units
+      const x = (clientX - rect.left) / notationScale;
+      const y = (clientY - rect.top) / notationScale;
       for (let i = 0; i < measureBounds.length; i++) {
         const b = measureBounds[i];
         if (x >= b.x && x <= b.x + b.width && y >= b.y - 4 && y <= b.y + b.height + 20) {
@@ -4670,30 +3581,44 @@
     }
 
     function renderMeasure(context, stave, measure, measureIdx, staveWidth, hasClef, hasTimeSig) {
-      // Notes voice
+      // Notes voice. Split bars (measure.chords) read as slash notation in
+      // licks/tones modes — a one-bar lick or tone stack can't honestly
+      // represent a mid-bar chord change.
       let notes;
-      if (currentMode === 'licks') {
+      if (currentMode === 'melody') {
+        notes = makeMelodyNotes(measure);
+      } else if (measure.chords) {
+        notes = makeSlashNotes();
+      } else if (currentMode === 'licks') {
         notes = makeLickNotes(measure.chord, measureIdx);
       } else if (currentMode === 'tones') {
         notes = makeChordToneNotes(measure.chord);
-      } else if (currentMode === 'melody') {
-        notes = makeMelodyNotes(measure);
       } else {
         notes = makeSlashNotes();
       }
 
-      // Chord symbol as TextNote voice (transposed for instrument)
-      const chordText = new VF.TextNote({
-        text: transposeChordName(measure.chord),
-        duration: 'w',
-        line: -1,
-        font: { family: 'Arial', size: 14, weight: 'bold' }
+      // Chord symbols as a TextNote voice (transposed for instrument).
+      // Split bars emit one TextNote per chord with durations matching each
+      // chord's beats, so the formatter aligns every symbol to its beat.
+      const CHORD_TEXT_DUR = { 4: 'w', 3: 'hd', 2: 'h', 1: 'q' };
+      const chordSpans = measure.chords || [{ chord: measure.chord, beats: 4 }];
+      // Half-diminished prints as the jazz glyph (Dø7, like the band's
+      // charts) — narrower too, which matters when chords share a bar.
+      const prettyChordName = name => name.replace('m7b5', 'ø7');
+      const chordTexts = chordSpans.map(span => {
+        const t = new VF.TextNote({
+          text: prettyChordName(transposeChordName(span.chord)),
+          duration: CHORD_TEXT_DUR[span.beats] || 'q',
+          line: -1,
+          font: { family: 'Arial', size: chordSpans.length >= 3 ? 12 : 14, weight: 'bold' }
+        });
+        t.setContext(context);
+        t.setJustification(VF.TextNote.Justification.LEFT);
+        return t;
       });
-      chordText.setContext(context);
-      chordText.setJustification(VF.TextNote.Justification.LEFT);
 
       const noteVoice = new VF.Voice({ num_beats: 4, beat_value: 4 }).setStrict(false).addTickables(notes);
-      const textVoice = new VF.Voice({ num_beats: 4, beat_value: 4 }).setStrict(false).addTickables([chordText]);
+      const textVoice = new VF.Voice({ num_beats: 4, beat_value: 4 }).setStrict(false).addTickables(chordTexts);
 
       const padding = (hasClef ? 60 : 0) + (hasTimeSig ? 30 : 0) + 10;
       const formatWidth = Math.max(staveWidth - padding - 10, 80);
@@ -4976,805 +3901,15 @@
       }
       const b = measureBounds[currentMeasure];
       el.style.display = 'block';
-      el.style.left = b.x + 'px';
-      el.style.top = b.y + 'px';
-      el.style.width = b.width + 'px';
-      el.style.height = b.height + 'px';
+      el.style.left = (b.x * notationScale) + 'px';
+      el.style.top = (b.y * notationScale) + 'px';
+      el.style.width = (b.width * notationScale) + 'px';
+      el.style.height = (b.height * notationScale) + 'px';
     }
 
     function setMeasure(idx) {
       currentMeasure = idx;
       updateHighlight();
-    }
-
-    // =========================================================================
-    // MIC / PITCH DETECTION
-    // =========================================================================
-
-    let micActive = false;
-    let micStream = null;
-    let micAnalyser = null;
-    let micAnimFrame = null;
-
-    function autoCorrelate(buf, sampleRate) {
-      const SIZE = buf.length;
-      const MAX_SAMPLES = Math.floor(SIZE / 2);
-      let bestOffset = -1, bestCorr = 0, foundGood = false;
-      let rms = 0;
-      for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
-      rms = Math.sqrt(rms / SIZE);
-      if (rms < 0.008) return -1;
-
-      let lastCorr = 1;
-      const correlations = new Array(MAX_SAMPLES);
-      for (let offset = 0; offset < MAX_SAMPLES; offset++) {
-        let corr = 0;
-        for (let i = 0; i < MAX_SAMPLES; i++) corr += Math.abs(buf[i] - buf[i + offset]);
-        corr = 1 - corr / MAX_SAMPLES;
-        correlations[offset] = corr;
-        if (corr > 0.9 && corr > lastCorr) {
-          foundGood = true;
-          if (corr > bestCorr) { bestCorr = corr; bestOffset = offset; }
-        } else if (foundGood) {
-          const shift = (correlations[bestOffset + 1] - correlations[bestOffset - 1]) / correlations[bestOffset];
-          return sampleRate / (bestOffset + 8 * shift);
-        }
-        lastCorr = corr;
-      }
-      return bestCorr > 0.01 ? sampleRate / bestOffset : -1;
-    }
-
-    const PITCH_NOTE_NAMES = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
-
-    function freqToNote(freq) {
-      if (freq <= 0) return null;
-      const noteNum = 12 * Math.log2(freq / 440) + 69;
-      const rounded = Math.round(noteNum);
-      const cents = Math.round((noteNum - rounded) * 100);
-      return {
-        name: PITCH_NOTE_NAMES[((rounded % 12) + 12) % 12],
-        octave: Math.floor(rounded / 12) - 1,
-        cents, midi: rounded
-      };
-    }
-
-    async function startMic() {
-      try {
-        await initAudio();
-        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const source = Tone.context.createMediaStreamSource(micStream);
-        micAnalyser = Tone.context.createAnalyser();
-        micAnalyser.fftSize = 4096;
-        source.connect(micAnalyser);
-        micActive = true;
-        document.getElementById('pitchDisplay').classList.add('active');
-        document.getElementById('micBtn').classList.add('active');
-        document.getElementById('micIcon').className = 'bi bi-mic-fill';
-        detectPitchLoop();
-      } catch (e) {
-        gamification.showToastPublic('info', 'Mic access denied', 'bi-mic-mute');
-      }
-    }
-
-    function stopMic() {
-      micActive = false;
-      if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
-      if (micAnimFrame) { cancelAnimationFrame(micAnimFrame); micAnimFrame = null; }
-      document.getElementById('pitchDisplay').classList.remove('active');
-      document.getElementById('micBtn').classList.remove('active');
-      document.getElementById('micIcon').className = 'bi bi-mic';
-      document.getElementById('pitchNoteName').textContent = '—';
-    }
-
-    function detectPitchLoop() {
-      if (!micActive || !micAnalyser) return;
-      const buffer = new Float32Array(micAnalyser.fftSize);
-      micAnalyser.getFloatTimeDomainData(buffer);
-      const freq = autoCorrelate(buffer, Tone.context.sampleRate);
-      updatePitchDisplay(freq > 0 ? freqToNote(freq) : null);
-      micAnimFrame = requestAnimationFrame(detectPitchLoop);
-    }
-
-    function updatePitchDisplay(note) {
-      const nameEl = document.getElementById('pitchNoteName');
-      const centsLabel = document.getElementById('pitchCentsLabel');
-      const marker = document.getElementById('pitchCentsMarker');
-      const matchEl = document.getElementById('pitchMatch');
-
-      // Jam mode feeds the pitch history buffer so targets crossing the
-      // strike line can look back at recent samples for scoring.
-      if (jamMode && note) {
-        const now = performance.now();
-        jamState.pitchHistory.push({ t: now, midi: note.midi, cents: note.cents });
-        // Keep only last 500ms of samples
-        while (jamState.pitchHistory.length > 0 && jamState.pitchHistory[0].t < now - 500) {
-          jamState.pitchHistory.shift();
-        }
-      }
-
-      if (!note) {
-        nameEl.textContent = '—';
-        nameEl.style.color = 'var(--text-secondary)';
-        centsLabel.textContent = '';
-        marker.style.left = '50%';
-        matchEl.innerHTML = '';
-        return;
-      }
-
-      nameEl.textContent = note.name + note.octave;
-      centsLabel.textContent = (note.cents >= 0 ? '+' : '') + note.cents + '\u00A2';
-      marker.style.left = Math.max(2, Math.min(98, 50 + note.cents)) + '%';
-
-      // Match against current chord's tones
-      if (currentMeasure >= 0 && currentMeasure < currentProgression.measures.length) {
-        const chord = currentProgression.measures[currentMeasure].chord;
-        const tones = CHORD_TONES[chord];
-        if (tones) {
-          const isChord = tones.chord.some(k => k.split('/')[0] === note.name);
-          const isScale = tones.scale.some(k => k.split('/')[0] === note.name);
-          if (isChord) {
-            nameEl.style.color = 'var(--accent)';
-            matchEl.innerHTML = '<i class="bi bi-check-circle-fill" style="color:var(--accent)"></i><small>Chord tone</small>';
-          } else if (isScale) {
-            nameEl.style.color = 'var(--accent2)';
-            matchEl.innerHTML = '<i class="bi bi-circle-fill" style="color:var(--accent2)"></i><small>Scale tone</small>';
-          } else {
-            nameEl.style.color = 'var(--text-secondary)';
-            matchEl.innerHTML = '<i class="bi bi-x-circle" style="color:var(--text-secondary)"></i><small>Outside</small>';
-          }
-        }
-      } else {
-        // No active chord — just show tuner
-        const inTune = Math.abs(note.cents) <= 10;
-        nameEl.style.color = inTune ? 'var(--accent)' : 'var(--text-secondary)';
-        matchEl.innerHTML = inTune
-          ? '<i class="bi bi-check-circle-fill" style="color:var(--accent)"></i><small>In tune</small>'
-          : '<small>' + (note.cents > 0 ? 'Sharp' : 'Flat') + '</small>';
-      }
-    }
-
-    // =========================================================================
-    // JAM MODE — Guitar-Hero-style scrolling staff
-    //
-    // When jamMode is active, renderNotation() delegates to renderJamNotation()
-    // which lays the entire progression on ONE horizontal row. An overflow-
-    // hidden wrapper + CSS translate on the SVG scrolls notes past a fixed
-    // strike line. As each note crosses the line, jamTick samples the mic
-    // pitch history and grades Perfect/Great/Good/Miss.
-    //
-    // Pitch comparison uses concert MIDI (what the mic detects) against the
-    // target's concert MIDI (from measure.parts[instrument] raw data) —
-    // no transposition math needed on the match path, because transposition
-    // only affects what's *drawn* on the staff, not what's played.
-    // =========================================================================
-
-    function vexKeyToConcertMidi(key) {
-      // Convert a VexFlow key string like "Bb/3" into MIDI number (concert pitch).
-      // C4 = MIDI 60; MIDI = (octave + 1) * 12 + semitone
-      const [noteName, octStr] = key.split('/');
-      const letter = noteName[0];
-      const acc = noteName.substring(1);
-      let semi = NOTE_TO_SEMI[letter];
-      if (acc === 'b') semi -= 1;
-      else if (acc === 'bb') semi -= 2;
-      else if (acc === '#') semi += 1;
-      else if (acc === '##') semi += 2;
-      const oct = parseInt(octStr, 10);
-      return (oct + 1) * 12 + semi;
-    }
-
-    function durationToBeatsJam(d) {
-      // VexFlow-ish duration strings → beats in 4/4
-      const map = { 'w': 4, 'h': 2, 'q': 1, '8': 0.5, '16': 0.25, '32': 0.125 };
-      // Handle dotted notes (e.g., "qd" = dotted quarter = 1.5 beats)
-      const base = d.replace('d', '').replace('r', '');
-      let b = map[base] != null ? map[base] : 1;
-      if (d.includes('d')) b *= 1.5;
-      return b;
-    }
-
-    function renderJamNotation() {
-      // Unrolled single-line layout. Much wider than the viewport — we scroll
-      // it left via CSS transform as playback advances.
-      const container = document.getElementById('notation');
-      const highlightEl = document.getElementById('highlight');
-      container.innerHTML = '';
-      container.appendChild(highlightEl);
-      measureBounds = [];
-      updateLickConcept();
-
-      const prog = currentProgression;
-      const containerWidth = container.clientWidth || 600;
-
-      // Wide measures so busy 8th-note passages don't cram. Each measure is
-      // 4 beats; strike line sits at ~25% from the left so the student has
-      // a generous lookahead window.
-      const measureWidth = Math.max(260, Math.min(containerWidth, 420));
-      const pxPerBeat = measureWidth / 4;
-
-      const clefWidth = 50;
-      const keySigWidth = 30;
-      const timeSigWidth = 30;
-      const leadInX = clefWidth + keySigWidth + timeSigWidth;
-      const totalWidth = leadInX + prog.measures.length * measureWidth + 20;
-      // Taller staff in jam mode — gives notes, stems, and above-staff
-      // measure numbers room to breathe without overlapping the scoreboard.
-      const height = 200;
-      const staveTop = 40;  // leaves room for the measure-number strip above
-
-      // Render a wide SVG. The container is still fixed-width (from CSS), but
-      // SVG is absolutely positioned inside and we translate it.
-      const renderer = new VF.Renderer(container, VF.Renderer.Backends.SVG);
-      renderer.resize(totalWidth, height);
-      const context = renderer.getContext();
-      // Position the SVG so we can transform it — it'll overflow the container
-      const svgEl = container.querySelector('svg');
-      if (svgEl) {
-        svgEl.style.position = 'absolute';
-        svgEl.style.left = '0';
-        svgEl.style.top = '0';
-        svgEl.style.willChange = 'transform';
-      }
-
-      for (let i = 0; i < prog.measures.length; i++) {
-        const measure = prog.measures[i];
-        const isFirst = i === 0;
-        const baseX = leadInX + i * measureWidth;
-        const x = isFirst ? 0 : baseX;
-        const w = isFirst ? (leadInX + measureWidth) : measureWidth;
-
-        const clef = currentInstrument.clef;
-        const displayKey = getTransposedKey();
-        const stave = new VF.Stave(x, staveTop, w);
-        if (isFirst) {
-          stave.addClef(clef);
-          stave.addKeySignature(displayKey);
-          stave.addTimeSignature('4/4');
-        }
-        stave.setContext(context).draw();
-        renderMeasure(context, stave, measure, i, w, isFirst, isFirst);
-        measureBounds.push({ x: baseX, y: staveTop, width: measureWidth, height: 80 });
-      }
-
-      // ===== Beat tick marks + bold bar lines + measure numbers =====
-      // VexFlow's default bar lines are faint in a scrolling context. Inject
-      // custom markings into the SVG so the student can always see which
-      // beat they're on as the notation flies past the strike line.
-      if (svgEl) {
-        const SVG_NS = 'http://www.w3.org/2000/svg';
-        const gridGroup = document.createElementNS(SVG_NS, 'g');
-        gridGroup.setAttribute('class', 'jam-grid');
-        // Insert at the FRONT so notes render on top of grid lines.
-        svgEl.insertBefore(gridGroup, svgEl.firstChild);
-
-        const staveTopY = staveTop;
-        const staveBotY = staveTop + 50; // 5 lines × 10px ≈ 50
-
-        for (let m = 0; m < prog.measures.length; m++) {
-          const mX = leadInX + m * measureWidth;
-          const barX = m === 0 ? leadInX : mX;
-
-          // Alternating measure shading — a very faint wash to group each
-          // measure visually. Odd measures get a touch more accent tone.
-          const shade = document.createElementNS(SVG_NS, 'rect');
-          shade.setAttribute('x', barX);
-          shade.setAttribute('y', staveTopY - 8);
-          shade.setAttribute('width', measureWidth);
-          shade.setAttribute('height', staveBotY - staveTopY + 16);
-          shade.setAttribute('fill', m % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'rgba(255,120,0,0.04)');
-          gridGroup.appendChild(shade);
-
-          // BOLD bar line at the START of every measure — full-height, bright
-          // white, with a subtle glow. This is the primary visual guide for
-          // "you just entered a new bar."
-          const bar = document.createElementNS(SVG_NS, 'line');
-          bar.setAttribute('x1', barX);
-          bar.setAttribute('x2', barX);
-          bar.setAttribute('y1', staveTopY - 10);
-          bar.setAttribute('y2', staveBotY + 12);
-          bar.setAttribute('stroke', '#ffffff');
-          bar.setAttribute('stroke-opacity', '1');
-          bar.setAttribute('stroke-width', '3');
-          gridGroup.appendChild(bar);
-
-          // Measure number in a pill above the bar line
-          const pillBg = document.createElementNS(SVG_NS, 'rect');
-          pillBg.setAttribute('x', barX - 11);
-          pillBg.setAttribute('y', 8);
-          pillBg.setAttribute('width', 22);
-          pillBg.setAttribute('height', 18);
-          pillBg.setAttribute('rx', 4);
-          pillBg.setAttribute('fill', 'rgba(255,255,255,0.12)');
-          pillBg.setAttribute('stroke', 'rgba(255,255,255,0.25)');
-          pillBg.setAttribute('stroke-width', '1');
-          gridGroup.appendChild(pillBg);
-          const num = document.createElementNS(SVG_NS, 'text');
-          num.setAttribute('x', barX);
-          num.setAttribute('y', 21);
-          num.setAttribute('fill', '#ffffff');
-          num.setAttribute('font-size', '12');
-          num.setAttribute('font-family', 'system-ui, -apple-system, sans-serif');
-          num.setAttribute('font-weight', '700');
-          num.setAttribute('text-anchor', 'middle');
-          num.textContent = (m + 1);
-          gridGroup.appendChild(num);
-
-          // Beat tick marks for beats 2, 3, 4 within the measure. Longer and
-          // brighter than before so you can clearly feel the pulse.
-          for (let beat = 1; beat < 4; beat++) {
-            const tx = mX + beat * pxPerBeat;
-            // Dashed full-height guide at each beat, semi-transparent
-            const tick = document.createElementNS(SVG_NS, 'line');
-            tick.setAttribute('x1', tx);
-            tick.setAttribute('x2', tx);
-            tick.setAttribute('y1', staveTopY - 6);
-            tick.setAttribute('y2', staveBotY + 8);
-            tick.setAttribute('stroke', 'rgba(255,255,255,0.35)');
-            tick.setAttribute('stroke-width', '1');
-            tick.setAttribute('stroke-dasharray', '3 3');
-            gridGroup.appendChild(tick);
-            // Small beat-number caption above (2, 3, 4)
-            const bn = document.createElementNS(SVG_NS, 'text');
-            bn.setAttribute('x', tx);
-            bn.setAttribute('y', staveTopY - 10);
-            bn.setAttribute('fill', 'rgba(255,255,255,0.45)');
-            bn.setAttribute('font-size', '9');
-            bn.setAttribute('font-family', 'system-ui, -apple-system, sans-serif');
-            bn.setAttribute('text-anchor', 'middle');
-            bn.textContent = (beat + 1);
-            gridGroup.appendChild(bn);
-          }
-        }
-        // Final bar line at the end of the chorus — double-line style
-        const endX = leadInX + prog.measures.length * measureWidth;
-        const endBar1 = document.createElementNS(SVG_NS, 'line');
-        endBar1.setAttribute('x1', endX - 3);
-        endBar1.setAttribute('x2', endX - 3);
-        endBar1.setAttribute('y1', staveTopY - 4);
-        endBar1.setAttribute('y2', staveBotY + 4);
-        endBar1.setAttribute('stroke', '#ffffff');
-        endBar1.setAttribute('stroke-opacity', '0.9');
-        endBar1.setAttribute('stroke-width', '2');
-        gridGroup.appendChild(endBar1);
-        const endBar2 = document.createElementNS(SVG_NS, 'line');
-        endBar2.setAttribute('x1', endX);
-        endBar2.setAttribute('x2', endX);
-        endBar2.setAttribute('y1', staveTopY - 4);
-        endBar2.setAttribute('y2', staveBotY + 4);
-        endBar2.setAttribute('stroke', '#ffffff');
-        endBar2.setAttribute('stroke-opacity', '0.9');
-        endBar2.setAttribute('stroke-width', '4');
-        gridGroup.appendChild(endBar2);
-      }
-
-      // Build the target list: every playable note across the chorus
-      buildJamTargets(pxPerBeat, leadInX);
-
-      // Save layout dims for the scroll loop
-      jamState.totalWidth = totalWidth;
-      jamState.pxPerBeat = pxPerBeat;
-      jamState.leadInX = leadInX;
-      jamState.totalBeats = prog.measures.length * 4;
-      // Strike line sits at ~25% of the notation-area viewport (more lookahead)
-      const areaEl = document.getElementById('notationArea');
-      const areaW = areaEl ? areaEl.clientWidth : containerWidth;
-      jamState.strikeX = Math.round(areaW * 0.25);
-
-      // Position the strike-line element at jamState.strikeX
-      const strikeEl = document.getElementById('jamStrikeLine');
-      if (strikeEl) strikeEl.style.left = jamState.strikeX + 'px';
-
-      // Reset scroll to the start
-      if (svgEl) svgEl.style.transform = 'translateX(' + jamState.strikeX + 'px)';
-
-      updateHighlight();
-      updateLoopRangeBadge();
-    }
-
-    function buildJamTargets(pxPerBeat, leadInX) {
-      const prog = currentProgression;
-      jamState.targets = [];
-      let absBeat = 0;
-
-      prog.measures.forEach((measure, mi) => {
-        // Reuse the existing playable-notes accessor so we get the right
-        // note array for the current instrument + mode + level.
-        let notes;
-        try {
-          notes = getPlayableNotesForMeasure(measure);
-        } catch (e) {
-          notes = measure.parts && measure.parts[currentInstrumentName]
-            ? measure.parts[currentInstrumentName]
-            : (measure.melody || []);
-        }
-        if (!Array.isArray(notes)) notes = [];
-
-        let beatInMeasure = 0;
-        notes.forEach(n => {
-          const beats = durationToBeatsJam(n.duration || 'q');
-          const isRest = (n.duration || '').includes('r') || !n.keys || !n.keys.length;
-          if (!isRest) {
-            // One target per note (use first pitch of a chord as the melodic target)
-            const key = n.keys[0];
-            const concertMidi = vexKeyToConcertMidi(key);
-            jamState.targets.push({
-              beat: absBeat + beatInMeasure,
-              x: leadInX + (absBeat + beatInMeasure) * pxPerBeat,
-              concertMidi,
-              noteName: key.split('/')[0],
-              judged: false,
-              grade: null
-            });
-          }
-          beatInMeasure += beats;
-        });
-        absBeat += 4;
-      });
-    }
-
-    // Convert Tone.Transport.position "bar:beat:sixteenth" to absolute beats
-    function transportAbsBeats() {
-      const pos = Tone.Transport.position.split(':');
-      const bars = parseFloat(pos[0]) || 0;
-      const beats = parseFloat(pos[1]) || 0;
-      const sixteenths = parseFloat(pos[2]) || 0;
-      return bars * 4 + beats + sixteenths / 4;
-    }
-
-    function jamTick() {
-      if (!jamMode) { jamState.rafId = null; return; }
-      const svgEl = document.querySelector('#notation svg');
-
-      // Only scroll + grade during active playback. When stopped/paused,
-      // park at beat 0 so the first measure sits at the strike line.
-      let absBeat = 0;
-      let playing = false;
-      if (Tone.Transport.state === 'started') {
-        const countInBeats = countInEnabled ? 4 : 0;
-        const raw = transportAbsBeats();
-        // Still in count-in: no scroll yet, targets silent
-        if (raw >= countInBeats) {
-          const chorusBeats = jamState.totalBeats;
-          let b = raw - countInBeats;
-          if (chorusBeats > 0) b = b % chorusBeats;
-          absBeat = b;
-          playing = true;
-        }
-      }
-
-      // Detect chorus wrap: if absBeat went backward meaningfully, reset target judgements
-      if (playing && jamState._lastBeat !== undefined && absBeat < jamState._lastBeat - 2) {
-        jamState.targets.forEach(t => { t.judged = false; t.grade = null; });
-      }
-      jamState._lastBeat = playing ? absBeat : undefined;
-
-      // Scroll: current beat sits under the strike line.
-      if (svgEl) {
-        const currentX = jamState.leadInX + absBeat * jamState.pxPerBeat;
-        const translate = jamState.strikeX - currentX;
-        svgEl.style.transform = 'translateX(' + translate + 'px)';
-      }
-
-      // Grade any target whose beat has just passed the strike line (only while playing)
-      if (playing) {
-        for (const t of jamState.targets) {
-          if (t.judged) continue;
-          if (absBeat >= t.beat) {
-            jamGradeTarget(t);
-          }
-        }
-      }
-
-      jamState.rafId = requestAnimationFrame(jamTick);
-    }
-
-    function jamGradeTarget(target) {
-      target.judged = true;
-      // Look back ~250ms around the crossing
-      const now = performance.now();
-      const windowStart = now - 250;
-      const samples = jamState.pitchHistory.filter(s => s.t >= windowStart);
-
-      let bestCents = null;
-      for (const s of samples) {
-        const diff = s.midi - target.concertMidi;
-        const pc = ((diff % 12) + 12) % 12;
-        if (pc === 0) {
-          const absCents = Math.abs(s.cents);
-          if (bestCents === null || absCents < bestCents) bestCents = absCents;
-        }
-      }
-
-      let grade, pts;
-      if (bestCents === null) {
-        grade = 'miss'; pts = 0;
-      } else if (bestCents <= 25) {
-        grade = 'perfect'; pts = 100;
-      } else if (bestCents <= 60) {
-        grade = 'great'; pts = 70;
-      } else {
-        grade = 'good'; pts = 40;
-      }
-      target.grade = grade;
-      jamApplyGrade(target, grade, pts);
-    }
-
-    function jamApplyGrade(target, grade, basePts) {
-      // Combo + multiplier
-      if (grade === 'miss') {
-        jamState.combo = 0;
-        jamState.multiplier = 1;
-      } else {
-        jamState.combo += 1;
-        if (jamState.combo > jamState.maxCombo) jamState.maxCombo = jamState.combo;
-        // Ramp multiplier: 5, 10, 20 consecutive hits
-        if (jamState.combo >= 20) jamState.multiplier = 4;
-        else if (jamState.combo >= 10) jamState.multiplier = 3;
-        else if (jamState.combo >= 5) jamState.multiplier = 2;
-        else jamState.multiplier = 1;
-      }
-      const earned = basePts * jamState.multiplier;
-      jamState.score += earned;
-
-      // Push to ledger (capped at 10)
-      jamState.hits.push({ grade, t: performance.now() });
-      if (jamState.hits.length > 10) jamState.hits.shift();
-
-      // Flash verdict
-      jamFlashVerdict(grade);
-      jamUpdateScoreboard();
-      jamRenderLedger();
-
-      // Feed XP (Perfect=3 xp, Great=2, Good=1, Miss=0) through existing gamification
-      const xpMap = { perfect: 3, great: 2, good: 1, miss: 0 };
-      const xp = xpMap[grade] || 0;
-      if (xp > 0 && typeof gamification !== 'undefined' && gamification.awardXPPublic) {
-        gamification.awardXPPublic(xp, 'jam');
-      }
-    }
-
-    function jamFlashVerdict(grade) {
-      const el = document.getElementById('jamVerdict');
-      if (!el) return;
-      const labels = { perfect: 'PERFECT', great: 'GREAT', good: 'GOOD', miss: 'MISS' };
-      el.textContent = labels[grade] || '';
-      el.className = 'jam-verdict jam-verdict-' + grade + ' show';
-      clearTimeout(jamState._verdictTimer);
-      jamState._verdictTimer = setTimeout(() => { el.classList.remove('show'); }, 450);
-    }
-
-    function jamUpdateScoreboard() {
-      const scoreEl = document.getElementById('jamScore');
-      const comboEl = document.getElementById('jamCombo');
-      const multEl = document.getElementById('jamMultiplier');
-      if (scoreEl) scoreEl.textContent = jamState.score.toLocaleString();
-      if (comboEl) comboEl.textContent = jamState.combo;
-      if (multEl) {
-        multEl.textContent = jamState.multiplier + '×';
-        multEl.className = 'jam-multiplier jam-mult-' + jamState.multiplier;
-      }
-    }
-
-    function jamRenderLedger() {
-      const el = document.getElementById('jamLedger');
-      if (!el) return;
-      el.innerHTML = '';
-      jamState.hits.forEach(h => {
-        const pip = document.createElement('span');
-        pip.className = 'jam-pip jam-pip-' + h.grade;
-        el.appendChild(pip);
-      });
-    }
-
-    function jamReset() {
-      jamState.targets.forEach(t => { t.judged = false; t.grade = null; });
-      jamState.combo = 0;
-      jamState.multiplier = 1;
-      jamState.maxCombo = 0;
-      jamState.score = 0;
-      jamState.hits = [];
-      jamState.pitchHistory = [];
-      jamState._lastBeat = undefined;
-      jamUpdateScoreboard();
-      jamRenderLedger();
-    }
-
-    function enterJamMode() {
-      // Jam Mode requires per-beat melodic notes. If this tune has no
-      // verified melody (only chord-progression data), bail with a toast
-      // rather than entering a broken state where Melody mode's button
-      // is hidden by updateMelodyAvailability().
-      if (!tuneHasVerifiedMelody(currentProgression)) {
-        gamification.showToastPublic(
-          'info',
-          'Jam Mode needs a verified melody. Try a different tune.',
-          'bi-music-note-beamed'
-        );
-        return;
-      }
-      jamMode = true;
-      document.body.classList.add('jam-on');
-      // Jam requires per-beat melodic notes. Melody mode fits; Licks rotates
-      // per chorus (v2); Symbols/Tones don't have beat-mapped notes. For MVP,
-      // auto-switch to melody when turning on Jam.
-      if (currentMode !== 'melody') {
-        currentMode = 'melody';
-        document.querySelectorAll('.mode-btn').forEach(b => {
-          b.classList.toggle('active', b.dataset.mode === 'melody');
-        });
-        // Hide level bar / hear-lick / slide toggle (not needed in melody)
-        document.getElementById('levelBar').style.display = 'none';
-        document.getElementById('hearLickRow').style.display = 'none';
-        document.getElementById('slideToggleRow').style.display = 'none';
-      }
-      document.getElementById('jamToggleBtn').classList.add('active');
-      jamReset();
-      renderNotation();
-      // Scroll loop runs even when not playing — gives a still preview
-      if (!jamState.rafId) jamState.rafId = requestAnimationFrame(jamTick);
-      // Turn on mic prompt (user still has to grant permission; startMic handles it)
-      if (!micActive && typeof startMic === 'function') {
-        gamification.showToastPublic('info', 'Turn on the mic to start scoring', 'bi-mic');
-      }
-    }
-
-    function exitJamMode() {
-      jamMode = false;
-      document.body.classList.remove('jam-on');
-      document.getElementById('jamToggleBtn').classList.remove('active');
-      if (jamState.rafId) { cancelAnimationFrame(jamState.rafId); jamState.rafId = null; }
-      // Persist best score for this tune × instrument
-      const key = currentProgression.id + '|' + currentInstrumentName;
-      const prev = jamState.scoreByTune[key] || { score: 0, combo: 0 };
-      if (jamState.score > prev.score || jamState.maxCombo > prev.combo) {
-        jamState.scoreByTune[key] = {
-          score: Math.max(jamState.score, prev.score),
-          combo: Math.max(jamState.maxCombo, prev.combo),
-          at: new Date().toISOString()
-        };
-        saveJamScores();
-      }
-      // Restore hear-lick / slide toggle visibility based on current mode
-      renderNotation();
-      const isLicks = currentMode === 'licks';
-      document.getElementById('levelBar').style.display = isLicks ? '' : 'none';
-      document.getElementById('hearLickRow').style.display = (isLicks || currentMode === 'melody') ? '' : 'none';
-      const showSlide = isLicks && currentInstrumentName === 'trombone';
-      document.getElementById('slideToggleRow').style.display = showSlide ? '' : 'none';
-    }
-
-    function toggleJamMode() {
-      if (jamMode) exitJamMode(); else enterJamMode();
-    }
-
-    // =========================================================================
-    // EAR TRAINING
-    // =========================================================================
-
-    const EAR_INTERVALS = [
-      { name: 'Minor 2nd', semi: 1, abbr: 'm2' },
-      { name: 'Major 2nd', semi: 2, abbr: 'M2' },
-      { name: 'Minor 3rd', semi: 3, abbr: 'm3' },
-      { name: 'Major 3rd', semi: 4, abbr: 'M3' },
-      { name: 'Perfect 4th', semi: 5, abbr: 'P4' },
-      { name: 'Tritone', semi: 6, abbr: 'TT' },
-      { name: 'Perfect 5th', semi: 7, abbr: 'P5' },
-      { name: 'Octave', semi: 12, abbr: 'P8' }
-    ];
-
-    const EAR_CHORDS = [
-      { name: 'Major 7', abbr: 'Maj7', intervals: [0, 4, 7, 11] },
-      { name: 'Dominant 7', abbr: 'Dom7', intervals: [0, 4, 7, 10] },
-      { name: 'Minor 7', abbr: 'min7', intervals: [0, 3, 7, 10] },
-      { name: 'Half-dim', abbr: 'm7b5', intervals: [0, 3, 6, 10] }
-    ];
-
-    let earQuizType = 'intervals';
-    let earCurrentQuiz = null;
-    let earScore = 0;
-    let earTotal = 0;
-    let earQuizStreak = 0;
-    let earAnswered = false;
-
-    function generateEarQuiz() {
-      earAnswered = false;
-      if (earQuizType === 'intervals') {
-        const startMidi = 48 + Math.floor(Math.random() * 12);
-        const interval = EAR_INTERVALS[Math.floor(Math.random() * EAR_INTERVALS.length)];
-        earCurrentQuiz = { notes: [startMidi, startMidi + interval.semi], answer: interval, type: 'intervals' };
-        renderEarOptions(EAR_INTERVALS.map(i => i.abbr));
-        document.getElementById('earPrompt').textContent = 'What interval do you hear?';
-      } else {
-        const startMidi = 48 + Math.floor(Math.random() * 12);
-        const chord = EAR_CHORDS[Math.floor(Math.random() * EAR_CHORDS.length)];
-        earCurrentQuiz = { notes: chord.intervals.map(i => startMidi + i), answer: chord, type: 'chords' };
-        renderEarOptions(EAR_CHORDS.map(c => c.abbr));
-        document.getElementById('earPrompt').textContent = 'What chord quality do you hear?';
-      }
-    }
-
-    function renderEarOptions(options) {
-      const el = document.getElementById('earOptions');
-      el.innerHTML = options.map(o =>
-        '<button class="ear-option" data-answer="' + o + '">' + o + '</button>'
-      ).join('');
-      el.querySelectorAll('.ear-option').forEach(btn => {
-        btn.addEventListener('click', () => checkEarAnswer(btn));
-      });
-    }
-
-    async function playEarQuiz() {
-      if (!earCurrentQuiz) generateEarQuiz();
-      await initAudio();
-      const now = Tone.now();
-      if (earCurrentQuiz.type === 'intervals') {
-        lickSynth.triggerAttackRelease(Tone.Frequency(earCurrentQuiz.notes[0], 'midi').toNote(), 0.5, now);
-        lickSynth.triggerAttackRelease(Tone.Frequency(earCurrentQuiz.notes[1], 'midi').toNote(), 0.5, now + 0.7);
-      } else {
-        earCurrentQuiz.notes.forEach((midi, i) => {
-          lickSynth.triggerAttackRelease(Tone.Frequency(midi, 'midi').toNote(), 0.4, now + i * 0.35);
-        });
-      }
-    }
-
-    function checkEarAnswer(btn) {
-      if (earAnswered) return;
-      earAnswered = true;
-      earTotal++;
-      const answer = btn.dataset.answer;
-      const correct = earCurrentQuiz.type === 'intervals'
-        ? earCurrentQuiz.answer.abbr
-        : earCurrentQuiz.answer.abbr;
-      const isCorrect = answer === correct;
-
-      if (isCorrect) {
-        earScore++;
-        earQuizStreak++;
-        btn.classList.add('correct');
-        gamification.awardXPPublic(3);
-      } else {
-        earQuizStreak = 0;
-        btn.classList.add('wrong');
-        // Reveal correct answer
-        document.querySelectorAll('.ear-option').forEach(b => {
-          if (b.dataset.answer === correct) b.classList.add('reveal');
-          else if (!b.classList.contains('wrong')) b.classList.add('disabled');
-        });
-      }
-
-      document.getElementById('earScore').textContent = earScore;
-      document.getElementById('earTotal').textContent = earTotal;
-      document.getElementById('earStreak').textContent = earQuizStreak > 1
-        ? earQuizStreak + ' streak' : '';
-      document.getElementById('earPrompt').textContent = isCorrect
-        ? 'Correct!' : 'It was ' + correct;
-
-      // Auto-advance after delay
-      setTimeout(() => {
-        if (document.getElementById('earOverlay').classList.contains('open')) {
-          generateEarQuiz();
-        }
-      }, isCorrect ? 1000 : 2000);
-    }
-
-    function openEarTraining() {
-      document.getElementById('earOverlay').classList.add('open');
-      earScore = 0;
-      earTotal = 0;
-      earQuizStreak = 0;
-      document.getElementById('earScore').textContent = '0';
-      document.getElementById('earTotal').textContent = '0';
-      document.getElementById('earStreak').textContent = '';
-      generateEarQuiz();
-    }
-
-    function closeEarTraining() {
-      document.getElementById('earOverlay').classList.remove('open');
-      earCurrentQuiz = null;
-      if (earTotal > 0) {
-        gamification.showToastPublic('info',
-          'Ear training: ' + earScore + '/' + earTotal + ' correct', 'bi-ear');
-      }
     }
 
     // =========================================================================
@@ -5835,7 +3970,7 @@
     }
 
     // =========================================================================
-    // CALL & RESPONSE — app plays 2 bars, you answer 2 bars via mic
+    // CALL & RESPONSE — app plays 2 bars, you answer 2 bars on your horn
     // =========================================================================
 
     // Library of "call" phrases per difficulty level. Each call is 2 bars
@@ -5949,108 +4084,6 @@
     function closeCallResponse() {
       document.getElementById('cnrOverlay').classList.remove('open');
       stopCallResponse();
-    }
-
-    // =========================================================================
-    // RECORDING — capture your solo via mic, play it back
-    // =========================================================================
-
-    let mediaRecorder = null;
-    let recordedChunks = [];
-    let recordedStream = null;
-    let isRecording = false;
-
-    async function toggleRecording() {
-      if (isRecording) {
-        stopRecording();
-        return;
-      }
-      try {
-        recordedStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        recordedChunks = [];
-        const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-          ? 'audio/webm;codecs=opus'
-          : (MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '');
-        mediaRecorder = mime ? new MediaRecorder(recordedStream, { mimeType: mime })
-                              : new MediaRecorder(recordedStream);
-        mediaRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
-        mediaRecorder.onstop = () => {
-          const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
-          const url = URL.createObjectURL(blob);
-          const audio = document.getElementById('recAudio');
-          audio.src = url;
-          document.getElementById('recPlayback').classList.add('show');
-          if (recordedStream) {
-            recordedStream.getTracks().forEach(t => t.stop());
-            recordedStream = null;
-          }
-        };
-        mediaRecorder.start();
-        isRecording = true;
-        updateRecordBtn();
-        gamification.showToastPublic('info', 'Recording... press again to stop', 'bi-record-circle');
-        // Bravery XP — hitting record is a vulnerable, self-assessing act.
-        // One reward per session so it doesn't become a farm button.
-        try {
-          const d = gamification.getData();
-          if (d && d.stats && d.stats.bravery) {
-            d.stats.bravery.recordAttempts = (d.stats.bravery.recordAttempts || 0) + 1;
-          }
-          gamification.brave('record', 10, null);
-        } catch (e) {}
-      } catch(e) {
-        console.error('Recording failed:', e);
-        gamification.showToastPublic('error', 'Mic access denied. Allow the browser to use your microphone.', 'bi-mic-mute');
-      }
-    }
-
-    function stopRecording() {
-      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
-      }
-      isRecording = false;
-      updateRecordBtn();
-      gamification.showToastPublic('success', 'Recording saved. Play it back below the transport.', 'bi-check-circle');
-    }
-
-    function updateRecordBtn() {
-      const btn = document.getElementById('recordBtn');
-      if (!btn) return;
-      btn.classList.toggle('active', isRecording);
-      btn.title = isRecording ? 'Stop recording' : 'Record your solo';
-    }
-
-    function deleteRecording() {
-      const audio = document.getElementById('recAudio');
-      if (audio.src) URL.revokeObjectURL(audio.src);
-      audio.src = '';
-      document.getElementById('recPlayback').classList.remove('show');
-    }
-
-    // =========================================================================
-    // SHARE
-    // =========================================================================
-
-    async function shareProgress() {
-      const d = gamification.getData();
-      if (!d) return;
-      const unlocked = Object.values(d.achievements).filter(a => a.unlocked).length;
-      const text = '\uD83C\uDFBA The Woodshed\n' +
-        'Level ' + d.xp.level + ': ' + d.xp.levelName + '\n' +
-        (d.streak.current > 0 ? d.streak.current + '-day streak \uD83D\uDD25\n' : '') +
-        d.stats.totalChoruses + ' choruses | ' + gamification.formatTimePublic(d.stats.totalPracticeSec) + ' practiced\n' +
-        unlocked + '/' + gamification.getAchievementCount() + ' achievements';
-
-      if (navigator.share) {
-        try { await navigator.share({ title: 'The Woodshed', text }); } catch (e) { /* cancelled */ }
-      } else {
-        try {
-          await navigator.clipboard.writeText(text);
-          gamification.showToastPublic('info', 'Copied to clipboard!', 'bi-clipboard-check');
-        } catch (e) {
-          gamification.showToastPublic('info', 'Could not copy', 'bi-x-circle');
-        }
-      }
     }
 
     // =========================================================================
@@ -6396,25 +4429,33 @@
         // highlight. Transport then jumps to loopStart on wrap, cycling only
         // the selected range.
         if (mi < rangeStartIdx || mi > rangeEndIdx) return;
-        const voicing = prog.audio.voicings[measure.chord];
-        const bassLine = prog.audio.bassNotes[measure.chord];
+        // Per-beat harmony map — supports split bars (measure.chords).
+        // For a plain bar this degenerates to the single chord on every beat.
+        const spans = measure.chords || [{ chord: measure.chord, beats: measure.beats }];
+        const beatChords = [];
+        spans.forEach(span => {
+          for (let k = 0; k < span.beats; k++) beatChords.push({ chord: span.chord, beatInChord: k });
+        });
 
         // Highlight
         Tone.Transport.schedule(time => {
           Tone.Draw.schedule(() => setMeasure(mi), time);
         }, `0:${beatOffset}:0`);
 
-        // Piano comp on 2 and 4
+        // Piano comp on 2 and 4 — uses whichever chord owns that beat
         for (let b = 1; b < 4; b += 2) {
           const beat = beatOffset + b;
+          const voicing = prog.audio.voicings[(beatChords[b] || beatChords[0]).chord];
           Tone.Transport.schedule(time => {
             piano.triggerAttackRelease(voicing, '8n', time);
           }, `0:${beat}:0`);
         }
 
-        // Walking bass
+        // Walking bass — each sub-chord restarts its pattern (root on arrival)
         for (let b = 0; b < 4; b++) {
-          const note = bassLine[b % bassLine.length];
+          const bc = beatChords[b] || beatChords[0];
+          const bassLine = prog.audio.bassNotes[bc.chord];
+          const note = bassLine[bc.beatInChord % bassLine.length];
           Tone.Transport.schedule(time => {
             bass.triggerAttackRelease(note, '4n', time);
           }, `0:${beatOffset + b}:0`);
@@ -6502,7 +4543,6 @@
             Tone.Transport.bpm.value = newBpm;
           }
           if (currentMode === 'licks') renderNotation();
-          gamification.onChorusComplete(currentProgression.id, currentMode, currentLevel);
         };
         setTimeout(doUpdate, 0);
       }, lastBeat);
@@ -6514,13 +4554,10 @@
 
     async function play() {
       await initAudio();
-      if (sessionStartTime_g) {
-        // Resuming from pause — don't reschedule, just resume Transport
-        gamification.onResume();
-      } else {
-        // Fresh start — schedule the progression
+      if (!isPausedMidProgression) {
+        // Fresh start — schedule the progression. On resume the Transport
+        // picks up where it paused, so no rescheduling.
         scheduleProgression();
-        gamification.startSession(currentProgression.id, currentMode, currentLevel);
       }
       Tone.Transport.bpm.value = parseInt(document.getElementById('tempoSlider').value);
       Tone.Transport.start();
@@ -6528,15 +4565,14 @@
       document.getElementById('playIcon').className = 'bi bi-pause-fill';
     }
 
-    // Track whether a gamification session has started (to distinguish resume from fresh start)
-    let sessionStartTime_g = false;
+    // True while paused mid-progression — tells play() to resume rather than reschedule
+    let isPausedMidProgression = false;
 
     function pause() {
       Tone.Transport.pause();
       isPlaying = false;
       document.getElementById('playIcon').className = 'bi bi-play-fill';
-      gamification.onPause();
-      sessionStartTime_g = true;
+      isPausedMidProgression = true;
     }
 
     // Auto-pause helper — called when user changes instrument/mode/level/feel
@@ -6548,8 +4584,7 @@
     }
 
     function stop() {
-      gamification.endSession();
-      sessionStartTime_g = false;
+      isPausedMidProgression = false;
       if (isPlayingLick) stopLickDemo();
       Tone.Transport.stop();
       Tone.Transport.position = 0;
@@ -6696,8 +4731,6 @@
           }
           updateSlideToggleVisibility();
           renderNotation();
-          // Parade-ready is tune × instrument, so re-check on instrument swap
-          if (typeof updateParadeBadge === 'function') updateParadeBadge();
         });
       });
 
@@ -6728,7 +4761,6 @@
           updateSlideToggleVisibility();
           // Stop lick demo if switching away from licks mode
           if (currentMode !== 'licks' && currentMode !== 'melody' && isPlayingLick) stopLickDemo();
-          gamification.trackModeUsed(currentMode);
           renderNotation();
         });
       });
@@ -6801,17 +4833,6 @@
         });
       });
 
-      // Mic toggle
-      document.getElementById('micBtn').addEventListener('click', () => {
-        if (micActive) stopMic(); else startMic();
-      });
-
-      // Jam Mode toggle — transforms the entire notation into a Guitar Hero
-      // style scrolling game. See JAM MODE block above renderJamNotation().
-      document.getElementById('jamToggleBtn').addEventListener('click', () => {
-        toggleJamMode();
-      });
-
       // Quotes
       document.getElementById('quotesBtn').addEventListener('click', openQuotes);
       document.getElementById('quotesClose').addEventListener('click', closeQuotes);
@@ -6830,83 +4851,6 @@
         });
       });
 
-      // Recording
-      document.getElementById('recordBtn').addEventListener('click', toggleRecording);
-      document.getElementById('recDelete').addEventListener('click', deleteRecording);
-
-      // Ear Training
-      document.getElementById('earTrainBtn').addEventListener('click', openEarTraining);
-      document.getElementById('earClose').addEventListener('click', closeEarTraining);
-      document.getElementById('earPlayBtn').addEventListener('click', playEarQuiz);
-      document.querySelectorAll('.ear-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-          document.querySelectorAll('.ear-tab').forEach(t => t.classList.remove('active'));
-          tab.classList.add('active');
-          earQuizType = tab.dataset.quiz;
-          earScore = 0; earTotal = 0; earQuizStreak = 0;
-          document.getElementById('earScore').textContent = '0';
-          document.getElementById('earTotal').textContent = '0';
-          document.getElementById('earStreak').textContent = '';
-          generateEarQuiz();
-        });
-      });
-      // Close ear training on overlay background click
-      document.getElementById('earOverlay').addEventListener('click', (e) => {
-        if (e.target === document.getElementById('earOverlay')) closeEarTraining();
-      });
-
-      // Share
-      document.getElementById('shareBtn').addEventListener('click', shareProgress);
-
-      // Export / Import progress — cross-device backup without a server.
-      // User ownership is intentional: we don't transmit practice data
-      // anywhere; the user downloads a file and puts it wherever they want.
-      document.getElementById('exportProgressBtn').addEventListener('click', () => {
-        try {
-          const json = gamification.exportJson();
-          const blob = new Blob([json], { type: 'application/json' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          const stamp = new Date().toISOString().slice(0, 10);
-          a.download = 'woodshed-progress-' + stamp + '.json';
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          setTimeout(() => URL.revokeObjectURL(url), 1000);
-          gamification.showToastPublic('info', 'Progress exported. Keep it safe.', 'bi-download');
-        } catch (e) {
-          gamification.showToastPublic('error', 'Export failed — please try again.', 'bi-exclamation-triangle');
-        }
-      });
-
-      document.getElementById('importProgressInput').addEventListener('change', (e) => {
-        const file = e.target.files && e.target.files[0];
-        if (!file) return;
-        // Irreversible — confirm before we replace localStorage
-        const sure = confirm(
-          'Importing will replace your current progress (XP, achievements, ' +
-          'per-tune history) with the contents of this file. Continue?'
-        );
-        if (!sure) { e.target.value = ''; return; }
-        const reader = new FileReader();
-        reader.onload = () => {
-          const result = gamification.importJson(String(reader.result || ''));
-          if (result.ok) {
-            gamification.showToastPublic('info', 'Progress imported. Reloading...', 'bi-check-circle');
-            setTimeout(() => location.reload(), 800);
-          } else {
-            gamification.showToastPublic('error', result.error || 'Import failed.', 'bi-exclamation-triangle');
-            e.target.value = '';
-          }
-        };
-        reader.onerror = () => {
-          gamification.showToastPublic('error', 'Could not read file.', 'bi-exclamation-triangle');
-          e.target.value = '';
-        };
-        reader.readAsText(file);
-      });
-
       let resizeTimer;
       window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
@@ -6916,30 +4860,12 @@
 
     // Hide the Melody tab (and auto-exit melody mode) when the current tune
     // has no verified melody data. Chord progression still shows in Licks /
-    // Symbols / Tones modes as expected. Also gates the Jam-Mode toggle —
-    // Jam relies on beat-mapped melody notes, so it's useless without them.
+    // Symbols / Tones modes as expected.
     function updateMelodyAvailability() {
       const hasMelody = tuneHasVerifiedMelody(currentProgression);
       const melodyBtn = document.querySelector('.mode-btn[data-mode="melody"]');
       if (melodyBtn) {
         melodyBtn.style.display = hasMelody ? '' : 'none';
-      }
-      // Jam Mode button STAYS VISIBLE even when this tune has no melody —
-      // hiding it entirely means new users never discover the feature exists.
-      // Instead we toggle a `.disabled` class that dims the button; clicking
-      // it while disabled still fires enterJamMode() which shows a "pick a
-      // different tune" toast (see the guard at the top of enterJamMode()).
-      const jamBtn = document.getElementById('jamToggleBtn');
-      if (jamBtn) {
-        jamBtn.classList.toggle('disabled', !hasMelody);
-        jamBtn.title = hasMelody
-          ? 'Jam Mode (Guitar-Hero-style scrolling staff)'
-          : 'Jam Mode — needs a tune with a verified melody. Pick another tune.';
-      }
-      // If user was in jam mode and the new tune has no melody, drop out
-      // cleanly so we don't leave the UI in a half-transformed state.
-      if (!hasMelody && jamMode) {
-        exitJamMode();
       }
       // If user was in melody mode and the new tune has no melody, bounce
       // to Licks (the main chord-progression practice mode).
@@ -7131,22 +5057,6 @@
       favBtn.classList.toggle('is-fav', fav);
       favIcon.className = fav ? 'bi bi-star-fill' : 'bi bi-star';
       favBtn.title = fav ? 'Unfavorite' : 'Favorite';
-      updateParadeBadge();
-    }
-
-    // Parade-ready badge — shown when current tune × current instrument has
-    // crossed the threshold (10+ choruses at target tempo or higher, within
-    // the last 14 days). Reads live from the gamification module so it stays
-    // in sync after each chorus completion.
-    function updateParadeBadge() {
-      const el = document.getElementById('tuneStripParade');
-      if (!el || !currentProgression || !currentInstrumentName) return;
-      try {
-        const ready = gamification.isParadeReady(currentProgression.id, currentInstrumentName);
-        el.style.display = ready ? 'inline-flex' : 'none';
-      } catch (e) {
-        el.style.display = 'none';
-      }
     }
 
     function init() {
@@ -7176,7 +5086,6 @@
       updateMelodyAvailability();
       updateTuneMetaStrip();
 
-      gamification.init();
       setupUI();
       renderTips();
       setupKeyboardShortcuts();
@@ -7296,8 +5205,6 @@
   })();
   </script>
 
-  <!-- Toast container -->
-  <div class="toast-container" id="toastContainer"></div>
 
   <!-- Service Worker Registration -->
   <script>
