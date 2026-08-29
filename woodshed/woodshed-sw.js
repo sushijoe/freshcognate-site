@@ -1,4 +1,4 @@
-const CACHE_NAME = 'woodshed-v21-chart-verified';
+const CACHE_NAME = 'woodshed-v22-ui-cleanup';
 const ASSETS = [
   './index.html',
   './woodshed.css',

@@ -149,6 +149,28 @@ body {
 }
 
 /* Mode toggle */
+/* Mode + level share one band. Base (mobile): stack vertically, exactly as
+   the two bars did before they were wrapped. Desktop turns this into a row. */
+.tabs-band {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+/* "Lick level" segment label — hidden on mobile (context is clear when the
+   levels sit directly under the mode tabs), shown on desktop where it names
+   the right-hand segment and disambiguates it from the tune-difficulty badge. */
+.level-bar-label {
+  display: none;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+  align-self: center;
+}
+
 .mode-bar {
   display: flex;
   padding: 8px 16px;
@@ -1018,14 +1040,16 @@ body {
 .practice-row {
   display: flex;
   align-items: center;
-  gap: 14px;
+  flex-wrap: wrap;          /* a toggle drops to a second line intact rather
+                               than the label breaking mid-word on narrow screens */
+  gap: 8px 18px;
   margin-top: 8px;
   padding: 6px 4px;
   border-top: 1px solid rgba(255,255,255,0.06);
 }
 
 .practice-toggle {
-  flex: 1;
+  flex: 0 1 auto;           /* size to content; no forced equal thirds */
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1033,9 +1057,12 @@ body {
   font-weight: 600;
   color: var(--text-secondary);
   letter-spacing: 0.2px;
+  white-space: nowrap;      /* keep "Count-in" / "Favorites only" on one line */
   cursor: pointer;
   user-select: none;
 }
+/* The tempo-trainer toggle carries a dropdown, so let it take the slack */
+.practice-toggle:has(select) { flex: 1 1 auto; min-width: 150px; }
 
 .practice-toggle input[type="checkbox"] {
   width: 16px;
@@ -1443,27 +1470,42 @@ body {
     font-size: 11px;
   }
 
-  /* --- Mode + Level on ONE row ---
-     Desktop: float the level-bar up alongside the mode-bar using negative
-     margin, so they occupy the same visual band. Mode takes ~60% width,
-     level sits to its right. */
+  /* --- Mode + Level share ONE honest row ---
+     The .tabs-band wrapper becomes a flex row: mode tabs take the available
+     width on the left, the lick-level segment sits to their right. One border
+     under the whole band. No negative-margin overlay. */
+  .tabs-band {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 14px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--section-border);
+    padding: 5px 16px;
+  }
   .mode-bar {
-    padding: 4px 16px;
-    position: relative;
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    background: none;
+    border-bottom: none;
   }
   .mode-btn {
     padding: 6px 4px;
     font-size: 12px;
   }
-  /* Level bar: collapse into the right side of the mode bar row */
+  /* Lick-level segment: sizes to its content on the right, doesn't stretch */
   .level-bar {
-    padding: 4px 16px;
-    background: var(--bg-surface);
-    border-bottom: 1px solid var(--section-border);
+    flex: 0 0 auto;
+    align-items: center;
+    padding: 0;
+    background: none;
+    border-bottom: none;
     gap: 6px;
   }
+  .level-bar-label { display: inline-block; }
   .level-btn {
-    padding: 5px 10px;
+    flex: 0 0 auto;
+    padding: 5px 12px;
     font-size: 11px;
   }
 
@@ -1547,27 +1589,9 @@ body {
    combining hear-lick-row + slide-toggle-row into a single horizontal band
    via their existing flex alignment. */
 @media (min-width: 1100px) {
-  /* Merge mode-bar + level-bar into one visual row */
-  .level-bar {
-    margin-top: -47px;  /* pull level-bar up onto the mode-bar's row */
-    padding-left: 68%;   /* push level buttons to the right half */
-    padding-right: 16px;
-    border-bottom: none;
-    background: transparent;
-    pointer-events: none;
-  }
-  .level-bar .level-btn {
-    pointer-events: auto;
-    padding: 4px 8px;
-    font-size: 10px;
-  }
-  /* Give the mode-bar extra right padding so mode buttons don't run under
-     the overlaid level buttons */
-  .mode-bar {
-    padding-right: calc(32% + 16px);
-  }
-
-  /* Similarly: overlay slide toggle onto the hear-lick-row */
+  /* Mode + level already merge cleanly via the .tabs-band flex row at ≥900px
+     (no overlay needed). Here we only overlay the slide toggle onto the
+     hear-lick row to save one more band. */
   .slide-toggle-row {
     margin-top: -32px;
     padding-left: 16px;

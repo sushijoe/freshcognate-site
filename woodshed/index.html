@@ -59,25 +59,30 @@
     <button class="inst-btn" data-name="piano" title="Piano / Guitar / Flute">Keys</button>
   </div>
 
-  <!-- Mode toggle -->
-  <div class="mode-bar">
-    <button class="mode-btn" data-mode="melody">Melody</button>
-    <button class="mode-btn" data-mode="symbols">Symbols</button>
-    <button class="mode-btn active" data-mode="licks">Licks</button>
-    <button class="mode-btn" data-mode="tones">Tones</button>
-  </div>
+  <!-- Mode + level share one band. On desktop they sit side by side via
+       flex (mode tabs left, lick levels right); on mobile they stack. -->
+  <div class="tabs-band">
+    <!-- Mode toggle -->
+    <div class="mode-bar">
+      <button class="mode-btn" data-mode="melody">Melody</button>
+      <button class="mode-btn" data-mode="symbols">Symbols</button>
+      <button class="mode-btn active" data-mode="licks">Licks</button>
+      <button class="mode-btn" data-mode="tones">Tones</button>
+    </div>
 
-  <!-- Level selector (visible only in Guided Licks mode) -->
-  <div class="level-bar" id="levelBar" style="display:none">
-    <button class="level-btn active" data-level="beginner">
-      <i class="bi bi-1-circle"></i> Beginner
-    </button>
-    <button class="level-btn" data-level="intermediate">
-      <i class="bi bi-2-circle"></i> Intermediate
-    </button>
-    <button class="level-btn" data-level="advanced">
-      <i class="bi bi-3-circle"></i> Advanced
-    </button>
+    <!-- Level selector (visible only in Guided Licks mode) -->
+    <div class="level-bar" id="levelBar" style="display:none">
+      <span class="level-bar-label">Lick level</span>
+      <button class="level-btn active" data-level="beginner">
+        <i class="bi bi-1-circle"></i> Beginner
+      </button>
+      <button class="level-btn" data-level="intermediate">
+        <i class="bi bi-2-circle"></i> Intermediate
+      </button>
+      <button class="level-btn" data-level="advanced">
+        <i class="bi bi-3-circle"></i> Advanced
+      </button>
+    </div>
   </div>
 
   <!-- Hear Lick (visible in Guided Licks mode) -->
