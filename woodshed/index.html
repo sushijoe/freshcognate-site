@@ -19,32 +19,33 @@
     <div class="loading-sub">Loading notation engine...</div>
   </div>
 
-  <!-- Header -->
+  <!-- Header. The tune-metadata strip lives INSIDE the header: on desktop it
+       shares the header's row (wordmark · metadata · tune picker); on mobile
+       CSS `order` drops it to its own line under the wordmark + picker. -->
   <header class="app-header">
     <div class="app-title">THE WOODSHED</div>
     <select class="progression-select" id="progressionSelect">
       <!-- Options populated dynamically from PROGRESSIONS at init -->
     </select>
-  </header>
-
-  <!-- Persistent tune metadata strip — directly under the header.
-       Populated by updateTuneMetaStrip() on init and on tune change. -->
-  <div class="tune-strip" id="tuneStrip">
-    <button class="tune-fav-btn" id="tuneFavBtn" title="Favorite" aria-label="Favorite this tune">
-      <i class="bi bi-star" id="tuneFavIcon"></i>
-    </button>
-    <div class="tune-strip-meta">
-      <div class="tune-strip-composer" id="tuneStripComposer"></div>
-      <div class="tune-strip-badges">
-        <span class="tune-meta-badge difficulty" id="tuneStripDifficulty"></span>
-        <span class="tune-meta-badge" id="tuneStripForm"></span>
-        <span class="tune-meta-badge tempo-source" id="tuneStripTempo"></span>
+    <!-- Persistent tune metadata strip.
+         Populated by updateTuneMetaStrip() on init and on tune change. -->
+    <div class="tune-strip" id="tuneStrip">
+      <button class="tune-fav-btn" id="tuneFavBtn" title="Favorite" aria-label="Favorite this tune">
+        <i class="bi bi-star" id="tuneFavIcon"></i>
+      </button>
+      <div class="tune-strip-meta">
+        <div class="tune-strip-composer" id="tuneStripComposer"></div>
+        <div class="tune-strip-badges">
+          <span class="tune-meta-badge difficulty" id="tuneStripDifficulty"></span>
+          <span class="tune-meta-badge" id="tuneStripForm"></span>
+          <span class="tune-meta-badge tempo-source" id="tuneStripTempo"></span>
+        </div>
       </div>
+      <a class="tune-ref-btn" id="tuneRefBtn" target="_blank" rel="noopener" title="Listen to reference recording" style="display:none">
+        <i class="bi bi-play-circle"></i> Listen
+      </a>
     </div>
-    <a class="tune-ref-btn" id="tuneRefBtn" target="_blank" rel="noopener" title="Listen to reference recording" style="display:none">
-      <i class="bi bi-play-circle"></i> Listen
-    </a>
-  </div>
+  </header>
 
   <!-- Instrument Picker -->
   <div class="instrument-row" id="instrumentRow">
@@ -85,17 +86,22 @@
     </div>
   </div>
 
-  <!-- Hear Lick (visible in Guided Licks mode) -->
-  <div class="hear-lick-row" id="hearLickRow" style="display:none">
-    <button class="hear-lick-btn" id="hearLickBtn">
-      <i class="bi bi-headphones" id="hearLickIcon"></i> <span id="hearLickLabel">Hear Lick</span>
-    </button>
-  </div>
+  <!-- Hear Lick + Slide toggle share one band. On desktop they sit centered
+       on a single row via flex; on mobile they stack. Either child hides
+       independently (JS toggles their display by mode/instrument). -->
+  <div class="assist-row">
+    <!-- Hear Lick (visible in Guided Licks / Melody mode) -->
+    <div class="hear-lick-row" id="hearLickRow" style="display:none">
+      <button class="hear-lick-btn" id="hearLickBtn">
+        <i class="bi bi-headphones" id="hearLickIcon"></i> <span id="hearLickLabel">Hear Lick</span>
+      </button>
+    </div>
 
-  <!-- Slide position toggle (trombone only, licks mode only) -->
-  <div class="slide-toggle-row" id="slideToggleRow" style="display:none">
-    <button class="slide-toggle" id="slideToggle" aria-label="Show slide positions"></button>
-    <span>Slide positions</span>
+    <!-- Slide position toggle (trombone only, licks mode only) -->
+    <div class="slide-toggle-row" id="slideToggleRow" style="display:none">
+      <button class="slide-toggle" id="slideToggle" aria-label="Show slide positions"></button>
+      <span>Slide positions</span>
+    </div>
   </div>
 
   <!-- Notation -->

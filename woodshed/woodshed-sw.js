@@ -1,4 +1,4 @@
-const CACHE_NAME = 'woodshed-v22-ui-cleanup';
+const CACHE_NAME = 'woodshed-v23-ui-cleanup-2';
 const ASSETS = [
   './index.html',
   './woodshed.css',
