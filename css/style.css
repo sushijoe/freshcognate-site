@@ -6262,22 +6262,24 @@ table.shopping-cart-table tr td{
    Section spacing overrides
    ============================== */
 
-/* Reduces the top gap above the Services section from 140px to 80px.
-   Scoped to the ID so the shared .page-section rule (line ~2397) is
-   left untouched and all other sections keep their 140px spacing. */
+/* Gated to desktop so the existing small-screen values
+   (.mb-sm-70 on About, and any .page-section rules in
+   style-responsive.css) continue to apply unchanged. */
 
-#services.page-section,
-#services.small-section,
-#services > .page-section{
-    padding-top: 80px;
-}
+@media (min-width: 768px) {
 
-/* Reduces the bottom gap below the About section to 80px.
-   Note: .page-section sets bottom padding to 0, so this ADDS 80px
-   rather than trimming 140px. See notes if the gap grows. */
+    /* About: inner wrapper carries .mb-140 from
+       vertical-rhythm.min.css, which loads after this file.
+       The ID raises specificity so it wins on load order. */
+    #about .mb-140{
+        margin-bottom: 80px;
+    }
 
-#about.page-section,
-#about.small-section,
-#about > .page-section{
-    padding-bottom: 80px;
+    /* Services: 140px top padding inherited from the shared
+       .page-section rule (~line 2397). Scoped here so every
+       other section keeps its original 140px. */
+    #services.page-section{
+        padding-top: 80px;
+    }
+
 }
