@@ -6278,7 +6278,7 @@ table.shopping-cart-table tr td{
     /* Services: 140px top padding inherited from the shared
        .page-section rule (~line 2397). Scoped here so every
        other section keeps its original 140px. */
-    #services.page-section, #works.page-section {
+    #services.page-section, #works.page-section, #team.page-section {
         padding-top: 80px;
     }
 
