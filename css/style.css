@@ -6283,3 +6283,8 @@ table.shopping-cart-table tr td{
     }
 
 }
+
+#home .mb_YTPBar,
+#home .mb_YTPPlaypause {
+    display: none !important;
+}
