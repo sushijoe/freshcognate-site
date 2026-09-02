@@ -6262,29 +6262,75 @@ table.shopping-cart-table tr td{
    Section spacing overrides
    ============================== */
 
-/* Gated to desktop so the existing small-screen values
-   (.mb-sm-70 on About, and any .page-section rules in
-   style-responsive.css) continue to apply unchanged. */
-
 @media (min-width: 768px) {
 
-    /* About: inner wrapper carries .mb-140 from
-       vertical-rhythm.min.css, which loads after this file.
-       The ID raises specificity so it wins on load order. */
-    #about, #works .mb-140{
+    #about .mb-140{
         margin-bottom: 80px;
     }
 
-    /* Services: 140px top padding inherited from the shared
-       .page-section rule (~line 2397). Scoped here so every
-       other section keeps its original 140px. */
-    #services.page-section, #works.page-section, #team.page-section {
+    #services.page-section{
         padding-top: 80px;
     }
 
 }
 
-#home .mb_YTPBar,
-#home .mb_YTPPlaypause {
-    display: none !important;
+
+/* ==============================
+   Hero video link (bottom right)
+   ============================== */
+
+/* Anchored to #home (position:relative, ~line 1061) rather than
+   .container, so it sits at the corner of the video itself.
+   Requires the .hero-video-link wrapper to be a direct child
+   of <section id="home">. */
+
+#home .hero-video-link{
+    position: absolute;
+    right: 30px;
+    bottom: 30px;
+    z-index: 3;
+    margin: 0;
+    pointer-events: auto;
+}
+
+/* Scoped to #home so .big-icon keeps its 90px size on the
+   six work subpages and anywhere else the theme uses it. */
+
+#home .hero-video-link .big-icon{
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    border-width: 2px;
+    line-height: 40px;
+    font-size: 16px;
+}
+
+/* The theme nudges the play triangle 4px right to optically
+   centre it (~line 602). Scaled down to match the new size. */
+
+#home .hero-video-link .big-icon .fa-play{
+    left: 2px;
+}
+
+@media (max-width: 767px) {
+    #home .hero-video-link{
+        right: 16px;
+        bottom: 16px;
+    }
+}
+
+/* ==============================
+   Hero click-through
+   ============================== */
+
+/* The headline, its container, and the tint layer all sit above
+   the video and swallow clicks meant for the player's own
+   pause control. Making them click-through lets those clicks
+   reach the video. Scoped to #home so .container behaves
+   normally everywhere else. */
+
+#home .container,
+#home .home-content,
+#home .YTPOverlay{
+    pointer-events: none;
 }
