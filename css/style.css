@@ -6256,3 +6256,28 @@ table.shopping-cart-table tr td{
 }
 
 
+
+
+/* ==============================
+   Section spacing overrides
+   ============================== */
+
+/* Reduces the top gap above the Services section from 140px to 80px.
+   Scoped to the ID so the shared .page-section rule (line ~2397) is
+   left untouched and all other sections keep their 140px spacing. */
+
+#services.page-section,
+#services.small-section,
+#services > .page-section{
+    padding-top: 80px;
+}
+
+/* Reduces the bottom gap below the About section to 80px.
+   Note: .page-section sets bottom padding to 0, so this ADDS 80px
+   rather than trimming 140px. See notes if the gap grows. */
+
+#about.page-section,
+#about.small-section,
+#about > .page-section{
+    padding-bottom: 80px;
+}
