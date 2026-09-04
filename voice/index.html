@@ -3347,6 +3347,35 @@
       return names[newSemi] + '/' + newOct;
     }
 
+    // Absolute semitone number for a VexFlow key like "Bb/3" (octave*12 + pc).
+    function vexKeyToAbs(vexKey) {
+      const [noteName, octStr] = vexKey.split('/');
+      let s = NOTE_TO_SEMI[noteName[0]];
+      const acc = noteName.substring(1);
+      if (acc === 'b') s--; else if (acc === '#') s++; else if (acc === 'bb') s -= 2;
+      return parseInt(octStr) * 12 + s;
+    }
+
+    // Shift a VexFlow key up/down by whole octaves (semis must be a multiple of 12).
+    function shiftVexOctave(vexKey, semis) {
+      if (!semis) return vexKey;
+      const [noteName, octStr] = vexKey.split('/');
+      return noteName + '/' + (parseInt(octStr) + semis / 12);
+    }
+
+    // Licks and chord-tone stacks are authored in ONE generic (bass-ish)
+    // register, so on other instruments they can land many ledger lines off
+    // the staff (e.g. clarinet 8 lines below). Return the whole-octave shift
+    // that centers a set of absolute pitches on the current instrument's
+    // staff middle (bass D3 / treble B4), keeping the phrase's shape intact.
+    // Melody parts are NOT normalized — their octaves come from real charts.
+    function octaveShiftForClef(absPitches) {
+      if (!absPitches.length) return 0;
+      const center = currentInstrument.clef === 'bass' ? 38 : 59; // D3 / B4
+      const mean = absPitches.reduce((a, b) => a + b, 0) / absPitches.length;
+      return Math.round((center - mean) / 12) * 12;
+    }
+
     function transposeChordName(chordName) {
       const semi = currentInstrument.semitones;
       if (semi === 0) return chordName;
@@ -3783,18 +3812,29 @@
       // Same lick for same chord type per chorus (reinforces learning)
       const lick = licks[(chorusCount - 1) % licks.length];
       const isTrombone = currentInstrumentName === 'trombone' && showSlidePositions;
-      return lick.notes.map(n => {
+
+      // Transpose the whole lick first, then compute ONE whole-octave shift
+      // that centers it on this instrument's staff — otherwise licks authored
+      // in the bass register fall many ledger lines off on other clefs.
+      const transposedLick = lick.notes.map(n =>
+        n.duration.endsWith('r') ? null : n.keys.map(k => transposeVexKey(k)));
+      const octShift = octaveShiftForClef(
+        transposedLick.filter(Boolean).flat().map(vexKeyToAbs));
+
+      return lick.notes.map((n, idx) => {
         const isRest = n.duration.endsWith('r');
         if (isRest) {
           return new VF.StaveNote({ clef, keys: [restKey], duration: n.duration });
         }
-        const transposedKeys = n.keys.map(k => transposeVexKey(k));
+        const transposedKeys = transposedLick[idx].map(k => shiftVexOctave(k, octShift));
         const note = new VF.StaveNote({ clef, keys: transposedKeys, duration: n.duration });
         addAccidentals(note, transposedKeys);
 
-        // Slide position annotation (trombone only)
-        if (isTrombone && n.keys.length > 0) {
-          const pos = SLIDE_POSITIONS[n.keys[0]];
+        // Slide position annotation (trombone only). Look up by the DISPLAYED
+        // key (trombone is concert pitch, so transposedKeys[0] is the concert
+        // note at the shifted octave) so positions match what's on the staff.
+        if (isTrombone && transposedKeys.length > 0) {
+          const pos = SLIDE_POSITIONS[transposedKeys[0]];
           if (pos !== undefined) {
             const ann = new VF.Annotation(String(pos))
               .setFont('Arial', 11, 'bold')
@@ -3894,9 +3934,13 @@
       const durationMap = { 1: '8', 2: '4', 3: '4d', 4: '2', 6: '2d', 8: 'w' };
 
       const clef = currentInstrument.clef;
+      // Center the chord-tone stack on this instrument's staff (same reason as
+      // licks — the CHORD_TONES table is authored in one generic register).
+      const octShift = octaveShiftForClef(
+        selected.map(n => vexKeyToAbs(transposeVexKey(n.key))));
       return selected.map((n, i) => {
         const dur = durationMap[durations[i]] || '8';
-        const transKey = transposeVexKey(n.key);
+        const transKey = shiftVexOctave(transposeVexKey(n.key), octShift);
         const note = new VF.StaveNote({ clef, keys: [transKey], duration: dur });
         // Color: orange for chord tones, purple for scale tones. Must be
         // resolved colors (not CSS vars) because SVG fill attributes don't

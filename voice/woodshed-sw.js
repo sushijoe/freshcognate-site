@@ -1,4 +1,4 @@
-const CACHE_NAME = 'findyourvoice-v1';
+const CACHE_NAME = 'findyourvoice-v2';
 const ASSETS = [
   './index.html',
   './woodshed.css',
