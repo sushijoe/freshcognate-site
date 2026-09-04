@@ -1,7 +1,7 @@
 {
-  "name": "The Woodshed — Brass Improvisation Trainer",
-  "short_name": "The Woodshed",
-  "description": "Learn jazz improvisation over chord progressions",
+  "name": "Find Your Voice — Brass Improvisation Trainer",
+  "short_name": "Find Your Voice",
+  "description": "Find your voice as an improviser — practice licks and changes over real brass-band tunes",
   "start_url": "./",
   "display": "standalone",
   "orientation": "portrait",

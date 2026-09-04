@@ -12,5 +12,5 @@
     <line x1="-140" y1="28" x2="140" y2="28" stroke="#9898b0" stroke-width="3" opacity="0.4"/>
     <line x1="-140" y1="55" x2="140" y2="55" stroke="#9898b0" stroke-width="3" opacity="0.4"/>
   </g>
-  <text x="256" y="445" text-anchor="middle" fill="#e84a27" font-family="system-ui,sans-serif" font-size="48" font-weight="700" letter-spacing="4">WOODSHED</text>
+  <text x="256" y="445" text-anchor="middle" fill="#e84a27" font-family="system-ui,sans-serif" font-size="60" font-weight="700" letter-spacing="6">VOICE</text>
 </svg>

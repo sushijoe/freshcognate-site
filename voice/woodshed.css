@@ -298,7 +298,7 @@ body {
 
 #notation {
   width: 100%;
-  max-width: 1024px; /* >800px of width becomes zoom — see notationScale */
+  max-width: 1080px; /* >800px of width becomes zoom — see notationScale */
   position: relative;
   overflow: visible;
 }
@@ -317,7 +317,7 @@ body {
 #notation svg .vf-stave > path,
 #notation svg .vf-stave > line,
 #notation svg .vf-stave > rect {
-  stroke: rgba(255,255,255,0.45) !important;
+  stroke: rgba(255,255,255,0.55) !important;
   stroke-width: 1px !important;
   fill: none !important;
 }
@@ -340,7 +340,7 @@ body {
   fill: #ffffff !important;
   stroke: #ffffff !important;
 }
-/* Notes, stems, flags, accidentals — default white for dark-mode contrast.
+/* Noteheads + accidentals — default white for dark-mode contrast.
    Scoped to .vf-stavenote:not([fill]) so when VexFlow's setStyle() sets a
    fill attribute on the group (Tones mode coloring chord vs. scale tones),
    the child paths inherit the group's fill instead of being overridden white. */
@@ -349,7 +349,15 @@ body {
   fill: #ffffff;
   stroke: #ffffff;
 }
-/* Beam paths (which live outside stavenote groups) always default white. */
+/* Stems, flags, and beams render in their OWN groups (.vf-stem / .vf-flag /
+   .vf-beam) as SIBLINGS of .vf-stavenote — not children — so the notehead
+   rule above never reaches them and they'd keep VexFlow's default black
+   (invisible on the dark staff). This is why stemmed notes (8ths/16ths in
+   intermediate & advanced licks, half notes, melody lines) looked like
+   floating white noteheads. Color them white here too. */
+#notation svg .vf-stem path,
+#notation svg .vf-stem line,
+#notation svg .vf-flag path,
 #notation svg .vf-beam path {
   fill: #ffffff;
   stroke: #ffffff;

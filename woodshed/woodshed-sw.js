@@ -1,35 +1,23 @@
-const CACHE_NAME = 'woodshed-v23-ui-cleanup-2';
-const ASSETS = [
-  './index.html',
-  './woodshed.css',
-  './woodshed-tunes-core.js',
-  './woodshed-manifest.json',
-  './woodshed-icon-192.svg',
-  './woodshed-icon-512.svg',
-  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
-  'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css',
-  'https://unpkg.com/vexflow@4.2.5/build/cjs/vexflow.js',
-  'https://cdn.jsdelivr.net/npm/tone@15.0.4/build/Tone.min.js'
-];
-
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
-  );
-  self.skipWaiting();
-});
+// The Woodshed moved to /voice/ (renamed "Find Your Voice").
+// This service worker REPLACES the old caching one at this URL. It self-
+// destructs: clears the old Woodshed caches, unregisters itself, and reloads
+// any open client so the next navigation hits the network and lands on the
+// redirect page (index.html) → /voice/. This releases anyone who installed
+// the old PWA from its cache-first grip. Only woodshed-* caches are touched,
+// so the new Find Your Voice app's cache (findyourvoice-v1) is left intact.
+self.addEventListener('install', () => self.skipWaiting());
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
-  );
-  self.clients.claim();
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k.includes('woodshed')).map(k => caches.delete(k)));
+    try { await self.registration.unregister(); } catch (e) {}
+    const clients = await self.clients.matchAll({ type: 'window' });
+    clients.forEach(c => { try { c.navigate(c.url); } catch (e) {} });
+  })());
 });
 
+// Never serve from cache — always pass through so the redirect page loads.
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
-  );
+  event.respondWith(fetch(event.request).catch(() => new Response('', { status: 504 })));
 });
