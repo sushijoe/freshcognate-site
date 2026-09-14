@@ -22,6 +22,136 @@
         <link rel="stylesheet" href="css/splitting.css">
         <link rel="stylesheet" href="css/YTPlayer.css">
 
+        <!-- Sandpiper Banner -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@700&display=swap">
+        <style>
+            #sandpiper-banner .sandpiper-banner-row{
+                display:flex;
+                flex-direction:column;
+                align-items:center;
+                gap:48px;
+            }
+            @media (min-width:992px){
+                #sandpiper-banner .sandpiper-banner-row{
+                    flex-direction:row;
+                    align-items:center;
+                    gap:64px;
+                }
+                #sandpiper-banner .sandpiper-banner-text{
+                    flex:0 0 40%;
+                    max-width:40%;
+                }
+                #sandpiper-banner .sandpiper-banner-media{
+                    flex:0 0 60%;
+                    max-width:60%;
+                }
+            }
+            #sandpiper-banner .sandpiper-badge{
+                display:inline-flex;
+                align-items:center;
+                gap:6px;
+                border-radius:999px;
+                border:1px solid rgba(166,75,42,0.12);
+                background:#e8f4f7;
+                color:#367181;
+                padding:6px 16px;
+                font-size:0.78rem;
+                font-weight:700;
+                letter-spacing:0.03em;
+                text-transform:uppercase;
+                margin-bottom:24px;
+            }
+            #sandpiper-banner .sandpiper-badge svg{
+                width:14px;
+                height:14px;
+                flex-shrink:0;
+            }
+            #sandpiper-banner .sandpiper-heading{
+                font-family:'Josefin Sans', sans-serif;
+                font-weight:700;
+                font-size:clamp(2.2rem, 4vw, 3.2rem);
+                line-height:1.1;
+                letter-spacing:-0.02em;
+                color:#2C241B;
+                margin-bottom:20px;
+            }
+            #sandpiper-banner .sandpiper-heading-accent{
+                background:linear-gradient(135deg, #B31B1B, #D8654F);
+                -webkit-background-clip:text;
+                background-clip:text;
+                -webkit-text-fill-color:transparent;
+            }
+            #sandpiper-banner .sandpiper-descr{
+                max-width:480px;
+                font-size:1.1rem;
+                line-height:1.75;
+                color:#5D534A;
+                margin-bottom:24px;
+            }
+            #sandpiper-banner .sandpiper-stat{
+                display:inline-flex;
+                align-items:center;
+                gap:10px;
+                border:1.5px solid #367181;
+                border-radius:999px;
+                background:rgba(54,113,129,0.08);
+                padding:8px 20px 8px 10px;
+                margin-bottom:20px;
+            }
+            #sandpiper-banner .sandpiper-stat-pill{
+                display:inline-flex;
+                align-items:center;
+                justify-content:center;
+                border-radius:999px;
+                background:#367181;
+                color:#fff;
+                font-weight:800;
+                font-size:1.05rem;
+                padding:6px 10px;
+                line-height:1;
+            }
+            #sandpiper-banner .sandpiper-stat-label{
+                font-size:0.9rem;
+                font-weight:600;
+                color:#2C241B;
+            }
+            #sandpiper-banner .sandpiper-partner{
+                font-size:0.95rem;
+                color:#5D534A;
+                margin-bottom:28px;
+            }
+            #sandpiper-banner .sandpiper-btn{
+                display:block;
+                width:fit-content;
+                margin:0 auto;
+                background:#A64B2A;
+                color:#fff;
+                font-weight:600;
+                padding:12px 28px;
+                border-radius:10px;
+                text-decoration:none;
+                transition:all .2s ease;
+            }
+            #sandpiper-banner .sandpiper-btn:hover{
+                background:#8B3D21;
+                color:#fff;
+                transform:translateY(-2px);
+                box-shadow:0 8px 20px rgba(0,0,0,0.15);
+            }
+            #sandpiper-banner .sandpiper-banner-media{
+                width:100%;
+            }
+            #sandpiper-banner .sandpiper-video{
+                width:100%;
+                height:auto;
+                display:block;
+                border-radius:12px;
+                box-shadow:0 8px 32px rgba(0,0,0,0.12);
+            }
+        </style>
+
     </head>
     <body class="appear-animate">
 
@@ -238,6 +368,52 @@
                     </div>
                 </section>
                 <!-- End Services Section -->
+
+
+                <!-- Divider -->
+                <hr class="mt-0 mb-0" />
+                <!-- End Divider -->
+
+
+                <!-- Sandpiper Banner Section -->
+                <section class="page-section" id="sandpiper-banner" style="background-color:#fff;">
+                    <div class="container relative">
+                        <div class="row justify-content-center">
+                        <div class="col-12 col-lg-11 col-xl-10">
+                        <div class="sandpiper-banner-row">
+
+                            <div class="sandpiper-banner-text">
+                                <div class="sandpiper-badge">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path><path d="M22 10v6"></path><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path></svg>
+                                    A National Tutoring Observatory Project
+                                </div>
+
+                                <h2 class="sandpiper-heading">The Future of Discourse <span class="sandpiper-heading-accent">Annotation</span></h2>
+
+                                <p class="sandpiper-descr">Sandpiper orchestrates multiple LLMs to produce reliable, highly accurate annotations at scale. Starting with tutoring transcripts, built for any field.</p>
+
+                                <div class="sandpiper-stat">
+                                    <span class="sandpiper-stat-pill">130%</span>
+                                    <span class="sandpiper-stat-label">better performance than an AI chat interface</span>
+                                </div>
+
+                                <p class="sandpiper-partner">In partnership with the National Tutoring Observatory</p>
+
+                                <a href="https://sandpiperresearch.org/" target="_blank" rel="noopener" class="sandpiper-btn">Visit Sandpiper</a>
+                            </div>
+
+                            <div class="sandpiper-banner-media">
+                                <video autoplay loop muted playsinline class="sandpiper-video">
+                                    <source src="video/sandpiper-banner.mp4" type="video/mp4">
+                                </video>
+                            </div>
+
+                        </div>
+                        </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- End Sandpiper Banner Section -->
 
 
                 <!-- Portfolio Section -->
