@@ -21,6 +21,45 @@
         <link rel="stylesheet" href="css/animate.min.css">
         <link rel="stylesheet" href="css/splitting.css">
 
+        <!-- Values in Teaching: stacked gallery images -->
+        <style>
+            .vit-stack{
+                position:relative;
+                width:100%;
+                max-width:780px;
+                height:520px;
+                margin:0 auto;
+            }
+            .vit-stack img{
+                position:absolute;
+                top:50%;
+                max-width:74%;
+                max-height:86%;
+                width:auto;
+                height:auto;
+                border-radius:10px;
+                border:1px solid rgba(0,0,0,0.08);
+                background:#fff;
+            }
+            .vit-stack .vit-behind{
+                left:0;
+                z-index:1;
+                transform:translateY(-58%) rotate(-3deg);
+                box-shadow:0 10px 24px rgba(0,0,0,0.15);
+            }
+            .vit-stack .vit-front{
+                left:28%;
+                z-index:2;
+                transform:translateY(-42%) rotate(2deg);
+                box-shadow:0 16px 32px rgba(0,0,0,0.22);
+            }
+            @media (max-width:767px){
+                .vit-stack{
+                    height:380px;
+                }
+            }
+        </style>
+
     </head>
     <body class="appear-animate">
 
@@ -126,36 +165,32 @@
                     <div class="work-full-media mb-80 mb-xs-40 wow fadeInUpShort">
                         <ul class="clearlist work-full-slider owl-carousel dark-content" style="padding-bottom: 30px;">
                             <li>
-                                <img src="images/part-1-description.png" alt="" /><br><br>
-                                <figcaption><p style="color:black;"></p></figcaption>
+                                <div class="vit-stack">
+                                    <img class="vit-behind" src="images/VIT1-example.png" alt="Part 1 - Reflect example activity" />
+                                    <img class="vit-front" src="images/VIT1.png" alt="Part 1 - Reflect: Defining My Values" />
+                                </div>
+                                <figcaption><p style="color:black;">Part 1: Reflect section offers tools to help you clarify your professional values and classroom-ready resources to help students identify their own values as well. Together, these activities can strengthen your sense of purpose and build your confidence.</p></figcaption>
                             </li>
                             <li>
-                                <img src="images/part-1-example.png" alt="" /><br><br>
-                                <figcaption><p style="color:black;"></p></figcaption>
+                                <div class="vit-stack">
+                                    <img class="vit-behind" src="images/VIT2-example.png" alt="Part 2 - Learn example activity" />
+                                    <img class="vit-front" src="images/VIT2.png" alt="Part 2 - Learn: Navigating Risk and Context" />
+                                </div>
+                                <figcaption><p style="color:black;">In the Part 2: Learn section, you'll find resources for tracking and understanding the policies at play in your location, current professional recommendations for teacher rights, responsibilities, and political speech, and reflection activities for understanding your political context and determining your personal risk preferences.</p></figcaption>
                             </li>
                             <li>
-                                <img src="images/part-2-description.png" alt="" /><br><br>
-                                <figcaption><p style="color:black;"></p></figcaption>
+                                <div class="vit-stack">
+                                    <img class="vit-behind" src="images/VIT3-example.png" alt="Part 3 - Practice example activity" />
+                                    <img class="vit-front" src="images/VIT3.png" alt="Part 3 - Practice: Handling Difficult Conversations" />
+                                </div>
+                                <figcaption><p style="color:black;">In the Part 3: Practice section, you'll find reflection activities, practice exercises, and example language for teachers preparing to engage in challenging conversations with other stakeholders, like families, colleagues, and school and community leaders.</p></figcaption>
                             </li>
                             <li>
-                                <img src="images/part-2-example.png" alt="" /><br><br>
-                                <figcaption><p style="color:black;"></p></figcaption>
-                            </li>
-                            <li>
-                                <img src="images/part-3-description.png" alt="" /><br><br>
-                                <figcaption><p style="color:black;"></p></figcaption>
-                            </li>
-                            <li>
-                                <img src="images/part-3-example.png" alt="" /><br><br>
-                                <figcaption><p style="color:black;"></p></figcaption>
-                            </li>
-                            <li>
-                                <img src="images/part-4-description.png" alt="" /><br><br>
-                                <figcaption><p style="color:black;"></p></figcaption>
-                            </li>
-                            <li>
-                                <img src="images/part-4-example.png" alt="" /><br><br>
-                                <figcaption><p style="color:black;"></p></figcaption>
+                                <div class="vit-stack">
+                                    <img class="vit-behind" src="images/VIT4-example.png" alt="Part 4 - Teach example activity" />
+                                    <img class="vit-front" src="images/VIT4.png" alt="Part 4 - Teach: Student-Facing Resources" />
+                                </div>
+                                <figcaption><p style="color:black;">Part 4: Teach section offers practical support for teachers engaging in challenging conversations with students, whether that means preparing in advance for controversial topics that will arise in your curriculum, supporting students in discussing current events, or developing a repertoire of ways to respond to heated moments when they occur.</p></figcaption>
                             </li>
                         </ul>
                     </div>
